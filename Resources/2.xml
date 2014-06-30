@@ -1,0 +1,21 @@
+<map finishHookId="6">
+<Hooks length="6">
+<hook x="-200" y="200" id="1"></hook>
+<hook x="-75" y="200" id="2"></hook>
+<hook x="10" y="200" id="3"></hook>
+<hook x="20" y="-300" id="4"></hook>
+<hook x="-75" y="-300" id="5"></hook>
+<hook x="-200" y="-300" id="6"></hook>
+</Hooks>
+<Walls length="1">
+<wall x="550" y="-200" width="20" height="400" id="1"></wall>
+</Walls>
+<SpikeWalls length="5">
+<spikewall x="-750" y="-750" width="600" height="601" id="1"></spikewall>
+<spikewall x="750" y="-750" width="600" height="601" id="2"></spikewall>
+<spikewall x="-750" y="750" width="600" height="601" id="3"></spikewall>
+<spikewall x="750" y="750" width="600" height="601" id="4"></spikewall>
+<spikewall x="-750" y="10" width="400" height="10" id="5"></spikewall>
+</SpikeWalls>
+<spawner x="-400" y="400" xVelocity="100" yVelocity="120" id="1"></spawner>
+</map>

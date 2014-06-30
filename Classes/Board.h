@@ -1,0 +1,61 @@
+//
+//  Board.h
+//  Snag
+//
+//  Created by Zachary Prinzbach on 6/28/14.
+//
+//
+
+#ifndef __Snag__Board__
+#define __Snag__Board__
+
+#include <iostream>
+#include "cocos2d.h"
+#include <vector>
+#include "User.h"
+#include "Entity.h"
+#include "Hook.h"
+#include "Wall.h"
+#include "SpikeWall.h"
+
+USING_NS_CC;
+
+class Board{
+public:
+    Board(Layer* game, Size size, Point origin);
+    void AddEntity(Entity*);
+    static Board* Instance;
+    void AddHook(Hook*);
+    void AddWall(Wall*);
+    void AddSpikeWall(SpikeWall*);
+    void AddJoint(PhysicsJoint*);
+    void RemoveJoint();
+    Hook* GetClosestHook(Vec2 pos);
+    void onTouchBegin();//Touch* touch, Event* event);
+    void onTouchEnd();//Touch* touch, Event* event);
+    void update(float dt);
+    Point center;
+    Vec2 gravity;
+    Point TryMove(Point, Rect);
+    Layer* game;
+    Size visibleSize;
+    static void PrintVec2(std::string name, Vec2);
+private:
+    bool CheckSpikeWallCollision(Rect);
+    void LoadLevel(char* name);
+    Sprite* background;
+    void updateView(float dt);
+    void updateCollision(float dt);
+    Size boardSize;
+    User* user;
+    PhysicsWorld* world;
+    Point origin;
+    float scale;
+    std::vector<Hook*> hooks;
+    std::vector<Wall*> walls;
+    std::vector<SpikeWall*> spikewalls;
+    float ground;
+    std::vector<Entity*> ents;
+};
+
+#endif /* defined(__Snag__Board__) */

@@ -1,0 +1,130 @@
+//
+//  User.cpp
+//  Snag
+//
+//  Created by Zachary Prinzbach on 6/28/14.
+//
+//
+
+#include "User.h"
+#include "Board.h"
+
+#define FALL_SPEED 400.0
+
+User::User() : Entity("user.png"){
+    SetPosition(Vec2(150,150));
+    velocity.x = 800;
+    velocity.y = 250;
+    SetBaseScale(Vec2(0.5,0.5));
+    isHooked = false;
+    boardScale = 1.0f;
+    userPosition = Vec2(150,150);
+}
+
+void User::update(float dt){
+    updatePhysics(dt);
+    if(abs(velocity.x) < 0.1 && abs(velocity.y) < 25 || position.y < -200)
+        Reset();
+    userPosition = position;
+    Board::PrintVec2("UserPosition", GetBounds().origin);
+    Entity::update(dt);
+}
+
+void User::updatePhysics(float dt){
+    if(!isHooked){
+        acceleration.x += FALL_SPEED * Board::Instance->gravity.x * dt;
+        acceleration.y += FALL_SPEED * Board::Instance->gravity.y * dt;
+        velocity.x += acceleration.x * dt;
+        velocity.y += acceleration.y * dt;
+        Vec2 tempPos;
+        tempPos.x = position.x + velocity.x * dt;
+        tempPos.y = position.y + velocity.y * dt;
+        SetPosition(tempPos);
+    } else {
+        hookArmAngle = fmod(hookArmAngle, 360);
+        float angularAccelerationFromGravity = cos(hookArmAngle / 57.29) * (Board::Instance->gravity.y * FALL_SPEED);
+        angularVelocity -= (angularAccelerationFromGravity * dt);
+        hookArmAngle += angularVelocity * dt;
+        SetPositionToArmAngle();
+    }
+}
+
+void User::Snag(){
+    Hook* closest = Board::Instance->GetClosestHook(position);
+    Vec2 closestPos = closest->GetPosition();
+    hookArmDistance = closest->GetPosition().distance(position);
+    std::cout << "Distance: " << std::to_string(hookArmDistance);
+    hookArmAngle = atan((closestPos.y - position.y)/(position.x - closestPos.x)) * 57.29;
+    closestPosition = closest->GetPosition();
+    if(position.x - closestPos.x > 0) hookArmAngle += 360;
+    else hookArmAngle += 180;
+    
+    if(hookArmDistance < 500 && hookArmDistance > 10){
+        std::cout << " Angle: " << std::to_string(hookArmAngle);
+        FindAngularVelocity();
+        isHooked = true;
+    }
+}
+
+void User::FindAngularVelocity(){
+    Vec2 tempVelocity((0.5*sin(hookArmAngle / 57.29) + 0.5) * velocity.x, (0.5 * cos(hookArmAngle / 57.29) + 0.5) * velocity.y);
+    float tempTotal = sqrt(pow(tempVelocity.x,2) + pow(tempVelocity.y, 2));
+    angularVelocity = (tempTotal / hookArmDistance) * (tempVelocity.x / abs(tempVelocity.x));
+    velocity = tempVelocity;
+}
+
+void User::SetPositionToArmAngle(){
+    float tempX = (cos(hookArmAngle / 57.29) * hookArmDistance) + closestPosition.x;
+    float tempY = (-1 * (sin(hookArmAngle / 57.29) * hookArmDistance)) + closestPosition.y;
+    SetPosition(Vec2(tempX,tempY));
+}
+
+void User::Release(){
+    if(isHooked == true){
+        isHooked = false;
+        float totalVelocity = abs(hookArmDistance * angularVelocity) / 50;
+        int sign = 0;
+        if(angularVelocity > 0)
+            sign = 1;
+        if(angularVelocity == 0)
+            sign = 0;
+        if(angularVelocity < 0)
+            sign = -1;
+        float releaseAngle = hookArmAngle + (sign * 90);
+        velocity.x = cos(releaseAngle / 57.29) * totalVelocity;
+        velocity.y = -1 * sin(releaseAngle / 57.29) * totalVelocity;
+        velocity *= 1.15;
+    }
+}
+
+void User::collide(Vec2 side){
+    if(isHooked)
+        Release();
+    else{
+        if(side.x !=0){
+            velocity.x *= -0.9;
+            velocity.y *= 0.9;
+        }
+        if(side.y !=0){
+            velocity.y *= -0.9;
+            velocity.x *= 0.9;
+        }
+    }
+}
+
+void User::Reset(){
+    position.set(150,150);
+    acceleration.x = 0;
+    acceleration.y = 0;
+    velocity.x = 800;
+    velocity.y = 400;
+}
+
+void User::CalculateScale(){
+    float distanceToGround = 0 - position.y; // board.ground;
+    float newDistanceToGround = distanceToGround / boardScale;
+    sprite->setPosition((Board::Instance->visibleSize.width / 2.0), position.y);//0 -newDistanceToGround);
+    std::cout << "UserPosition.x: " << std::to_string(sprite->getPosition().x) << " UserPosition.y: " << std::to_string(sprite->getPosition().y) << std::endl;
+    //Why is this scale here?
+    //sprite->setScale(scale.x * (1/boardScale),scale.y * (1/boardScale));
+}
