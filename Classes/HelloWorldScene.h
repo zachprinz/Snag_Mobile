@@ -23,6 +23,7 @@ public:
     
     bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
     void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
+    void onContactPostSolve(PhysicsContact& contact);
     bool onContactBegin(PhysicsContact& contact);
     
     virtual void update(float dt);

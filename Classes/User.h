@@ -26,8 +26,12 @@ public:
     void Reset();
     void SetUpPhysicsSprite(char*);
     static int type;
-    void Bounce(PhysicsContactData data);
+    void Bounce(const PhysicsContactData* data);
+    void SetBackupVelocity(Vec2);
+    Point GetPhysicsPosition();
+    void UpdateBounce();
 private:
+    Vec2 backupVelocity;
     void CalculateScale();
     PhysicsJointDistance* joint;
     Hook* hook;

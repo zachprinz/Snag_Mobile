@@ -41,19 +41,31 @@ Board::Board(Layer* game, PhysicsWorld* world, Size size, Point origin){
 
 void Board::SetPhysicsWorld(PhysicsWorld* world){
     this->world = world;
+    this->world->setGravity(Vec2(0,-300));
+}
+
+void Board::onContactPostSolve(PhysicsContact& contact){
+    int type = contact.getShapeA()->getBody()->getTag();
+    int type2 = contact.getShapeB()->getBody()->getTag();
+    Print( "Type: " + std::to_string(type) + " Type2: " + std::to_string(type2));
+
+    //if(type == user->type)
+        type = type2;
+    if(type == Wall::type){
+        Print("Contact with Wall");
+        user->Bounce(contact.getContactData());
+    }
+    if(type == SpikeWall::type){
+        Print("Contact with SpikeWall");
+        user->Reset();
+    }
+    if(type == 3){
+        Print("Contact with hook, Ignore");
+    }
 }
 
 void Board::onContactBegin(PhysicsContact& contact){
-    int type = contact.getShapeA()->getBody()->getTag();
-    int type2 = contact.getShapeB()->getBody()->getTag();
-    if(type == user->type)
-        type = type2;
-    if(type == Wall::type){
-        user->Bounce(*contact.getContactData());
-    }
-    if(type == SpikeWall::type){
-        user->Reset();
-    }
+    user->SetBackupVelocity(user->body->getVelocity());
 }
 
 void Board::update(float dt){
@@ -61,16 +73,14 @@ void Board::update(float dt){
 }
 
 void Board::updateView(float dt){
-    for(int x = 0; x < ents.size(); x++){
-        ents[x]->update(dt);
-    }
-    float dist = (user->GetPosition().y + (user->GetSprite()->getTexture()->getPixelsHigh() * 0.5 * scale) - 0);
+    float dist = (user->GetPhysicsPosition().y + (user->GetSprite()->getTexture()->getPixelsHigh() * 0.5 * scale) - 0);
     if(dist < visibleSize.height)
         dist = visibleSize.height;
     scale = 1.0 / ((visibleSize.height - visibleSize.height * 0.15) / dist);
     Entity::boardScale = scale;
-    std::cout << "Scale: " << std::to_string(scale) << std::endl;
     center.set(user->GetPosition().x, (boardSize.height / 2.0) / scale);
+    user->UpdateSprite();
+    user->update(dt);
     for(int x = 0; x < ents.size(); x++){
         ents[x]->UpdateSprite();
     }
@@ -137,6 +147,11 @@ Hook* Board::GetClosestHook(Point pos){
 void Board::PrintVec2(std::string name, Vec2 vec){
     //std::cout << name + ".x: " << std::to_string(vec.x) << " " + name + ".y: " << std::to_string(vec.y) << std::endl;
 }
+
+void Board::Print(std::string message){
+    std::cout << message << std::endl;
+}
+
 void Board::LoadLevel(char* name){
     tinyxml2::XMLDocument doc;
     doc.LoadFile(FileUtils::getInstance()->fullPathForFilename("level.xml").c_str());

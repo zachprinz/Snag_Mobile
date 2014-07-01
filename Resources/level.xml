@@ -13,7 +13,7 @@
 		<spikewall x="750" y="250" width="250" height="250" id="1"></spikewall>
 	</SpikeWalls>
     <Spawners>
-        <spawner x="150" y="150" xVelocity="50" yVelocity="300" id="1"></spawner>
+        <spawner x="150" y="150" xVelocity="100" yVelocity="600" id="1"></spawner>
     </Spawners>
 	<GroundCollisions length="3">
 		<groundcollision x="-4000" y="550"></groundcollision>

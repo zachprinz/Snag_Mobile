@@ -37,11 +37,9 @@ Entity::Entity(char* texture,int x, int y){
 
 void Entity::SetUpPhysicsSprite(char* texture){
     physicsSprite = Sprite::create(texture);
-    physicsSprite->setTag(1);
     body = PhysicsBody::createBox(Size(imageSize.x * spriteBaseScale.x,spriteBaseScale.y * imageSize.y));
     body->setMass(PHYSICS_INFINITY);
     body->setDynamic(false);
-    body->setContactTestBitmask(true);
     physicsSprite->setPhysicsBody(body);
     physicsSprite->setPosition(position.x,position.y);
     physicsSprite->setVisible(false);

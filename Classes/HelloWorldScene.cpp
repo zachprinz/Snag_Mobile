@@ -24,15 +24,21 @@ void HelloWorld::update(float dt){
 
 void HelloWorld::setPhyWorld(PhysicsWorld* worlda){
     world = worlda;
-    world->setSpeed(5.0f);
+    world->setSpeed(3.0f);
     board->SetPhysicsWorld(world);
     auto contactListener = EventListenerPhysicsContact::create();
+    contactListener->onContactPostSolve = CC_CALLBACK_1(HelloWorld::onContactPostSolve, this);
     contactListener->onContactBegin = CC_CALLBACK_1(HelloWorld::onContactBegin, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(contactListener, this);
 }
 
+void HelloWorld::onContactPostSolve(PhysicsContact& contact){
+    board->onContactPostSolve(contact);
+}
+
 bool HelloWorld::onContactBegin(PhysicsContact& contact){
     board->onContactBegin(contact);
+    return true;
 }
 
 bool HelloWorld::init()

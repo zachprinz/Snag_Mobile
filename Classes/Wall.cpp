@@ -15,6 +15,10 @@ Wall::Wall(Vec2 position, Vec2 size) : Entity("wall.png",position.x + size.x/2.0
     SetUpPhysicsSprite("wall.png");
     type = 0;
     body->setTag(0);
+    body->setContactTestBitmask(true);
+    body->setCategoryBitmask(true);
+    //body->setCollisionBitmask(true);
+
 }
 
 void Wall::update(float dt){

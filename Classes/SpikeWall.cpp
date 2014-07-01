@@ -15,4 +15,8 @@ SpikeWall::SpikeWall(Vec2 position, Vec2 size) : Entity("spikewall.png",position
     SetUpPhysicsSprite("spikewall.png");
     type = 1;
     body->setTag(1);
+    body->setContactTestBitmask(true);
+    body->setCategoryBitmask(true);
+    //body->setCollisionBitmask(true);
+
 }

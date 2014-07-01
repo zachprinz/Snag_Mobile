@@ -31,11 +31,13 @@ User::User() : Entity("user.png"){
 void User::SetUpPhysicsSprite(char* texture){
     physicsSprite = Sprite::create(texture);
     physicsSprite->setTag(5);
-    body = PhysicsBody::createCircle(imageSize.x * 0.25);
-    body->setVelocity(Vec2(50,150));//Vec2(Spawner::Instance->GetVelocity().x,Spawner::Instance->GetVelocity().y));
+    body = PhysicsBody::createCircle(imageSize.x * spriteBaseScale.x * 0.5);
+    body->setVelocity(Vec2(100,300));//Vec2(Spawner::Instance->GetVelocity().x,Spawner::Instance->GetVelocity().y));
     body->setMass(10.0f);
     body->setDynamic(true);
     body->setContactTestBitmask(true);
+    body->setCategoryBitmask(true);
+    //body->setCollisionBitmask(true);
     physicsSprite->setPhysicsBody(body);
     physicsSprite->setPosition(position.x,position.y);
     physicsSprite->setVisible(false);
@@ -44,7 +46,7 @@ void User::SetUpPhysicsSprite(char* texture){
 }
 
 void User::update(float dt){
-    if((abs(body->getVelocity().x) < 0.1 && abs(body->getVelocity().y) < 0.1) || position.y < -200)
+    if(position.y < -200)//(abs(body->getVelocity().x) < 0.1 && abs(body->getVelocity().y) < 0.1) || position.y < -200)
         Reset();
     userPosition = position;
     Board::PrintVec2("UserPosition", GetBounds().origin);
@@ -90,18 +92,28 @@ void User::CalculateScale(){
     }
 }
 
-void User::Bounce(PhysicsContactData data){
+void User::Bounce(const PhysicsContactData* bounceData){
     if(isHooked)
         Release();
     std::vector<Vec2> points;
     for(int x = 0; x < PhysicsContactData::POINT_MAX; x++){
-        points.push_back(data.points[x]);
+        points.push_back(bounceData->points[x]);
     }
     Vec2 relativePoint = Vec2(points[0].x - position.x, points[0].y - position.y);
-    if(abs(relativePoint.x) < 30)
-        body->setVelocity(Vec2(body->getVelocity().x * 0.9, body->getVelocity().y * -0.9));
+    if(abs(relativePoint.x) < 30){
+        if(abs(backupVelocity.y) > 30)
+            body->setVelocity(Vec2(backupVelocity.x * 0.9, backupVelocity.y * -0.9));
+    }
     else
-        body->setVelocity(Vec2(body->getVelocity().x * -0.9, body->getVelocity().y * 1.25));
+        body->setVelocity(Vec2(backupVelocity.x * -0.9, backupVelocity.y * 1.15));
+}
+
+void User::SetBackupVelocity(Vec2 vel){
+    backupVelocity = vel;
+}
+
+Point User::GetPhysicsPosition(){
+    return physicsSprite->getPosition();
 }
 
 float User::GetAngle(Vec2 a, Vec2 b){

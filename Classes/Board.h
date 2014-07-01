@@ -45,7 +45,9 @@ public:
     PhysicsWorld* world;
     void SetPhysicsWorld(PhysicsWorld* world);
     void onContactBegin(PhysicsContact& contact);
+    void onContactPostSolve(PhysicsContact& contact);
     EventDispatcher* eventDispatcher;
+    static void Print(std::string);
 private:
     void LoadLevel(char* name);
     Sprite* background;
