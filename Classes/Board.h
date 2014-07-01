@@ -17,6 +17,7 @@
 #include "Hook.h"
 #include "Wall.h"
 #include "SpikeWall.h"
+#include "Spawner.h"
 
 USING_NS_CC;
 
@@ -29,6 +30,7 @@ public:
     void AddWall(Wall*);
     void AddSpikeWall(SpikeWall*);
     void AddJoint(PhysicsJoint*);
+    void AddSpawner(Spawner*);
     void RemoveJoint();
     Hook* GetClosestHook(Vec2 pos);
     void onTouchBegin();//Touch* touch, Event* event);
@@ -40,6 +42,7 @@ public:
     Layer* game;
     Size visibleSize;
     static void PrintVec2(std::string name, Vec2);
+    User* user;
 private:
     bool CheckSpikeWallCollision(Rect);
     void LoadLevel(char* name);
@@ -47,13 +50,13 @@ private:
     void updateView(float dt);
     void updateCollision(float dt);
     Size boardSize;
-    User* user;
     PhysicsWorld* world;
     Point origin;
     float scale;
     std::vector<Hook*> hooks;
     std::vector<Wall*> walls;
     std::vector<SpikeWall*> spikewalls;
+    std::vector<Spawner*> spawners;
     float ground;
     std::vector<Entity*> ents;
 };

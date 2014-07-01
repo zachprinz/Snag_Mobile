@@ -38,6 +38,9 @@ private:
     Vec2 closestPosition;
     void SetPositionToArmAngle();
     void FindAngularVelocity();
+    Sprite* line;
+    float lineBaseScale;
+    Hook* closest;
 };
 
 #endif /* defined(__Snag__User__) */

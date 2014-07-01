@@ -20,7 +20,6 @@ USING_NS_CC;
 class Entity{
 public:
     Entity(char* texture, int x = 500, int y = 300);
-    Entity(char* texture, Vec2 pos);
     virtual void update(float dt);
     Sprite* GetSprite();
     void SetPosition(Point);
@@ -32,11 +31,10 @@ public:
     void draw();
     static Vec2 userPosition;
     static float boardScale;
+    void UpdateSprite();
 private:
     
 protected:
-    void UpdateSprite();
-    virtual void CalculatePosition();
     virtual void CalculateScale();
     static Vec2 baseScale;
     Vec2 spriteBaseScale;

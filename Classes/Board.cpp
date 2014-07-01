@@ -12,6 +12,7 @@
 #include "tinyxml2.h"
 #include <iostream>
 #include <fstream>
+#include "Spawner.h"
 
 USING_NS_CC;
 
@@ -23,6 +24,7 @@ Board::Board(Layer* game, Size size, Point origin){
     background->setAnchorPoint(Vec2(0,0));
     Vec2 backgroundImageSize = Vec2(background->getTexture()->getPixelsHigh(), background->getTexture()->getPixelsWide());
     background->setScale(size.width / backgroundImageSize.y, size.height / backgroundImageSize.x);
+    background->setPositionZ(-2);
     game->addChild(background);
     Instance = this;
     this->game = game;
@@ -40,17 +42,20 @@ void Board::update(float dt){
     updateView(dt);
 }
 void Board::updateView(float dt){
-    float dist = (user->GetPosition().y - (user->GetSprite()->getTexture()->getPixelsHigh() * 0.5 * scale) - ground);
     for(int x = 0; x < ents.size(); x++){
         ents[x]->update(dt);
     }
+    float dist = (user->GetPosition().y + (user->GetSprite()->getTexture()->getPixelsHigh() * 0.5 * scale) - 0);
     if(dist < visibleSize.height)
         dist = visibleSize.height;
-    if(dist > (visibleSize.height*scale))
-        scale = visibleSize.height / dist;
+    scale = 1.0 / ((visibleSize.height - visibleSize.height * 0.15) / dist);
     Entity::boardScale = scale;
     std::cout << "Scale: " << std::to_string(scale) << std::endl;
     center.set(user->GetPosition().x, (boardSize.height / 2.0) / scale);
+    for(int x = 0; x < ents.size(); x++){
+        ents[x]->UpdateSprite();
+    }
+    user->UpdateSprite();
 }
 void Board::updateCollision(float dt){
     
@@ -146,6 +151,11 @@ void Board::AddWall(Wall* wall){
     ents.push_back(wall);
 }
 
+void Board::AddSpawner(Spawner* spawner){
+    spawners.push_back(spawner);
+    ents.push_back(spawner);
+}
+
 void Board::AddJoint(PhysicsJoint* joint){
     world->addJoint(joint);
 }
@@ -213,5 +223,20 @@ void Board::LoadLevel(char* name){
         currentSpikeWall->QueryIntAttribute("height", &height);
         AddSpikeWall(new SpikeWall(Vec2(x,y),Vec2(width,height)));
         currentSpikeWall = currentSpikeWall->NextSiblingElement();
+    }
+    
+    tinyxml2::XMLElement* SpawnersNode = doc.RootElement()->FirstChildElement("Spawners");
+    tinyxml2::XMLElement* currentSpawner = SpawnersNode->FirstChildElement();
+    while(currentSpawner != NULL){
+        int x;
+        int y;
+        int xVelocity;
+        int yVelocity;
+        currentSpawner->QueryIntAttribute("x", &x);
+        currentSpawner->QueryIntAttribute("y", &y);
+        currentSpawner->QueryIntAttribute("xVelocity", &xVelocity);
+        currentSpawner->QueryIntAttribute("yVelocity", &yVelocity);
+        AddSpawner(new Spawner(Vec2(x,y),Vec2(xVelocity,yVelocity)));
+        currentSpawner = currentSpawner->NextSiblingElement();
     }
 }

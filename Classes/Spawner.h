@@ -13,9 +13,11 @@
 
 class Spawner : public Entity{
 public:
-    Spawner(Vec2 pos);
+    Spawner(Vec2 pos, Vec2 vel);
+    Vec2 GetVelocity();
+    static Spawner* Instance;
 private:
-    
+    Vec2 velocity;
 };
 
 

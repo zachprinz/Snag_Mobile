@@ -8,17 +8,22 @@
 
 #include "User.h"
 #include "Board.h"
+#include "Spawner.h"
 
-#define FALL_SPEED 400.0
+#define FALL_SPEED 2500
 
 User::User() : Entity("user.png"){
     SetPosition(Vec2(150,150));
-    velocity.x = 800;
-    velocity.y = 250;
+    velocity.x = 500;
+    velocity.y = 1500;
     SetBaseScale(Vec2(0.5,0.5));
     isHooked = false;
     boardScale = 1.0f;
     userPosition = Vec2(150,150);
+    line = Sprite::create("line.png");
+    line->setAnchorPoint(Vec2(0,0.5));
+    line->setPositionZ(-1);
+    Board::Instance->game->addChild(line);
 }
 
 void User::update(float dt){
@@ -27,22 +32,21 @@ void User::update(float dt){
         Reset();
     userPosition = position;
     Board::PrintVec2("UserPosition", GetBounds().origin);
-    Entity::update(dt);
 }
 
 void User::updatePhysics(float dt){
     if(!isHooked){
-        acceleration.x += FALL_SPEED * Board::Instance->gravity.x * dt;
-        acceleration.y += FALL_SPEED * Board::Instance->gravity.y * dt;
-        velocity.x += acceleration.x * dt;
-        velocity.y += acceleration.y * dt;
+        acceleration.x = FALL_SPEED * Board::Instance->gravity.x * dt;
+        acceleration.y = FALL_SPEED * Board::Instance->gravity.y * dt;
+        velocity.x += acceleration.x;
+        velocity.y += acceleration.y;
         Vec2 tempPos;
         tempPos.x = position.x + velocity.x * dt;
         tempPos.y = position.y + velocity.y * dt;
         SetPosition(tempPos);
     } else {
         hookArmAngle = fmod(hookArmAngle, 360);
-        float angularAccelerationFromGravity = cos(hookArmAngle / 57.29) * (Board::Instance->gravity.y * FALL_SPEED);
+        float angularAccelerationFromGravity = cos(hookArmAngle / 57.29) * (Board::Instance->gravity.y * FALL_SPEED * 0.7);
         angularVelocity -= (angularAccelerationFromGravity * dt);
         hookArmAngle += angularVelocity * dt;
         SetPositionToArmAngle();
@@ -50,7 +54,7 @@ void User::updatePhysics(float dt){
 }
 
 void User::Snag(){
-    Hook* closest = Board::Instance->GetClosestHook(position);
+    closest = Board::Instance->GetClosestHook(position);
     Vec2 closestPos = closest->GetPosition();
     hookArmDistance = closest->GetPosition().distance(position);
     std::cout << "Distance: " << std::to_string(hookArmDistance);
@@ -63,6 +67,8 @@ void User::Snag(){
         std::cout << " Angle: " << std::to_string(hookArmAngle);
         FindAngularVelocity();
         isHooked = true;
+        line->setVisible(true);
+        lineBaseScale = hookArmDistance / line->getTexture()->getPixelsWide();
     }
 }
 
@@ -94,6 +100,7 @@ void User::Release(){
         velocity.x = cos(releaseAngle / 57.29) * totalVelocity;
         velocity.y = -1 * sin(releaseAngle / 57.29) * totalVelocity;
         velocity *= 1.15;
+        line->setVisible(false);
     }
 }
 
@@ -113,18 +120,21 @@ void User::collide(Vec2 side){
 }
 
 void User::Reset(){
-    position.set(150,150);
+    position.set(Spawner::Instance->GetPosition());
     acceleration.x = 0;
     acceleration.y = 0;
-    velocity.x = 800;
-    velocity.y = 400;
+    velocity = Spawner::Instance->GetVelocity();
 }
 
 void User::CalculateScale(){
     float distanceToGround = 0 - position.y; // board.ground;
     float newDistanceToGround = distanceToGround / boardScale;
-    sprite->setPosition((Board::Instance->visibleSize.width / 2.0), position.y);//0 -newDistanceToGround);
-    std::cout << "UserPosition.x: " << std::to_string(sprite->getPosition().x) << " UserPosition.y: " << std::to_string(sprite->getPosition().y) << std::endl;
+    sprite->setPosition((Board::Instance->visibleSize.width / 2.0), 0 -newDistanceToGround);
     //Why is this scale here?
-    //sprite->setScale(scale.x * (1/boardScale),scale.y * (1/boardScale));
+    SetScale(Vec2((1/boardScale),(1/boardScale)));
+    if(isHooked){
+        line->setPosition(closest->GetSprite()->getPosition());
+        line->setScale(lineBaseScale*(1/boardScale), 10.0 * (1/boardScale));
+        line->setRotation(hookArmAngle);
+    }
 }
