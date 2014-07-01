@@ -1,4 +1,5 @@
 #include "HelloWorldScene.h"
+#include "MainMenu.h"
 
 USING_NS_CC;
 
@@ -63,7 +64,34 @@ bool HelloWorld::init()
     
     schedule(schedule_selector(HelloWorld::update));
     
+    cocos2d::Vector<MenuItem*> menuItems;
+    
+    auto resetButton = MenuItemImage::create("reset.png", "reset.png", this, menu_selector(HelloWorld::resetButtonCallback));
+    resetButton->setPosition(Point(15,visibleSize.height - 15));//57 + (visibleSize.width - 100) / 4.0,- 100));
+    resetButton->setAnchorPoint(Point(0.0,1.0));
+    menuItems.pushBack(resetButton);
+    auto homeButton = MenuItemImage::create("home.png", "home.png", this, menu_selector(HelloWorld::homeButtonCallback));
+    homeButton->setPosition(Point(visibleSize.width  - 15, visibleSize.height -15));//52 + ((visibleSize.width - 100) / 4.0) * 3,- 100));
+    homeButton->setAnchorPoint(Point(1.0,1.0));
+    menuItems.pushBack(homeButton);
+    
+    resetButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
+    homeButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
+    
+    Menu* menu = Menu::createWithArray(menuItems);
+    menu->setAnchorPoint(Point(0.0,0.0));
+    menu->setPosition(0,0);
+    this->addChild(menu, 1);
+    
     return true;
+}
+
+void HelloWorld::resetButtonCallback(Ref* ref){
+    board->user->Reset();
+}
+
+void HelloWorld::homeButtonCallback(Ref* ref){
+    Director::getInstance()->pushScene(MainMenu::myScene);
 }
 
 bool HelloWorld::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){

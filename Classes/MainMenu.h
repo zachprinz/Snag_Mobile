@@ -1,43 +1,40 @@
-#ifndef __HELLOWORLD_SCENE_H__
-#define __HELLOWORLD_SCENE_H__
+//
+//  MainMenu.h
+//  Snag
+//
+//  Created by Zachary Prinzbach on 7/1/14.
+//
+//
 
+#ifndef __Snag__MainMenu__
+#define __Snag__MainMenu__
+
+#include <iostream>
 #include "Board.h"
 #include "cocos2d.h"
 
-class HelloWorld : public cocos2d::Layer
+class MainMenu : public cocos2d::Layer
 {
 public:
     // there's no 'id' in cpp, so we recommend returning the class instance pointer
     static cocos2d::Scene* createScene();
-
     // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
-    virtual bool init();  
-    
-    // a selector callback
+    virtual bool init();
     void menuCloseCallback(cocos2d::Ref* pSender);
-    
+
     // implement the "static create()" method manually
-    CREATE_FUNC(HelloWorld);
-    
-    Board* board;
+    CREATE_FUNC(MainMenu);
     
     bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
     void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
-    void onContactPostSolve(PhysicsContact& contact);
-    bool onContactBegin(PhysicsContact& contact);
     
-    void resetButtonCallback(Ref*);
-    void homeButtonCallback(Ref*);
-    
-    virtual void update(float dt);
-    
-    void setPhyWorld(PhysicsWorld* worlda);
+    void playButtonCallback(Ref*);
+    void levelCreatorButtonCallback(Ref*);
     
     static Scene* myScene;
+    static Vec2 screenScale;
 private:
-    PhysicsWorld* world;
-    Point currentCenter;
-    Sprite* map;    
+    
 };
 
-#endif // __HELLOWORLD_SCENE_H__
+#endif /* defined(__Snag__MainMenu__) */
