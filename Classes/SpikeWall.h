@@ -15,6 +15,7 @@
 class SpikeWall : public Entity{
 public:
     SpikeWall(Vec2 pos, Vec2 size);
+    static int type;
 private:
     
 };

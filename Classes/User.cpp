@@ -12,10 +12,10 @@
 
 #define FALL_SPEED 2500
 
+int User::type;
+
 User::User() : Entity("user.png"){
-    SetPosition(Vec2(150,150));
-    velocity.x = 500;
-    velocity.y = 1500;
+    position.set(150,150);
     SetBaseScale(Vec2(0.5,0.5));
     isHooked = false;
     boardScale = 1.0f;
@@ -24,109 +24,60 @@ User::User() : Entity("user.png"){
     line->setAnchorPoint(Vec2(0,0.5));
     line->setPositionZ(-1);
     Board::Instance->game->addChild(line);
+    SetUpPhysicsSprite("user.png");
+    type = 5;
+}
+
+void User::SetUpPhysicsSprite(char* texture){
+    physicsSprite = Sprite::create(texture);
+    physicsSprite->setTag(5);
+    body = PhysicsBody::createCircle(imageSize.x * 0.25);
+    body->setVelocity(Vec2(50,150));//Vec2(Spawner::Instance->GetVelocity().x,Spawner::Instance->GetVelocity().y));
+    body->setMass(10.0f);
+    body->setDynamic(true);
+    body->setContactTestBitmask(true);
+    physicsSprite->setPhysicsBody(body);
+    physicsSprite->setPosition(position.x,position.y);
+    physicsSprite->setVisible(false);
+    physicsSprite->setScale(spriteBaseScale.x,spriteBaseScale.y);
+    Board::Instance->game->addChild(physicsSprite);
 }
 
 void User::update(float dt){
-    updatePhysics(dt);
-    if(abs(velocity.x) < 0.1 && abs(velocity.y) < 25 || position.y < -200)
+    if((abs(body->getVelocity().x) < 0.1 && abs(body->getVelocity().y) < 0.1) || position.y < -200)
         Reset();
     userPosition = position;
     Board::PrintVec2("UserPosition", GetBounds().origin);
 }
 
-void User::updatePhysics(float dt){
-    if(!isHooked){
-        acceleration.x = FALL_SPEED * Board::Instance->gravity.x * dt;
-        acceleration.y = FALL_SPEED * Board::Instance->gravity.y * dt;
-        velocity.x += acceleration.x;
-        velocity.y += acceleration.y;
-        Vec2 tempPos;
-        tempPos.x = position.x + velocity.x * dt;
-        tempPos.y = position.y + velocity.y * dt;
-        SetPosition(tempPos);
-    } else {
-        hookArmAngle = fmod(hookArmAngle, 360);
-        float angularAccelerationFromGravity = cos(hookArmAngle / 57.29) * (Board::Instance->gravity.y * FALL_SPEED * 0.7);
-        angularVelocity -= (angularAccelerationFromGravity * dt);
-        hookArmAngle += angularVelocity * dt;
-        SetPositionToArmAngle();
-    }
-}
-
 void User::Snag(){
     closest = Board::Instance->GetClosestHook(position);
-    Vec2 closestPos = closest->GetPosition();
-    hookArmDistance = closest->GetPosition().distance(position);
-    std::cout << "Distance: " << std::to_string(hookArmDistance);
-    hookArmAngle = atan((closestPos.y - position.y)/(position.x - closestPos.x)) * 57.29;
-    closestPosition = closest->GetPosition();
-    if(position.x - closestPos.x > 0) hookArmAngle += 360;
-    else hookArmAngle += 180;
-    
-    if(hookArmDistance < 500 && hookArmDistance > 10){
-        std::cout << " Angle: " << std::to_string(hookArmAngle);
-        FindAngularVelocity();
-        isHooked = true;
-        line->setVisible(true);
-        lineBaseScale = hookArmDistance / line->getTexture()->getPixelsWide();
-    }
-}
-
-void User::FindAngularVelocity(){
-    Vec2 tempVelocity((0.5*sin(hookArmAngle / 57.29) + 0.5) * velocity.x, (0.5 * cos(hookArmAngle / 57.29) + 0.5) * velocity.y);
-    float tempTotal = sqrt(pow(tempVelocity.x,2) + pow(tempVelocity.y, 2));
-    angularVelocity = (tempTotal / hookArmDistance) * (tempVelocity.x / abs(tempVelocity.x));
-    velocity = tempVelocity;
-}
-
-void User::SetPositionToArmAngle(){
-    float tempX = (cos(hookArmAngle / 57.29) * hookArmDistance) + closestPosition.x;
-    float tempY = (-1 * (sin(hookArmAngle / 57.29) * hookArmDistance)) + closestPosition.y;
-    SetPosition(Vec2(tempX,tempY));
+    isHooked = true;
+    line->setVisible(true);
+    joint = PhysicsJointDistance::construct(physicsSprite->getPhysicsBody(), closest->physicsSprite->getPhysicsBody(), Vec2(0.5,0.5), Vec2(0.5,0.5));
+    joint->setEnable(true);
+    Board::Instance->AddJoint(joint);
+    lineBaseScale = joint->getDistance() / line->getTexture()->getPixelsWide();
 }
 
 void User::Release(){
     if(isHooked == true){
         isHooked = false;
-        float totalVelocity = abs(hookArmDistance * angularVelocity) / 50;
-        int sign = 0;
-        if(angularVelocity > 0)
-            sign = 1;
-        if(angularVelocity == 0)
-            sign = 0;
-        if(angularVelocity < 0)
-            sign = -1;
-        float releaseAngle = hookArmAngle + (sign * 90);
-        velocity.x = cos(releaseAngle / 57.29) * totalVelocity;
-        velocity.y = -1 * sin(releaseAngle / 57.29) * totalVelocity;
-        velocity *= 1.15;
         line->setVisible(false);
-    }
-}
-
-void User::collide(Vec2 side){
-    if(isHooked)
-        Release();
-    else{
-        if(side.x !=0){
-            velocity.x *= -0.9;
-            velocity.y *= 0.9;
-        }
-        if(side.y !=0){
-            velocity.y *= -0.9;
-            velocity.x *= 0.9;
-        }
+        Board::Instance->world->removeAllJoints();
+        body->setVelocity(Vec2(body->getVelocity().x * 1.25, body->getVelocity().y * 1.25));
     }
 }
 
 void User::Reset(){
-    position.set(Spawner::Instance->GetPosition());
-    acceleration.x = 0;
-    acceleration.y = 0;
-    velocity = Spawner::Instance->GetVelocity();
+    if(isHooked)
+        Release();
+    physicsSprite->setPosition(Spawner::Instance->GetPosition());
+    body->setVelocity(Spawner::Instance->GetVelocity());
 }
 
 void User::CalculateScale(){
+    position = physicsSprite->getPosition();
     float distanceToGround = 0 - position.y; // board.ground;
     float newDistanceToGround = distanceToGround / boardScale;
     sprite->setPosition((Board::Instance->visibleSize.width / 2.0), 0 -newDistanceToGround);
@@ -135,6 +86,39 @@ void User::CalculateScale(){
     if(isHooked){
         line->setPosition(closest->GetSprite()->getPosition());
         line->setScale(lineBaseScale*(1/boardScale), 10.0 * (1/boardScale));
-        line->setRotation(hookArmAngle);
+        line->setRotation(GetAngle(joint->getBodyA()->getPosition(),joint->getBodyB()->getPosition()));
     }
+}
+
+void User::Bounce(PhysicsContactData data){
+    if(isHooked)
+        Release();
+    std::vector<Vec2> points;
+    for(int x = 0; x < PhysicsContactData::POINT_MAX; x++){
+        points.push_back(data.points[x]);
+    }
+    Vec2 relativePoint = Vec2(points[0].x - position.x, points[0].y - position.y);
+    if(abs(relativePoint.x) < 30)
+        body->setVelocity(Vec2(body->getVelocity().x * 0.9, body->getVelocity().y * -0.9));
+    else
+        body->setVelocity(Vec2(body->getVelocity().x * -0.9, body->getVelocity().y * 1.25));
+}
+
+float User::GetAngle(Vec2 a, Vec2 b){
+    float o = a.x - b.x;
+    float adj = a.y - b.y;
+    float angle = atan(o/adj) * 57.29;
+    if(adj < 0){ //Left two
+        if(adj > 0) // bottom left
+            angle = (90-angle) + 180;
+        if(adj < 0) // top left
+            angle = 90 + angle;
+    }
+    else{ // Right two
+        if(adj > 0) // bottom right
+            angle += 270;
+        if(adj < 0) // top right
+            angle = (90 - angle);
+    }
+    return angle;
 }

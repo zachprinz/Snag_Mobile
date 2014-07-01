@@ -35,14 +35,22 @@ Entity::Entity(char* texture,int x, int y){
     //boundsDebug->setPosition(GetBounds().origin.x,GetBounds().origin.y);
 }
 
-Sprite* Entity::GetSprite(){
-    return sprite;
+void Entity::SetUpPhysicsSprite(char* texture){
+    physicsSprite = Sprite::create(texture);
+    physicsSprite->setTag(1);
+    body = PhysicsBody::createBox(Size(imageSize.x * spriteBaseScale.x,spriteBaseScale.y * imageSize.y));
+    body->setMass(PHYSICS_INFINITY);
+    body->setDynamic(false);
+    body->setContactTestBitmask(true);
+    physicsSprite->setPhysicsBody(body);
+    physicsSprite->setPosition(position.x,position.y);
+    physicsSprite->setVisible(false);
+    physicsSprite->setScale(spriteBaseScale.x,spriteBaseScale.y);
+    Board::Instance->game->addChild(physicsSprite);
 }
 
-void Entity::SetPosition(Point point){
-    Point goodPoint = Board::Instance->TryMove(point,GetBounds());
-    if(goodPoint.y != 999999999)
-        this->position = goodPoint;
+Sprite* Entity::GetSprite(){
+    return sprite;
 }
 
 Point Entity::GetPosition(){
@@ -79,6 +87,8 @@ void Entity::UpdateSprite(){
 }
 
 void Entity::CalculateScale(){
+    if(physicsSprite != NULL)
+        position = physicsSprite->getPosition();
     //Board::PrintVec2("userPosition",userPosition);
     float distanceToCenter = position.x - userPosition.x;
     float newDistanceToCenter = distanceToCenter / boardScale;

@@ -16,6 +16,7 @@ class Wall : public Entity{
 public:
     Wall(Vec2 position, Vec2 size);
     void update(float dt);
+    static int type;
 private:
 
 };

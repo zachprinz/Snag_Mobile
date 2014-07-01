@@ -23,9 +23,15 @@ public:
     
     bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
     void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
+    bool onContactBegin(PhysicsContact& contact);
     
     virtual void update(float dt);
+    
+    void setPhyWorld(PhysicsWorld* worlda);
+    
+    static Scene* myScene;
 private:
+    PhysicsWorld* world;
     Point currentCenter;
     Sprite* map;    
 };

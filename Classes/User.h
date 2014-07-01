@@ -24,23 +24,20 @@ public:
     void update(float dt);
     void collide(Vec2);
     void Reset();
+    void SetUpPhysicsSprite(char*);
+    static int type;
+    void Bounce(PhysicsContactData data);
 private:
     void CalculateScale();
     PhysicsJointDistance* joint;
     Hook* hook;
     bool isHooked;
     void updatePhysics(float dt);
-    Vec2 velocity;
-    Vec2 acceleration;
-    float angularVelocity;
-    float hookArmAngle;
-    float hookArmDistance;
     Vec2 closestPosition;
-    void SetPositionToArmAngle();
-    void FindAngularVelocity();
     Sprite* line;
     float lineBaseScale;
     Hook* closest;
+    float GetAngle(Vec2 a, Vec2 b);
 };
 
 #endif /* defined(__Snag__User__) */

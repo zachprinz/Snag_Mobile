@@ -18,7 +18,8 @@ USING_NS_CC;
 
 Board* Board::Instance;
 
-Board::Board(Layer* game, Size size, Point origin){
+Board::Board(Layer* game, PhysicsWorld* world, Size size, Point origin){
+    this->world = world;
     background = Sprite::create("background.png");
     background->setPosition(0,0);
     background->setAnchorPoint(Vec2(0,0));
@@ -38,9 +39,27 @@ Board::Board(Layer* game, Size size, Point origin){
     gravity.set(0,-1);
 }
 
+void Board::SetPhysicsWorld(PhysicsWorld* world){
+    this->world = world;
+}
+
+void Board::onContactBegin(PhysicsContact& contact){
+    int type = contact.getShapeA()->getBody()->getTag();
+    int type2 = contact.getShapeB()->getBody()->getTag();
+    if(type == user->type)
+        type = type2;
+    if(type == Wall::type){
+        user->Bounce(*contact.getContactData());
+    }
+    if(type == SpikeWall::type){
+        user->Reset();
+    }
+}
+
 void Board::update(float dt){
     updateView(dt);
 }
+
 void Board::updateView(float dt){
     for(int x = 0; x < ents.size(); x++){
         ents[x]->update(dt);
@@ -60,68 +79,6 @@ void Board::updateView(float dt){
 void Board::updateCollision(float dt){
     
 }
-Point Board::TryMove(Point destinationPoint, Rect bounds){
-    Rect userRect;
-    userRect.setRect(destinationPoint.x - bounds.size.width / 2.0,destinationPoint.y - bounds.size.height / 2.0,bounds.size.width,bounds.size.height);
-    std::vector<Vec2> sides;
-    std::vector<float> collisionPositions;
-    //It's not getting any collision until it reaches the bottom
-    if(CheckSpikeWallCollision(userRect)){
-        user->Reset();
-        return Point(0,999999999);
-    }
-    for(int x = 0; x < walls.size(); x++){
-        if(walls[x]->GetBounds().intersectsRect(userRect)){
-            std::cout << "Found Collision on";
-            if(walls[x]->GetBounds().containsPoint(userRect.origin)){ //Either left or bottom;
-                if(walls[x]->GetBounds().containsPoint(Point(userRect.origin.x,userRect.origin.y + userRect.size.height))){
-                    sides.push_back(Vec2(-1,0));
-                    collisionPositions.push_back(walls[x]->GetBounds().getMaxX());
-                    std::cout << " left side." << std::endl;
-                } else {
-                    sides.push_back(Vec2(0,-1));
-                    collisionPositions.push_back(walls[x]->GetBounds().getMaxY());
-                    std::cout << " bottom side." << std::endl;
-                }
-            } else { // Means that the top right is intersecting so it's either top or right;
-                if(walls[x]->GetBounds().containsPoint(Point(userRect.origin.x,userRect.origin.y + userRect.size.height))){
-                    sides.push_back(Vec2(0,1));
-                    collisionPositions.push_back(walls[x]->GetBounds().getMinY());
-                    std::cout << " top side." << std::endl;
-                } else {
-                    sides.push_back(Vec2(1,0));
-                    collisionPositions.push_back(walls[x]->GetBounds().getMinX());
-                    std::cout << " right side." << std::endl;
-                }
-            }
-        }
-    }
-    for(int x = 0; x < sides.size(); x++){
-        if(sides[x].x != 0){
-            if(sides[x].x > 0)
-                destinationPoint.x -= userRect.getMaxX() - collisionPositions[x];
-            else
-                destinationPoint.x += collisionPositions[x] - userRect.getMinX();
-        } else{
-            if(sides[x].y > 0)
-                destinationPoint.y -= userRect.getMaxY() - collisionPositions[x];
-            else
-                destinationPoint.y += collisionPositions[x] - userRect.getMinY();
-        }
-    }
-    if(sides.size() > 0)
-        user->collide(sides[0]);
-    return destinationPoint;
-}
-
-bool Board::CheckSpikeWallCollision(Rect userRect){
-    for(int x = 0; x < spikewalls.size(); x++){
-        if(spikewalls[x]->GetBounds().intersectsRect(userRect))
-            return true;
-    }
-    return false;
-}
-
 void Board::onTouchEnd(){//Touch* touch, Event* event){
     log("Recognised end of touch.");
     user->Release();
@@ -156,7 +113,7 @@ void Board::AddSpawner(Spawner* spawner){
     ents.push_back(spawner);
 }
 
-void Board::AddJoint(PhysicsJoint* joint){
+void Board::AddJoint(PhysicsJointDistance* joint){
     world->addJoint(joint);
 }
 void Board::RemoveJoint(){

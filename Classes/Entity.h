@@ -22,7 +22,6 @@ public:
     Entity(char* texture, int x = 500, int y = 300);
     virtual void update(float dt);
     Sprite* GetSprite();
-    void SetPosition(Point);
     Point GetPosition();
     void SetScale(Vec2);
     Vec2 GetScale();
@@ -32,6 +31,9 @@ public:
     static Vec2 userPosition;
     static float boardScale;
     void UpdateSprite();
+    virtual void SetUpPhysicsSprite(char*);
+    Sprite* physicsSprite;
+    PhysicsBody* body;
 private:
     
 protected:

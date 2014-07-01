@@ -2,10 +2,16 @@
 
 USING_NS_CC;
 
+Scene* HelloWorld::myScene;
+
 Scene* HelloWorld::createScene()
 {
-    auto scene = Scene::create();
+    auto scene = Scene::createWithPhysics();
+    //scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+    
     auto layer = HelloWorld::create();
+    layer->setPhyWorld(scene->getPhysicsWorld());
+    myScene = scene;
     
     scene->addChild(layer);
     
@@ -14,6 +20,19 @@ Scene* HelloWorld::createScene()
 
 void HelloWorld::update(float dt){
     board->update(dt);
+}
+
+void HelloWorld::setPhyWorld(PhysicsWorld* worlda){
+    world = worlda;
+    world->setSpeed(5.0f);
+    board->SetPhysicsWorld(world);
+    auto contactListener = EventListenerPhysicsContact::create();
+    contactListener->onContactBegin = CC_CALLBACK_1(HelloWorld::onContactBegin, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(contactListener, this);
+}
+
+bool HelloWorld::onContactBegin(PhysicsContact& contact){
+    board->onContactBegin(contact);
 }
 
 bool HelloWorld::init()
@@ -33,8 +52,8 @@ bool HelloWorld::init()
     
     float tempScale = 1.0;
     currentCenter.set(Director::getInstance()->getWinSize().width / (2 * tempScale), Director::getInstance()->getWinSize().height / (2 * tempScale));
-
-    board = new Board(this, visibleSize, origin);
+    
+    board = new Board(this, world, visibleSize, origin);
     
     schedule(schedule_selector(HelloWorld::update));
     

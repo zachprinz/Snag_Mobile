@@ -23,13 +23,13 @@ USING_NS_CC;
 
 class Board{
 public:
-    Board(Layer* game, Size size, Point origin);
+    Board(Layer* game, PhysicsWorld* world, Size size, Point origin);
     void AddEntity(Entity*);
     static Board* Instance;
     void AddHook(Hook*);
     void AddWall(Wall*);
     void AddSpikeWall(SpikeWall*);
-    void AddJoint(PhysicsJoint*);
+    void AddJoint(PhysicsJointDistance*);
     void AddSpawner(Spawner*);
     void RemoveJoint();
     Hook* GetClosestHook(Vec2 pos);
@@ -38,19 +38,20 @@ public:
     void update(float dt);
     Point center;
     Vec2 gravity;
-    Point TryMove(Point, Rect);
     Layer* game;
     Size visibleSize;
     static void PrintVec2(std::string name, Vec2);
     User* user;
+    PhysicsWorld* world;
+    void SetPhysicsWorld(PhysicsWorld* world);
+    void onContactBegin(PhysicsContact& contact);
+    EventDispatcher* eventDispatcher;
 private:
-    bool CheckSpikeWallCollision(Rect);
     void LoadLevel(char* name);
     Sprite* background;
     void updateView(float dt);
     void updateCollision(float dt);
     Size boardSize;
-    PhysicsWorld* world;
     Point origin;
     float scale;
     std::vector<Hook*> hooks;
