@@ -73,6 +73,16 @@ bool LevelEditor::init(){
     homeButton->setAnchorPoint(Point(1.0,1.0));
     menuItems.pushBack(homeButton);
     
+    auto trashButton = MenuItemImage::create("trash.png", "trash.png", this, menu_selector(LevelEditor::trashButtonCallback));
+    trashButton->setPosition(Point(visibleSize.width  - 15, 15));//52 + ((visibleSize.width - 100) / 4.0) * 3,- 100));
+    trashButton->setAnchorPoint(Point(1.0,0.0));
+    menuItems.pushBack(trashButton);
+    
+    auto saveButton = MenuItemImage::create("save.png", "save.png", this, menu_selector(LevelEditor::saveButtonCallback));
+    saveButton->setPosition(Point(15, 15));//52 + ((visibleSize.width - 100) / 4.0) * 3,- 100));
+    saveButton->setAnchorPoint(Point(0.0,0.0));
+    menuItems.pushBack(saveButton);
+    
     auto buttonsBackground = Sprite::create("LevelEditorBackground.png");
     buttonsBackground->setAnchorPoint(Point(0.0,1.0));
     buttonsBackground->setPosition(15, visibleSize.height - 15);
@@ -86,6 +96,10 @@ bool LevelEditor::init(){
     hookSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     spawnerSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     eraseSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
+    homeButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
+    saveButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
+    trashButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
+
     
     spikeWallSelectButton->setPositionZ(2);
     wallSelectButton->setPositionZ(2);
@@ -188,7 +202,18 @@ void LevelEditor::EraseSelectCallback(Ref*){
 void LevelEditor::homeButtonCallback(Ref* ref){
     Director::getInstance()->pushScene(MainMenu::myScene);
 }
-
+void LevelEditor::saveButtonCallback(Ref* ref){
+    
+}
+void LevelEditor::trashButtonCallback(Ref* ref){
+    for(int x = 0; x < mapObjects.size(); x++){
+        this->removeChild(mapObjects[x]->GetSprite());
+    }
+    mapObjects.clear();
+    originTile = Vec2(0,0);
+    MapObject::origin = originTile;
+    EnableSpawner();
+}
 bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
     touchStart = PixelToTile(touch->getLocation());
     switch(currentTool){
@@ -219,12 +244,24 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
         case NO_TOOL:
             break;
         case ERASE:
+            Erase(touchStart);
             break;
     }
     return true;
 }
 void LevelEditor::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
-    
+    if(currentTool != ERASE && currentTool != NO_TOOL && currentTool != SPAWNER && currentTool != HOOK){
+        if(currentMapObject->GetSprite()->getBoundingBox().size.width < TILE_SIZE || currentMapObject->GetSprite()->getBoundingBox().size.height < TILE_SIZE){
+            for(int x = 0; x < mapObjects.size(); x++){
+                if(currentMapObject == mapObjects[x]){
+                    Board::Print("Deleted object");
+                    this->removeChild(mapObjects[x]->GetSprite());
+                    mapObjects.erase(mapObjects.begin() + x);
+                    break;
+                }
+            }
+        }
+    }
 }
 void LevelEditor::onTouchMoved(Touch* touch, Event* event){
     if(currentTool != NO_TOOL && currentTool != ERASE){
@@ -248,7 +285,7 @@ void LevelEditor::onTouchMoved(Touch* touch, Event* event){
     }
 }
 Vec2 LevelEditor::PixelToTile(Point pos){
-    Vec2 ret = Vec2(ceil((float)pos.x / TILE_SIZE), ceil((float)pos.y / TILE_SIZE));
+    Vec2 ret = Vec2(floor((float)pos.x / TILE_SIZE), floor((float)pos.y / TILE_SIZE));
     ret.x += originTile.x;
     ret.y += originTile.y;
     return ret;
@@ -282,4 +319,17 @@ void LevelEditor::DisableSpawner(){
 }
 void LevelEditor::EnableSpawner(){
     spawnerSelectButton->setEnabled(true);
+}
+
+void LevelEditor::Erase(Vec2 tile){
+    Vec2 pixelPos = Vec2((tile.x - originTile.x + 0.5) * TILE_SIZE, (tile.y - originTile.y + 0.5) * TILE_SIZE);
+    for(int x = 0; x < mapObjects.size(); x++){
+        if(mapObjects[x]->GetSprite()->getBoundingBox().containsPoint(pixelPos)){
+            if(mapObjects[x]->GetType() == SPAWNER)
+                EnableSpawner();
+            this->removeChild(mapObjects[x]->GetSprite());
+            mapObjects.erase(mapObjects.begin() + x);
+            break;
+        }
+    }
 }

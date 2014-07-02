@@ -29,6 +29,7 @@ public:
     cocos2d::Sprite* GetSprite();
     void SetOriginTile(Vec2);
     static Vec2 origin;
+    int GetType();
 private:
     cocos2d::Vec2 startCoord;
     cocos2d::Vec2 endCoord;

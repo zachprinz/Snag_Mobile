@@ -44,6 +44,10 @@ MapObject::MapObject(Vec2 start, int type){
 }
 void MapObject::UpdateEndCoord(Vec2 coord){
     this->endCoord = coord;
+    if(endCoord.x < startCoord.x && endCoord.y < startCoord.y){
+        sprite->setAnchorPoint(Point(0,0));
+        sprite->setPosition(endCoord.x * TILE_SIZE, endCoord.y * TILE_SIZE);
+    }
     switch(type){
         case WALL:
             sprite->setScale((float)(abs(endCoord.x - startCoord.x) * TILE_SIZE) / sprite->getTexture()->getPixelsWide(), (float)(abs(endCoord.y - startCoord.y) * TILE_SIZE) / sprite->getTexture()->getPixelsHigh());
@@ -68,4 +72,8 @@ Sprite* MapObject::GetSprite(){
 void MapObject::SetOriginTile(Vec2 tile){
     origin = tile;
     sprite->setPosition((startCoord.x - tile.x) * TILE_SIZE, (startCoord.y - tile.y) * TILE_SIZE);
+}
+
+int MapObject::GetType(){
+    return type;
 }

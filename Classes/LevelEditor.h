@@ -44,6 +44,8 @@ public:
     void HookSelectCallback(Ref*);
     void EraseSelectCallback(Ref*);
     void homeButtonCallback(Ref*);
+    void trashButtonCallback(Ref*);
+    void saveButtonCallback(Ref*);
     
     MenuItemImage* homeSelectButton;
     MenuItemImage* hookSelectButton;
@@ -67,6 +69,8 @@ public:
     
     void DisableSpawner();
     void EnableSpawner();
+    
+    void Erase(Vec2);
     
     static LevelEditor* Instance;
 private:
