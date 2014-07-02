@@ -13,6 +13,7 @@
 #include "Board.h"
 #include "cocos2d.h"
 #include "MapObject.h"
+#include "tinyxml2.h"
 
 #define WALL 0
 #define SPIKE_WALL 1
@@ -20,6 +21,7 @@
 #define SPAWNER 3
 #define ERASE 4
 #define NO_TOOL 5
+#define MOVE 6
 #define TILE_SIZE 40
 
 class LevelEditor : public cocos2d::Layer
@@ -46,6 +48,9 @@ public:
     void homeButtonCallback(Ref*);
     void trashButtonCallback(Ref*);
     void saveButtonCallback(Ref*);
+    void moveButtonCallback(Ref*);
+    void playButtonCallback(Ref*);
+    void selectedButtonCallback(Ref*);
     
     MenuItemImage* homeSelectButton;
     MenuItemImage* hookSelectButton;
@@ -53,6 +58,9 @@ public:
     MenuItemImage* spawnerSelectButton;
     MenuItemImage* eraseSelectButton;
     MenuItemImage* wallSelectButton;
+    MenuItemImage* playSelectButton;
+    MenuItemImage* moveSelectButton;
+    MenuItemFont*  selectedLabel;
     
     MenuItemImage* currentSelection;
     
@@ -73,6 +81,11 @@ public:
     void Erase(Vec2);
     
     static LevelEditor* Instance;
+    
+    void SetToolPos();
+    void ResetToolPos();
+    
+    void Export();
 private:
     
 };

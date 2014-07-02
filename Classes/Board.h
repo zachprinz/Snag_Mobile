@@ -48,6 +48,7 @@ public:
     void onContactPostSolve(PhysicsContact& contact);
     EventDispatcher* eventDispatcher;
     static void Print(std::string);
+    static char* levelPath;
 private:
     void LoadLevel(char* name);
     Sprite* background;

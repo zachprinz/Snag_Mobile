@@ -15,6 +15,7 @@
 #define SPAWNER 3
 #define ERASE 4
 #define NO_TOOL 5
+#define MOVE 6
 #define TILE_SIZE 40
 
 #include <iostream>
@@ -30,6 +31,8 @@ public:
     void SetOriginTile(Vec2);
     static Vec2 origin;
     int GetType();
+    Vec2 GetStart();
+    Vec2 GetSize();
 private:
     cocos2d::Vec2 startCoord;
     cocos2d::Vec2 endCoord;

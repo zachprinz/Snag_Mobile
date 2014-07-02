@@ -77,3 +77,11 @@ void MapObject::SetOriginTile(Vec2 tile){
 int MapObject::GetType(){
     return type;
 }
+
+Vec2 MapObject::GetStart(){
+    return Vec2(startCoord.x * TILE_SIZE, startCoord.y * TILE_SIZE);
+}
+
+Vec2 MapObject::GetSize(){
+    return Vec2((endCoord.x - startCoord.x) * TILE_SIZE, (endCoord.y - startCoord.y) * TILE_SIZE);
+}
