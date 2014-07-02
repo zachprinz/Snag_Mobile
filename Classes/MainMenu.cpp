@@ -9,6 +9,7 @@
 #include "MainMenu.h"
 #include "Board.h"
 #include "HelloWorldScene.h"
+#include "LevelEditor.h"
 
 USING_NS_CC;
 
@@ -82,7 +83,13 @@ void MainMenu::playButtonCallback(Ref* pSender){
 }
 
 void MainMenu::levelCreatorButtonCallback(Ref* pSender){
-    Board::Print("Level Creator button click registered.");
+    if(LevelEditor::myScene == NULL){
+        auto scene = LevelEditor::createScene();
+        Director::getInstance()->pushScene(scene);
+    }
+    else{
+        Director::getInstance()->pushScene(LevelEditor::myScene);
+    }
 }
 
 bool MainMenu::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
