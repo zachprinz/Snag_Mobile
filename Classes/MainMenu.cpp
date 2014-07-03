@@ -10,6 +10,7 @@
 #include "Board.h"
 #include "HelloWorldScene.h"
 #include "LevelEditor.h"
+#include "LevelSelect.h"
 
 USING_NS_CC;
 
@@ -74,13 +75,13 @@ bool MainMenu::init()
 }
 
 void MainMenu::playButtonCallback(Ref* pSender){
-    if(HelloWorld::myScene == NULL){
+    if(LevelSelect::myScene == NULL){
         Board::Print("Play button click registered.");
-        auto scene = HelloWorld::createScene();
+        auto scene = LevelSelect::createScene();
         Director::getInstance()->pushScene(scene);
     }
     else{
-        Director::getInstance()->pushScene(HelloWorld::myScene);
+        Director::getInstance()->pushScene(LevelSelect::myScene);
     }
 }
 
