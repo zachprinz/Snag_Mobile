@@ -68,25 +68,25 @@ bool LevelEditor::init(){
     eraseSelectButton->setAnchorPoint(Point(0.0,1.0));
     menuItems.pushBack(eraseSelectButton);
     
-    auto homeButton = MenuItemImage::create("home.png", "home.png", this, menu_selector(LevelEditor::homeButtonCallback));
-    homeButton->setPosition(Point(visibleSize.width  - 10, visibleSize.height - (10 + buttonHeight * 0)));
-    homeButton->setAnchorPoint(Point(1.0,1.0));
-    menuItems.pushBack(homeButton);
+    homeSelectButton = MenuItemImage::create("home.png", "home.png", this, menu_selector(LevelEditor::homeButtonCallback));
+    homeSelectButton->setPosition(Point(visibleSize.width  - 10, visibleSize.height - (10 + buttonHeight * 0)));
+    homeSelectButton->setAnchorPoint(Point(1.0,1.0));
+    menuItems.pushBack(homeSelectButton);
     
-    auto trashButton = MenuItemImage::create("trash.png", "trash.png", this, menu_selector(LevelEditor::trashButtonCallback));
-    trashButton->setPosition(Point(visibleSize.width  - 10,visibleSize.height - (10 + buttonHeight * 2)));
-    trashButton->setAnchorPoint(Point(1.0,1.0));
-    menuItems.pushBack(trashButton);
+    trashSelectButton = MenuItemImage::create("trash.png", "trash.png", this, menu_selector(LevelEditor::trashButtonCallback));
+    trashSelectButton->setPosition(Point(visibleSize.width  - 10,visibleSize.height - (10 + buttonHeight * 2)));
+    trashSelectButton->setAnchorPoint(Point(1.0,1.0));
+    menuItems.pushBack(trashSelectButton);
     
-    auto saveButton = MenuItemImage::create("save.png", "save.png", this, menu_selector(LevelEditor::saveButtonCallback));
-    saveButton->setPosition(Point(visibleSize.width - 10,visibleSize.height - (10 + buttonHeight * 1)));
-    saveButton->setAnchorPoint(Point(1.0,1.0));
-    menuItems.pushBack(saveButton);
+    saveSelectButton = MenuItemImage::create("save.png", "save.png", this, menu_selector(LevelEditor::saveButtonCallback));
+    saveSelectButton->setPosition(Point(visibleSize.width - 10,visibleSize.height - (10 + buttonHeight * 1)));
+    saveSelectButton->setAnchorPoint(Point(1.0,1.0));
+    menuItems.pushBack(saveSelectButton);
     
-    auto playButton = MenuItemImage::create("LevelEditorPlay.png", "LevelEditorPlay.png", this, menu_selector(LevelEditor::playButtonCallback));
-    playButton->setPosition(Point(visibleSize.width - 10,visibleSize.height - (10 + buttonHeight * 3)));
-    playButton->setAnchorPoint(Point(1.0,1.0));
-    menuItems.pushBack(playButton);
+    playSelectButton = MenuItemImage::create("LevelEditorPlay.png", "LevelEditorPlay.png", this, menu_selector(LevelEditor::playButtonCallback));
+    playSelectButton->setPosition(Point(visibleSize.width - 10,visibleSize.height - (10 + buttonHeight * 3)));
+    playSelectButton->setAnchorPoint(Point(1.0,1.0));
+    menuItems.pushBack(playSelectButton);
     
     moveSelectButton = MenuItemImage::create("LevelEditorMove.png", "LevelEditorMove.png", this, menu_selector(LevelEditor::moveButtonCallback));
     moveSelectButton->setPosition(Point(visibleSize.width - 10,visibleSize.height - (10 + buttonHeight * 4)));
@@ -101,6 +101,44 @@ bool LevelEditor::init(){
     selectedLabel->setEnabled(false);
     menuItems.pushBack(selectedLabel);
     
+    saveButtonsOnY = visibleSize.height - (10 + buttonHeight * 4);
+    saveButtonsOffY = -100;
+    
+    shade = Sprite::create("shade.png");
+    shade->setAnchorPoint(Point(0,1.0));
+    shade->setPosition(Point(0,0));
+    shade->setScale(visibleSize.width / shade->getTexture()->getPixelsWide(), visibleSize.height / shade->getTexture()->getPixelsHigh());
+    shade->setPositionZ(0);
+    
+    this->addChild(shade);
+    
+    cocos2d::Vector<MenuItem*> saveMenuItems;
+    
+    saveAcceptButton = MenuItemImage::create("check.png", "check.png", this, menu_selector(LevelEditor::saveAcceptCallback));
+    saveAcceptButton->setPosition(Point(visibleSize.width / 2.0 + 25,saveButtonsOffY));
+    saveAcceptButton->setAnchorPoint(Point(0.0,1.0));
+    saveMenuItems.pushBack(saveAcceptButton);
+    saveAcceptButton->setPositionZ(3);
+    
+    saveDeclineButton = MenuItemImage::create("x.png", "x.png", this, menu_selector(LevelEditor::saveDeclineCallback));
+    saveDeclineButton->setPosition(Point(visibleSize.width / 2.0 - 25,saveButtonsOffY));
+    saveDeclineButton->setAnchorPoint(Point(1.0,1.0));
+    saveMenuItems.pushBack(saveDeclineButton);
+    saveDeclineButton->setPositionZ(3);
+    
+    Size editBoxSize = Size(750*MainMenu::screenScale.x, 100 * MainMenu::screenScale.y);
+    Scale9Sprite* nameBoxBG = Scale9Sprite::create("line.png");
+    nameBoxBG->setContentSize(editBoxSize);
+    nameBox = EditBox::create(Size(350,50), nameBoxBG);
+    nameBox->setPosition(Point(visibleSize.width / 2.0, visibleSize.height / 2.0 + 100 + 1000));
+    nameBox->setFontSize(30);
+    nameBox->setMaxLength(18);
+    nameBox->setPlaceHolder("level name");
+    nameBox->setFontColor(Color3B::WHITE);
+    //nameBox->setReturnType(kKeyboardReturnTypeDone);
+    //nameBox->setInputMode(kEditBoxInputModeAny);
+    //nameBox->setDelegate(this);
+    this->addChild(nameBox);
     
     auto buttonsBackground = Sprite::create("LevelEditorSelected.png");
     buttonsBackground->setAnchorPoint(Point(0.5,1.0));
@@ -115,19 +153,22 @@ bool LevelEditor::init(){
     hookSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     spawnerSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     eraseSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    homeButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    saveButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    trashButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    playButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
+    homeSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
+    saveSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
+    trashSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
+    playSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     moveSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     selectedLabel->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
+    saveAcceptButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
+    saveDeclineButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
+
     
-    spikeWallSelectButton->setPositionZ(2);
-    wallSelectButton->setPositionZ(2);
-    spawnerSelectButton->setPositionZ(2);
-    hookSelectButton->setPositionZ(2);
-    eraseSelectButton->setPositionZ(2);
-    homeButton->setPositionZ(2);
+    spikeWallSelectButton->setPositionZ(1);
+    wallSelectButton->setPositionZ(1);
+    spawnerSelectButton->setPositionZ(1);
+    hookSelectButton->setPositionZ(1);
+    eraseSelectButton->setPositionZ(1);
+    homeSelectButton->setPositionZ(1);
 
     buttonsBackground->setPositionZ(-1);
     background->setPositionZ(-4);
@@ -135,13 +176,31 @@ bool LevelEditor::init(){
     this->addChild(buttonsBackground);
     
     Menu* menu = Menu::createWithArray(menuItems);
+    Menu* menu2 = Menu::createWithArray(saveMenuItems);
+    menu2->setAnchorPoint(Point(0.0,0.0));
+    menu2->setPosition(0,0);
+    menu2->setPositionZ(5);
     menu->setAnchorPoint(Point(0.0,0.0));
     menu->setPosition(0,0);
+    this->addChild(menu2,1);
     this->addChild(menu, 1);
     
     currentSelection = NULL;
     
     return true;
+}
+
+void LevelEditor::editBoxEditingDidBegin(EditBox *editBox) {
+}
+
+void LevelEditor::editBoxEditingDidEnd(EditBox *editBox) {
+}
+
+void LevelEditor::editBoxTextChanged(EditBox *editBox, std::string &text) {
+    
+}
+
+void LevelEditor::editBoxReturn(EditBox *editBox) {
 }
 
 void LevelEditor::SpikeWallSelectCallback(Ref*){
@@ -219,7 +278,43 @@ void LevelEditor::homeButtonCallback(Ref* ref){
     Director::getInstance()->pushScene(MainMenu::myScene);
 }
 void LevelEditor::saveButtonCallback(Ref* ref){
+    shade->setAnchorPoint(Point(0,0));
+    saveDeclineButton->setPosition(saveDeclineButton->getPosition().x, saveButtonsOnY);
+    saveAcceptButton->setPosition(saveAcceptButton->getPosition().x, saveButtonsOnY);
+    
+    moveSelectButton->setEnabled(false);
+    eraseSelectButton->setEnabled(false);
+    hookSelectButton->setEnabled(false);
+    wallSelectButton->setEnabled(false);
+    spikeWallSelectButton->setEnabled(false);
+    spawnerSelectButton->setEnabled(false);
+    playSelectButton->setEnabled(false);
+    homeSelectButton->setEnabled(false);
+    trashSelectButton->setEnabled(false);
+    saveSelectButton->setEnabled(false);
+    saveAcceptButton->setEnabled(true);
+    saveDeclineButton->setEnabled(true);
+    
+    moveSelectButton->setPosition(Point(moveSelectButton->getPosition().x + 100, moveSelectButton->getPosition().y));
+    eraseSelectButton->setPosition(Point(eraseSelectButton->getPosition().x - 100, eraseSelectButton->getPosition().y));
+    hookSelectButton->setPosition(Point(hookSelectButton->getPosition().x - 100, hookSelectButton->getPosition().y));
+    wallSelectButton->setPosition(Point(wallSelectButton->getPosition().x - 100, wallSelectButton->getPosition().y));
+    spikeWallSelectButton->setPosition(Point(spikeWallSelectButton->getPosition().x - 100, spikeWallSelectButton->getPosition().y));
+    spawnerSelectButton->setPosition(Point(spawnerSelectButton->getPosition().x - 100, spawnerSelectButton->getPosition().y));
+    playSelectButton->setPosition(Point(playSelectButton->getPosition().x + 100, playSelectButton->getPosition().y));
+    homeSelectButton->setPosition(Point(homeSelectButton->getPosition().x + 100, homeSelectButton->getPosition().y));
+    trashSelectButton->setPosition(Point(homeSelectButton->getPosition().x + 100, homeSelectButton->getPosition().y));
+    saveSelectButton->setPosition(Point(homeSelectButton->getPosition().x + 100, homeSelectButton->getPosition().y));
+
+    nameBox->setPosition(Point(nameBox->getPosition().x, nameBox->getPosition().y - 1000));
+    
     Export();
+}
+void LevelEditor::saveAcceptCallback(Ref* ref){
+    
+}
+void LevelEditor::saveDeclineCallback(Ref* ref){
+    
 }
 void LevelEditor::moveButtonCallback(Ref* ref){
     if(currentSelection != moveSelectButton){

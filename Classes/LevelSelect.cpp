@@ -79,6 +79,8 @@ bool LevelSelect::init()
     homeButton->setAnchorPoint(Point(1.0,1.0));
     menuItems.pushBack(homeButton);
     
+    
+    
     onlineLevelsBackground = Sprite::create("LevelSelectOnline.png");
     myLevelsBackground = Sprite::create("LevelSelectMyLevels.png");
     localLevelsBackground = Sprite::create("LevelSelectLocal.png");
