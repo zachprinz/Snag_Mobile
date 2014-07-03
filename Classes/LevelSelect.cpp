@@ -45,7 +45,8 @@ bool LevelSelect::init()
     cocos2d::Vector<MenuItem*> menuItems;
     
     auto onlineLevelsButton = MenuItemImage::create("LevelSelectOnlineButton.png", "LevelSelectOnlineButton.png", this, menu_selector(LevelSelect::onlineCallback));
-    onlineLevelsButton->setPosition(Point(visibleSize.width / 2.0, visibleSize.height));
+    float availableWidth = visibleSize.width - 155 * MainMenu::screenScale.x;
+    onlineLevelsButton->setPosition(Point(availableWidth / 2.0, visibleSize.height));
     onlineLevelsButton->setAnchorPoint(Point(0.5,1.0));
     menuItems.pushBack(onlineLevelsButton);
     
@@ -57,7 +58,7 @@ bool LevelSelect::init()
     menuItems.pushBack(localLevelsButton);
     
     auto myLevelsButton = MenuItemImage::create("LevelSelectMyLevelsButton.png", "LevelSelectMyLevelsButton.png", this, menu_selector(LevelSelect::myLevelsCallback));
-    myLevelsButton->setPosition(Point(visibleSize.width, visibleSize.height));
+    myLevelsButton->setPosition(Point(availableWidth + 11, visibleSize.height));
     myLevelsButton->setAnchorPoint(Point(1.0,1.0));
     menuItems.pushBack(myLevelsButton);
     
@@ -72,6 +73,11 @@ bool LevelSelect::init()
     scrollDownButton->setPosition(Point(visibleSize.width / 2.0, 15));
     scrollDownButton->setAnchorPoint(Point(0.5,0.0));
     menuItems.pushBack(scrollDownButton);
+    
+    auto homeButton = MenuItemImage::create("home.png", "home.png", this, menu_selector(LevelSelect::homeCallback));
+    homeButton->setPosition(Point(visibleSize.width - 5, visibleSize.height - 5));
+    homeButton->setAnchorPoint(Point(1.0,1.0));
+    menuItems.pushBack(homeButton);
     
     onlineLevelsBackground = Sprite::create("LevelSelectOnline.png");
     myLevelsBackground = Sprite::create("LevelSelectMyLevels.png");
@@ -102,6 +108,7 @@ bool LevelSelect::init()
     localLevelsBackground->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     myLevelsBackground->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     onlineLevelsBackground->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
+    homeButton->setScale(MainMenu::screenScale.x * 0.75, MainMenu::screenScale.y * 0.75);
     background->setScale(visibleSize.width / background->getTexture()->getPixelsWide(), visibleSize.height / background->getTexture()->getPixelsHigh());
     
     for(int x = 0; x < 3; x++){
@@ -124,7 +131,14 @@ void LevelSelect::editCallback(Ref*){
 
 }
 void LevelSelect::playCallback(Ref*){
-
+    if(HelloWorld::myScene == NULL){
+        Board::Print("Play button click registered.");
+        auto scene = HelloWorld::createScene();
+        Director::getInstance()->pushScene(scene);
+    }
+    else{
+        Director::getInstance()->pushScene(HelloWorld::myScene);
+    }
 };
 void LevelSelect::highscoresCallback(Ref*){
 
@@ -135,6 +149,9 @@ void LevelSelect::scrollUpCallback(Ref*){
 void LevelSelect::scrollDownCallback(Ref*){
 
 };
+void LevelSelect::homeCallback(Ref* ref){
+    Director::getInstance()->pushScene(MainMenu::myScene);
+}
 void LevelSelect::localCallback(Ref*){
     localLevelsBackground->setVisible(true);
     onlineLevelsBackground->setVisible(false);

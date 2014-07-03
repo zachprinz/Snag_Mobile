@@ -21,15 +21,15 @@ LevelMenuItem::LevelMenuItem(std::string name, Size visibleSize, int x, int y){
     float x2 = x - backgroundWidth / 2.0;
     
     edit = MenuItemImage::create("LevelSelectEdit.png", "LevelSelectEdit.png", LevelSelect::myScene, menu_selector(LevelSelect::editCallback));
-    edit->setPosition(Point(backgroundWidth * 0.9 + x2, y));
+    edit->setPosition(Point(backgroundWidth * 0.93 + x2, y));
     edit->setAnchorPoint(Point(0.5,0.5));
     
     highscores = MenuItemImage::create("LevelSelectScores.png", "LevelSelectScores.png", LevelSelect::myScene, menu_selector(LevelSelect::highscoresCallback));
-    highscores->setPosition(Point(backgroundWidth * 0.75 + x2, y));
+    highscores->setPosition(Point(backgroundWidth * 0.82 + x2, y));
     highscores->setAnchorPoint(Point(0.5,0.5));
     
     play = MenuItemImage::create("LevelSelectPlay.png", "LevelSelectPlay.png", LevelSelect::myScene, menu_selector(LevelSelect::playCallback));
-    play->setPosition(Point(backgroundWidth * 0.6 + x2, y));
+    play->setPosition(Point(backgroundWidth * 0.71 + x2, y));
     play->setAnchorPoint(Point(0.5,0.5));
     
     edit->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);

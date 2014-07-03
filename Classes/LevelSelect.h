@@ -38,6 +38,7 @@ public:
     void localCallback(Ref*);
     void myLevelsCallback(Ref*);
     void onlineCallback(Ref*);
+    void homeCallback(Ref*);
     
     std::vector<LevelMenuItem*> levels;
     void AddLevel(LevelMenuItem*);
