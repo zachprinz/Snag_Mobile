@@ -49,6 +49,7 @@ public:
     EventDispatcher* eventDispatcher;
     static void Print(std::string);
     static char* levelPath;
+    static bool customLevel;
 private:
     void LoadLevel(char* name);
     Sprite* background;

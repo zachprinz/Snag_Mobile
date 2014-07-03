@@ -18,6 +18,7 @@ USING_NS_CC;
 
 Board* Board::Instance;
 char* Board::levelPath;
+bool Board::customLevel;
 
 Board::Board(Layer* game, PhysicsWorld* world, Size size, Point origin){
     this->world = world;
@@ -156,7 +157,7 @@ void Board::Print(std::string message){
 void Board::LoadLevel(char* name){
     tinyxml2::XMLDocument doc;
     //doc.LoadFile(FileUtils::getInstance()->fullPathForFilename("level.xml").c_str());
-    if(sizeof(levelPath) / sizeof(char) > 3)
+    if(customLevel)
         doc.LoadFile(levelPath);
     else
         doc.LoadFile(FileUtils::getInstance()->fullPathForFilename("level.xml").c_str());

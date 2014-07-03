@@ -509,5 +509,6 @@ void LevelEditor::Export(){
     std::strcpy(cstr, str.c_str());
     doc.SaveFile(cstr);
     Board::levelPath = cstr;
+    Board::customLevel = true;
     std::cout << "FilePath: " << FileUtils::getInstance()->getWritablePath().c_str() << std::endl;
 }

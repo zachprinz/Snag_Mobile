@@ -34,6 +34,8 @@ bool MainMenu::init()
     if(!Layer::init()){
         return false;
     }
+    Board::customLevel = false;
+
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     
