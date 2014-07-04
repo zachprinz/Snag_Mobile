@@ -94,13 +94,11 @@ bool LevelEditor::init(){
     moveSelectButton->setAnchorPoint(Point(1.0,1.0));
     menuItems.pushBack(moveSelectButton);
     
-    selectedLabel = MenuItemFont::create("New Map 1", this, menu_selector(LevelEditor::selectedButtonCallback));
-    selectedLabel->setAnchorPoint(Point(0.5,1.15));
-    selectedLabel->setPosition(visibleSize.width / 2.0, visibleSize.height - 10);
-    selectedLabel->setFontSizeObj(selectedLabel->getFontSize() * 5);
+    selectedLabel = Label::createWithBMFont("comfortaa_large.fnt", "Pan Tool", TextHAlignment::CENTER);
+    selectedLabel->setPosition(visibleSize.width / 2.0, visibleSize.height - 10 - (100 * MainMenu::screenScale.y));
     selectedLabel->setColor(Color3B(0.0,0.0,0.0));
-    selectedLabel->setEnabled(false);
-    menuItems.pushBack(selectedLabel);
+    //selectedLabel->setEnabled(false);
+    this->addChild(selectedLabel);
     
     saveButtonsOnY = visibleSize.height - (10 + buttonHeight * 4);
     saveButtonsOffY = -100;
@@ -159,7 +157,7 @@ bool LevelEditor::init(){
     trashSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     playSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     moveSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    selectedLabel->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
+    //selectedLabel->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     saveAcceptButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     saveDeclineButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
 

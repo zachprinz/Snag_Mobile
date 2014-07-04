@@ -65,7 +65,7 @@ public:
     MenuItemImage* wallSelectButton;
     MenuItemImage* playSelectButton;
     MenuItemImage* moveSelectButton;
-    MenuItemFont*  selectedLabel;
+    Label* selectedLabel;
     MenuItemImage* saveAcceptButton;
     MenuItemImage* saveDeclineButton;
     MenuItemImage* trashSelectButton;

@@ -32,12 +32,9 @@ LevelMenuItem::LevelMenuItem(std::string name, Size visibleSize, int x, int y){
     play->setPosition(Point(backgroundWidth * 0.71 + x2, y));
     play->setAnchorPoint(Point(0.5,0.5));
     
-    this->name = MenuItemFont::create(name, LevelSelect::myScene, menu_selector(LevelSelect::playCallback));
-    this->name->setAnchorPoint(Point(0.5,0.5));
+    this->name = Label::createWithBMFont("comfortaa_large.fnt", "New Level", TextHAlignment::CENTER);
     this->name->setPosition(backgroundWidth * 0.35 + x2, y+10);
-    this->name->setFontSizeObj(this->name->getFontSize() * 3);
-    this->name->setColor(Color3B(0.0,0.0,0.0));
-    this->name->setEnabled(false);
+    this->name->setPositionZ(4);
     
     edit->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     play->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
@@ -45,6 +42,16 @@ LevelMenuItem::LevelMenuItem(std::string name, Size visibleSize, int x, int y){
     background->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     background->setPosition(Point(x,y));
     background->setAnchorPoint(Point(0.5,0.5));
+}
+void LevelMenuItem::SetEnabled(bool is){
+    edit->setVisible(is);
+    edit->setEnabled(is);
+    highscores->setVisible(is);
+    highscores->setEnabled(is);
+    play->setVisible(is);
+    play->setEnabled(is);
+    background->setVisible(is);
+    name->setVisible(is);
 }
 void LevelMenuItem::SetOrder(int){
 

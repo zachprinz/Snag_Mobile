@@ -79,9 +79,11 @@ void MainMenu::playButtonCallback(Ref* pSender){
         Board::Print("Play button click registered.");
         auto scene = LevelSelect::createScene();
         Director::getInstance()->pushScene(scene);
+        LevelSelect::Instance->Refresh();
     }
     else{
         Director::getInstance()->pushScene(LevelSelect::myScene);
+        LevelSelect::Instance->Refresh();
     }
 }
 

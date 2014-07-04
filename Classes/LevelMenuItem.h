@@ -21,13 +21,13 @@ public:
     cocos2d::MenuItemImage* play;
     cocos2d::MenuItemImage* highscores;
     cocos2d::Sprite* background;
-    cocos2d::MenuItemFont* name;
+    cocos2d::Label* name;
     void SetOrder(int);
     void SetName(const char*);
     void SetPath(const char*);
     const char* myName;
     const char* myPath;
-    
+    void SetEnabled(bool);
 private:
 };
 

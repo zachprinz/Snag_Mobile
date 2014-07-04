@@ -17,6 +17,7 @@ USING_NS_CC;
 
 Scene* LevelSelect::myScene;
 Vec2 LevelSelect::screenScale;
+LevelSelect* LevelSelect::Instance;
 
 Scene* LevelSelect::createScene()
 {
@@ -36,6 +37,7 @@ bool LevelSelect::init()
         return false;
     }
     Board::customLevel = false;
+    Instance = this;
     
     currentLevelSet = LEVELS_LOCAL;
     
@@ -118,7 +120,7 @@ bool LevelSelect::init()
         menuItems.pushBack(lvl->edit);
         menuItems.pushBack(lvl->highscores);
         menuItems.pushBack(lvl->play);
-        menuItems.pushBack(lvl->name);
+        this->addChild(lvl->name);
         AddLevel(lvl);
     }
     
@@ -160,6 +162,17 @@ void LevelSelect::localCallback(Ref*){
     onlineLevelsBackground->setVisible(false);
     myLevelsBackground->setVisible(false);
     currentLevelSet = LEVELS_LOCAL;
+    
+    for(int x = 0; x < 3; x++){
+        if(Board::localLevels.size() > x){
+            levels[x]->SetEnabled(true);
+            levels[x]->SetName(Board::localLevelNames[x].c_str());
+            levels[x]->SetPath(Board::localLevels[x].c_str());
+        }
+        else
+            levels[x]->SetEnabled(false);
+    }
+    
     LoadLevels();
 };
 void LevelSelect::myLevelsCallback(Ref*){
@@ -171,24 +184,58 @@ void LevelSelect::myLevelsCallback(Ref*){
     tinyxml2::XMLDocument myLevelsDoc;
     myLevelsDoc.LoadFile(FileUtils::getInstance()->fullPathForFilename("MyLevels.xml").c_str());
     tinyxml2::XMLElement* level = myLevelsDoc.FirstChildElement();
-    int x = 0;
-    while(level != NULL && x < 3){
-        levels[x]->SetName(level->Attribute("name"));
-        levels[x]->SetPath(level->Attribute("path"));
-    }
+    /*for(int x = 0; x < 3; x++){
+        if(level != NULL){
+            levels[x]->SetEnabled(true);
+            levels[x]->SetName(level->Attribute("name"));
+            levels[x]->SetPath(level->Attribute("path"));
+        }
+        else
+            levels[x]->SetEnabled(false);
+        level = level->NextSiblingElement();
+    }*/
     
-    for(int x = 0; x < Board::myLevels.size(); x++){
-        levels[x]->SetName(Board::myLevelNames[x].c_str());
-        levels[x]->SetPath(Board::myLevels[x].c_str());
-    }
+    for(int x = 0; x < 3; x++){
+        if(Board::myLevels.size() > x){
+         levels[x]->SetEnabled(true);
+         levels[x]->SetName(Board::myLevelNames[x].c_str());
+         levels[x]->SetPath(Board::myLevels[x].c_str());
+     }
+     else
+        levels[x]->SetEnabled(false);
+     }
     
     LoadLevels();
 };
+void LevelSelect::Refresh(){
+    switch(currentLevelSet){
+        case LEVELS_MY:
+            myLevelsCallback(NULL);
+            break;
+        case LEVELS_LOCAL:
+            localCallback(NULL);
+            break;
+        case LEVELS_ONLINE:
+            onlineCallback(NULL);
+            break;
+    }
+}
 void LevelSelect::onlineCallback(Ref*){
     localLevelsBackground->setVisible(false);
     onlineLevelsBackground->setVisible(true);
     myLevelsBackground->setVisible(false);
     currentLevelSet = LEVELS_ONLINE;
+    
+    for(int x = 0; x < 3; x++){
+        if(Board::onlineLevels.size() > x){
+            levels[x]->SetEnabled(true);
+            levels[x]->SetName(Board::onlineLevelNames[x].c_str());
+            levels[x]->SetPath(Board::onlineLevels[x].c_str());
+        }
+        else
+            levels[x]->SetEnabled(false);
+    }
+    
     LoadLevels();
 };
 

@@ -52,6 +52,10 @@ public:
     static bool customLevel;
     static std::vector<std::string> myLevels;
     static std::vector<std::string> myLevelNames;
+    static std::vector<std::string> onlineLevels;
+    static std::vector<std::string> onlineLevelNames;
+    static std::vector<std::string> localLevels;
+    static std::vector<std::string> localLevelNames;
 private:
     void LoadLevel(char* name);
     Sprite* background;

@@ -51,6 +51,10 @@ public:
     Sprite* onlineLevelsBackground;
     Sprite* localLevelsBackground;
     int currentLevelSet;
+    
+    void Refresh();
+    
+    static LevelSelect* Instance;
 private:
     
 };

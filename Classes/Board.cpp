@@ -21,6 +21,10 @@ char* Board::levelPath;
 bool Board::customLevel;
 std::vector<std::string> Board::myLevels;
 std::vector<std::string> Board::myLevelNames;
+std::vector<std::string> Board::localLevels;
+std::vector<std::string> Board::localLevelNames;
+std::vector<std::string> Board::onlineLevels;
+std::vector<std::string> Board::onlineLevelNames;
 
 Board::Board(Layer* game, PhysicsWorld* world, Size size, Point origin){
     this->world = world;
