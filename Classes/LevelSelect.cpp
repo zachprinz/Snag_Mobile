@@ -45,6 +45,7 @@ bool LevelSelect::init()
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     
     cocos2d::Vector<MenuItem*> menuItems;
+    currentLevelSet = LEVELS_LOCAL;
     
     auto onlineLevelsButton = MenuItemImage::create("LevelSelectOnlineButton.png", "LevelSelectOnlineButton.png", this, menu_selector(LevelSelect::onlineCallback));
     float availableWidth = visibleSize.width - 155 * MainMenu::screenScale.x;
@@ -117,6 +118,7 @@ bool LevelSelect::init()
     
     for(int x = 0; x < 3; x++){
         LevelMenuItem* lvl = new LevelMenuItem("new map", visibleSize, visibleSize.width / 2.0, visibleSize.height - tabHeight - tabHeight - 55 - ((203 * MainMenu::screenScale.y + 5) * x));
+        lvl->SetTag(x);
         menuItems.pushBack(lvl->edit);
         menuItems.pushBack(lvl->highscores);
         menuItems.pushBack(lvl->play);
@@ -135,14 +137,38 @@ bool LevelSelect::init()
 void LevelSelect::editCallback(Ref*){
 
 }
-void LevelSelect::playCallback(Ref* ref){
+void LevelSelect::playCallback(Object* sender){
     if(HelloWorld::myScene == NULL){
         Board::Print("Play button click registered.");
         auto scene = HelloWorld::createScene();
         Director::getInstance()->pushScene(scene);
+        int levelSelected = ((MenuItem*)(sender))->getTag();
+        switch(LevelSelect::Instance->currentLevelSet){
+            case LEVELS_MY:
+                Board::Instance->Reset(Board::Instance->myLevels[levelSelected]);
+                break;
+            case LEVELS_LOCAL:
+                Board::Instance->Reset(Board::Instance->localLevels[levelSelected]);
+                break;
+            case LEVELS_ONLINE:
+                Board::Instance->Reset(Board::Instance->onlineLevels[levelSelected]);
+                break;
+        }
     }
     else{
         Director::getInstance()->pushScene(HelloWorld::myScene);
+        int levelSelected = ((MenuItem*)(sender))->getTag();
+        switch(LevelSelect::Instance->currentLevelSet){
+            case LEVELS_MY:
+                Board::Instance->Reset(Board::Instance->myLevels[levelSelected]);
+                break;
+            case LEVELS_LOCAL:
+                Board::Instance->Reset(Board::Instance->localLevels[levelSelected]);
+                break;
+            case LEVELS_ONLINE:
+                Board::Instance->Reset(Board::Instance->onlineLevels[levelSelected]);
+                break;
+        }
     }
 };
 void LevelSelect::highscoresCallback(Ref*){
@@ -162,7 +188,6 @@ void LevelSelect::localCallback(Ref*){
     onlineLevelsBackground->setVisible(false);
     myLevelsBackground->setVisible(false);
     currentLevelSet = LEVELS_LOCAL;
-    
     for(int x = 0; x < 3; x++){
         if(Board::localLevels.size() > x){
             levels[x]->SetEnabled(true);

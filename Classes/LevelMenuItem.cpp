@@ -63,3 +63,6 @@ void LevelMenuItem::SetName(const char* n){
 void LevelMenuItem::SetPath(const char* n){
     myPath = n;
 }
+void LevelMenuItem::SetTag(int x){
+    play->setTag(x);
+}

@@ -43,7 +43,7 @@ Board::Board(Layer* game, PhysicsWorld* world, Size size, Point origin){
     
     scale = 1.0f;
     user = new User();
-    LoadLevel("level.xml");
+    //LoadLevel("level.xml");
     gravity.set(0,-1);
 }
 
@@ -152,6 +152,19 @@ Hook* Board::GetClosestHook(Point pos){
     return closestHook;
 }
 
+void Board::Reset(std::string path){
+    Clear();
+    LoadLevel(path.c_str());
+    user->Reset();
+}
+
+void Board::Clear(){
+    spawners.clear();
+    spikewalls.clear();
+    walls.clear();
+    hooks.clear();
+}
+
 void Board::PrintVec2(std::string name, Vec2 vec){
     //std::cout << name + ".x: " << std::to_string(vec.x) << " " + name + ".y: " << std::to_string(vec.y) << std::endl;
 }
@@ -160,15 +173,9 @@ void Board::Print(std::string message){
     std::cout << message << std::endl;
 }
 
-void Board::LoadLevel(char* name){
+void Board::LoadLevel(std::string name){
     tinyxml2::XMLDocument doc;
-    //doc.LoadFile(FileUtils::getInstance()->fullPathForFilename("level.xml").c_str());
-    //if(customLevel)
-    //    doc.LoadFile(levelPath);
-   // else
-    doc.LoadFile(myLevels[0].c_str());//FileUtils::getInstance()->fullPathForFilename("level.xml").c_str());
-    std::cout << "FilePath: " << FileUtils::getInstance()->fullPathForFilename("level.xml").c_str() << std::endl;
-
+    doc.LoadFile(name.c_str());
     tinyxml2::XMLElement* hooksNode = doc.RootElement()->FirstChildElement();
     tinyxml2::XMLElement* currentHook = hooksNode->FirstChildElement();
     while(currentHook != NULL){
@@ -230,5 +237,9 @@ void Board::LoadLevel(char* name){
         Print("Loading Spawner X: " + std::to_string(x) + " Y: " + std::to_string(y));
         AddSpawner(new Spawner(Vec2(x,y),Vec2(xVelocity,yVelocity)));
         currentSpawner = currentSpawner->NextSiblingElement();
+    }
+    
+    if(spikewalls.size() == 0){
+        AddSpikeWall(new SpikeWall(Vec2(0,-100), Vec2(1,1)));
     }
 }

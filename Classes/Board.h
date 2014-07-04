@@ -56,8 +56,10 @@ public:
     static std::vector<std::string> onlineLevelNames;
     static std::vector<std::string> localLevels;
     static std::vector<std::string> localLevelNames;
+    void Reset(std::string levelPath);
+    void Clear();
 private:
-    void LoadLevel(char* name);
+    void LoadLevel(std::string name);
     Sprite* background;
     void updateView(float dt);
     void updateCollision(float dt);

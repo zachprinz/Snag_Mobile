@@ -66,6 +66,7 @@ public:
     MenuItemImage* playSelectButton;
     MenuItemImage* moveSelectButton;
     Label* selectedLabel;
+    Label* notice;
     MenuItemImage* saveAcceptButton;
     MenuItemImage* saveDeclineButton;
     MenuItemImage* trashSelectButton;
@@ -92,6 +93,7 @@ public:
     void AddMapObject(MapObject*);
     MapObject* currentMapObject;
     std::string name;
+    bool noticeUp;
     
     void DisableSpawner();
     void EnableSpawner();

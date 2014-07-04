@@ -32,6 +32,7 @@ bool LevelEditor::init(){
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     originTile = Vec2(0,0);
+    noticeUp = false;
 
     auto listener = EventListenerTouchOneByOne::create();
     listener->setSwallowTouches(true);
@@ -99,6 +100,13 @@ bool LevelEditor::init(){
     selectedLabel->setColor(Color3B(0.0,0.0,0.0));
     //selectedLabel->setEnabled(false);
     this->addChild(selectedLabel);
+    
+    notice = Label::createWithBMFont("comfortaa_large.fnt", "Please add at least one spawner to your level!", TextHAlignment::CENTER);
+    notice->setPosition(visibleSize.width / 2.0, visibleSize.height / 2.0 - 1000);
+    notice->setScale(0.45);
+    notice->setVisible(false);
+    notice->setColor(Color3B(0.0,0.0,0.0));
+    this->addChild(notice);
     
     saveButtonsOnY = visibleSize.height - (10 + buttonHeight * 4);
     saveButtonsOffY = -100;
@@ -214,6 +222,7 @@ void LevelEditor::SpikeWallSelectCallback(Ref*){
         ResetToolPos();
         currentTool = NO_TOOL;
         currentSelection = NULL;
+        selectedLabel->setString("Pan Tool");
     }
 };
 void LevelEditor::WallSelectCallback(Ref*){
@@ -228,6 +237,7 @@ void LevelEditor::WallSelectCallback(Ref*){
         ResetToolPos();
         currentTool = NO_TOOL;
         currentSelection = NULL;
+        selectedLabel->setString("Pan Tool");
     }
 };
 void LevelEditor::SpawnerSelectCallback(Ref*){
@@ -243,6 +253,7 @@ void LevelEditor::SpawnerSelectCallback(Ref*){
         ResetToolPos();
         currentTool = NO_TOOL;
         currentSelection = NULL;
+        selectedLabel->setString("Pan Tool");
     }
 };
 void LevelEditor::HookSelectCallback(Ref*){
@@ -257,6 +268,7 @@ void LevelEditor::HookSelectCallback(Ref*){
         ResetToolPos();
         currentTool = NO_TOOL;
         currentSelection = NULL;
+        selectedLabel->setString("Pan Tool");
     }
 };
 void LevelEditor::EraseSelectCallback(Ref*){
@@ -271,12 +283,28 @@ void LevelEditor::EraseSelectCallback(Ref*){
         ResetToolPos();
         currentTool = NO_TOOL;
         currentSelection = NULL;
+        selectedLabel->setString("Pan Tool");
     }
 };
 void LevelEditor::homeButtonCallback(Ref* ref){
     Director::getInstance()->pushScene(MainMenu::myScene);
 }
 void LevelEditor::saveButtonCallback(Ref* ref){
+    bool hasSpawner = false;
+    for(int x = 0; x < mapObjects.size(); x++){
+        if(mapObjects[x]->GetType() == SPAWNER){
+            hasSpawner = true;
+            break;
+        }
+    }
+    if(!hasSpawner){
+        if(!noticeUp){
+            notice->setVisible(true);
+            notice->setPosition(Point(notice->getPosition().x, notice->getPosition().y + 1000));
+            noticeUp = true;
+        }
+    }
+    else{
     shade->setAnchorPoint(Point(0,0));
     saveDeclineButton->setPosition(saveDeclineButton->getPosition().x, saveButtonsOnY);
     saveAcceptButton->setPosition(saveAcceptButton->getPosition().x, saveButtonsOnY);
@@ -310,6 +338,7 @@ void LevelEditor::saveButtonCallback(Ref* ref){
     saveDialog = true;
     
     nameBox->setPosition(Point(nameBox->getPosition().x, nameBox->getPosition().y - 1000));
+    }
 }
 void LevelEditor::saveAcceptCallback(Ref* ref){
     name = nameBox->getText();
@@ -366,6 +395,7 @@ void LevelEditor::moveButtonCallback(Ref* ref){
         ResetToolPos();
         currentTool = NO_TOOL;
         currentSelection = NULL;
+        selectedLabel->setString("Pan Tool");
     }
 }
 void LevelEditor::selectedButtonCallback(Ref* ref){
@@ -384,6 +414,12 @@ void LevelEditor::trashButtonCallback(Ref* ref){
     EnableSpawner();
 }
 bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
+    if(noticeUp){
+        notice->setVisible(false);
+        notice->setPosition(Point(notice->getPosition().x, notice->getPosition().y - 1000));
+        noticeUp = false;
+    }
+    else{
     if(!saveDialog){
     touchStart = PixelToTile(touch->getLocation());
     switch(currentTool){
@@ -418,6 +454,8 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
             break;
     }
     return true;
+    }
+    return false;
     }
     return false;
 }

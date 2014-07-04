@@ -28,6 +28,7 @@ public:
     const char* myName;
     const char* myPath;
     void SetEnabled(bool);
+    void SetTag(int);
 private:
 };
 

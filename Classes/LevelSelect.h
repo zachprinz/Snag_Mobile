@@ -31,7 +31,7 @@ public:
     CREATE_FUNC(LevelSelect);
     
     void editCallback(Ref*);
-    void playCallback(Ref*);
+    void playCallback(Object*);
     void highscoresCallback(Ref*);
     void scrollUpCallback(Ref*);
     void scrollDownCallback(Ref*);
