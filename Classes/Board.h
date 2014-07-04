@@ -50,6 +50,8 @@ public:
     static void Print(std::string);
     static char* levelPath;
     static bool customLevel;
+    static std::vector<std::string> myLevels;
+    static std::vector<std::string> myLevelNames;
 private:
     void LoadLevel(char* name);
     Sprite* background;

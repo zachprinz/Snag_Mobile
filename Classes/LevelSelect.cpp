@@ -118,6 +118,7 @@ bool LevelSelect::init()
         menuItems.pushBack(lvl->edit);
         menuItems.pushBack(lvl->highscores);
         menuItems.pushBack(lvl->play);
+        menuItems.pushBack(lvl->name);
         AddLevel(lvl);
     }
     
@@ -132,7 +133,7 @@ bool LevelSelect::init()
 void LevelSelect::editCallback(Ref*){
 
 }
-void LevelSelect::playCallback(Ref*){
+void LevelSelect::playCallback(Ref* ref){
     if(HelloWorld::myScene == NULL){
         Board::Print("Play button click registered.");
         auto scene = HelloWorld::createScene();
@@ -166,6 +167,21 @@ void LevelSelect::myLevelsCallback(Ref*){
     onlineLevelsBackground->setVisible(false);
     myLevelsBackground->setVisible(true);
     currentLevelSet = LEVELS_MY;
+    
+    tinyxml2::XMLDocument myLevelsDoc;
+    myLevelsDoc.LoadFile(FileUtils::getInstance()->fullPathForFilename("MyLevels.xml").c_str());
+    tinyxml2::XMLElement* level = myLevelsDoc.FirstChildElement();
+    int x = 0;
+    while(level != NULL && x < 3){
+        levels[x]->SetName(level->Attribute("name"));
+        levels[x]->SetPath(level->Attribute("path"));
+    }
+    
+    for(int x = 0; x < Board::myLevels.size(); x++){
+        levels[x]->SetName(Board::myLevelNames[x].c_str());
+        levels[x]->SetPath(Board::myLevels[x].c_str());
+    }
+    
     LoadLevels();
 };
 void LevelSelect::onlineCallback(Ref*){

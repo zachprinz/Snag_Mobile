@@ -41,6 +41,7 @@ bool LevelEditor::init(){
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener,this);
     
     cocos2d::Vector<MenuItem*> menuItems;
+    saveDialog = false;
     
     spikeWallSelectButton = MenuItemImage::create("LevelEditorSpikeWall.png", "LevelEditorSpikewall.png", this, menu_selector(LevelEditor::SpikeWallSelectCallback));
     float buttonHeight = 155 * MainMenu::screenScale.x + 22;
@@ -140,16 +141,16 @@ bool LevelEditor::init(){
     //nameBox->setDelegate(this);
     this->addChild(nameBox);
     
-    auto buttonsBackground = Sprite::create("LevelEditorSelected.png");
-    buttonsBackground->setAnchorPoint(Point(0.5,1.0));
-    buttonsBackground->setPosition(visibleSize.width / 2.0, visibleSize.height - 10);
+    selectedSprite = Sprite::create("LevelEditorSelected.png");
+    selectedSprite->setAnchorPoint(Point(0.5,1.0));
+    selectedSprite->setPosition(visibleSize.width / 2.0, visibleSize.height - 10);
     
     auto background = Sprite::create("GRID.png");
     background->setAnchorPoint(Point(0,0));
     
     spikeWallSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     wallSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    buttonsBackground->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
+    selectedSprite->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     hookSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     spawnerSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     eraseSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
@@ -170,10 +171,10 @@ bool LevelEditor::init(){
     eraseSelectButton->setPositionZ(1);
     homeSelectButton->setPositionZ(1);
 
-    buttonsBackground->setPositionZ(-1);
+    selectedSprite->setPositionZ(-1);
     background->setPositionZ(-4);
     this->addChild(background);
-    this->addChild(buttonsBackground);
+    this->addChild(selectedSprite);
     
     Menu* menu = Menu::createWithArray(menuItems);
     Menu* menu2 = Menu::createWithArray(saveMenuItems);
@@ -295,26 +296,65 @@ void LevelEditor::saveButtonCallback(Ref* ref){
     saveAcceptButton->setEnabled(true);
     saveDeclineButton->setEnabled(true);
     
-    moveSelectButton->setPosition(Point(moveSelectButton->getPosition().x + 100, moveSelectButton->getPosition().y));
-    eraseSelectButton->setPosition(Point(eraseSelectButton->getPosition().x - 100, eraseSelectButton->getPosition().y));
-    hookSelectButton->setPosition(Point(hookSelectButton->getPosition().x - 100, hookSelectButton->getPosition().y));
-    wallSelectButton->setPosition(Point(wallSelectButton->getPosition().x - 100, wallSelectButton->getPosition().y));
-    spikeWallSelectButton->setPosition(Point(spikeWallSelectButton->getPosition().x - 100, spikeWallSelectButton->getPosition().y));
-    spawnerSelectButton->setPosition(Point(spawnerSelectButton->getPosition().x - 100, spawnerSelectButton->getPosition().y));
-    playSelectButton->setPosition(Point(playSelectButton->getPosition().x + 100, playSelectButton->getPosition().y));
-    homeSelectButton->setPosition(Point(homeSelectButton->getPosition().x + 100, homeSelectButton->getPosition().y));
-    trashSelectButton->setPosition(Point(homeSelectButton->getPosition().x + 100, homeSelectButton->getPosition().y));
-    saveSelectButton->setPosition(Point(homeSelectButton->getPosition().x + 100, homeSelectButton->getPosition().y));
-
-    nameBox->setPosition(Point(nameBox->getPosition().x, nameBox->getPosition().y - 1000));
+    moveSelectButton->setVisible(false);
+    eraseSelectButton->setVisible(false);
+    hookSelectButton->setVisible(false);
+    wallSelectButton->setVisible(false);
+    spikeWallSelectButton->setVisible(false);
+    spawnerSelectButton->setVisible(false);
+    playSelectButton->setVisible(false);
+    homeSelectButton->setVisible(false);
+    trashSelectButton->setVisible(false);
+    saveSelectButton->setVisible(false);
+    selectedSprite->setVisible(false);
+    selectedLabel->setVisible(false);
     
-    Export();
+    saveDialog = true;
+    
+    nameBox->setPosition(Point(nameBox->getPosition().x, nameBox->getPosition().y - 1000));
 }
 void LevelEditor::saveAcceptCallback(Ref* ref){
-    
+    name = nameBox->getText();
+    Export();
+    ResetSaveDialog();
 }
 void LevelEditor::saveDeclineCallback(Ref* ref){
+    ResetSaveDialog();
+}
+void LevelEditor::ResetSaveDialog(){
+    shade->setAnchorPoint(Point(0,1.0));
+    saveDeclineButton->setPosition(saveDeclineButton->getPosition().x, saveButtonsOffY);
+    saveAcceptButton->setPosition(saveAcceptButton->getPosition().x, saveButtonsOffY);
     
+    moveSelectButton->setEnabled(true);
+    eraseSelectButton->setEnabled(true);
+    hookSelectButton->setEnabled(true);
+    wallSelectButton->setEnabled(true);
+    spikeWallSelectButton->setEnabled(true);
+    spawnerSelectButton->setEnabled(true);
+    playSelectButton->setEnabled(true);
+    homeSelectButton->setEnabled(true);
+    trashSelectButton->setEnabled(true);
+    saveSelectButton->setEnabled(true);
+    saveAcceptButton->setEnabled(false);
+    saveDeclineButton->setEnabled(false);
+    
+    moveSelectButton->setVisible(true);
+    eraseSelectButton->setVisible(true);
+    hookSelectButton->setVisible(true);
+    wallSelectButton->setVisible(true);
+    spikeWallSelectButton->setVisible(true);
+    spawnerSelectButton->setVisible(true);
+    playSelectButton->setVisible(true);
+    homeSelectButton->setVisible(true);
+    trashSelectButton->setVisible(true);
+    saveSelectButton->setVisible(true);
+    selectedSprite->setVisible(true);
+    selectedLabel->setVisible(true);
+    
+    saveDialog = false;
+    
+    nameBox->setPosition(Point(nameBox->getPosition().x, nameBox->getPosition().y + 1000));
 }
 void LevelEditor::moveButtonCallback(Ref* ref){
     if(currentSelection != moveSelectButton){
@@ -346,6 +386,7 @@ void LevelEditor::trashButtonCallback(Ref* ref){
     EnableSpawner();
 }
 bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
+    if(!saveDialog){
     touchStart = PixelToTile(touch->getLocation());
     switch(currentTool){
         case WALL:{
@@ -379,6 +420,8 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
             break;
     }
     return true;
+    }
+    return false;
 }
 void LevelEditor::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
     if(currentTool != ERASE && currentTool != NO_TOOL && currentTool != SPAWNER && currentTool != HOOK){
@@ -552,12 +595,27 @@ void LevelEditor::ResetToolPos(){
 //    doc.LoadFile(FileUtils::getInstance()->fullPathForFilename("level.xml").c_str());
 
 void LevelEditor::Export(){
+    std::string str = FileUtils::getInstance()->getWritablePath() + name + ".xml";
+    char* cstr = new char[str.length() + 1];
+    std::strcpy(cstr, str.c_str());
+    
+    Board::myLevels.push_back(str);
+    Board::myLevelNames.push_back(name);
+    
+    tinyxml2::XMLDocument myLevelsDoc;
+    myLevelsDoc.LoadFile(FileUtils::getInstance()->fullPathForFilename("MyLevels.xml").c_str());
+    tinyxml2::XMLElement* newLevel = myLevelsDoc.NewElement("level");
+    newLevel->SetAttribute("name", name.c_str());
+    newLevel->SetAttribute("path", str.c_str());
+    myLevelsDoc.InsertEndChild(newLevel);
+    
     tinyxml2::XMLDocument doc;
     tinyxml2::XMLElement* walls = doc.NewElement("Walls");
     tinyxml2::XMLElement* spawners = doc.NewElement("Spawners");
     tinyxml2::XMLElement* spikewalls = doc.NewElement("SpikeWalls");
     tinyxml2::XMLElement* hooks = doc.NewElement("Hooks");
     tinyxml2::XMLElement* map = doc.NewElement("map");
+    map->SetAttribute("name", name.c_str());
     for(int x = 0; x < mapObjects.size(); x++){
         switch(mapObjects[x]->GetType()){
             case WALL:{
@@ -582,6 +640,8 @@ void LevelEditor::Export(){
                 tinyxml2::XMLElement* wall = doc.NewElement("spawner");
                 wall->SetAttribute("x", mapObjects[x]->GetStart().x);
                 wall->SetAttribute("y", mapObjects[x]->GetStart().y);
+                wall->SetAttribute("xVelocity", 100);
+                wall->SetAttribute("yVelocity", 600);
                 spawners->InsertEndChild(wall);
                 break;
             }
@@ -599,10 +659,8 @@ void LevelEditor::Export(){
     map->InsertFirstChild(walls);
     map->InsertFirstChild(hooks);
     doc.InsertFirstChild(map);
-    std::string str = FileUtils::getInstance()->getWritablePath() + "customlevel.xml";
-    char* cstr = new char[str.length() + 1];
-    std::strcpy(cstr, str.c_str());
-    doc.SaveFile(cstr);
+
+    doc.SaveFile(str.c_str());
     Board::levelPath = cstr;
     Board::customLevel = true;
     std::cout << "FilePath: " << FileUtils::getInstance()->getWritablePath().c_str() << std::endl;

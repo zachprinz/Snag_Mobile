@@ -32,6 +32,13 @@ LevelMenuItem::LevelMenuItem(std::string name, Size visibleSize, int x, int y){
     play->setPosition(Point(backgroundWidth * 0.71 + x2, y));
     play->setAnchorPoint(Point(0.5,0.5));
     
+    this->name = MenuItemFont::create(name, LevelSelect::myScene, menu_selector(LevelSelect::playCallback));
+    this->name->setAnchorPoint(Point(0.5,0.5));
+    this->name->setPosition(backgroundWidth * 0.35 + x2, y+10);
+    this->name->setFontSizeObj(this->name->getFontSize() * 3);
+    this->name->setColor(Color3B(0.0,0.0,0.0));
+    this->name->setEnabled(false);
+    
     edit->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     play->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     highscores->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
@@ -41,4 +48,11 @@ LevelMenuItem::LevelMenuItem(std::string name, Size visibleSize, int x, int y){
 }
 void LevelMenuItem::SetOrder(int){
 
+}
+void LevelMenuItem::SetName(const char* n){
+    myName = n;
+    this->name->setString(myName);
+}
+void LevelMenuItem::SetPath(const char* n){
+    myPath = n;
 }

@@ -46,7 +46,7 @@ void User::SetUpPhysicsSprite(char* texture){
 }
 
 void User::update(float dt){
-    if(position.y < -200)//(abs(body->getVelocity().x) < 0.1 && abs(body->getVelocity().y) < 0.1) || position.y < -200)
+    if(position.y < -400)//(abs(body->getVelocity().x) < 0.1 && abs(body->getVelocity().y) < 0.1) || position.y < -200)
         Reset();
     userPosition = position;
     Board::PrintVec2("UserPosition", GetBounds().origin);

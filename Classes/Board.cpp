@@ -19,6 +19,8 @@ USING_NS_CC;
 Board* Board::Instance;
 char* Board::levelPath;
 bool Board::customLevel;
+std::vector<std::string> Board::myLevels;
+std::vector<std::string> Board::myLevelNames;
 
 Board::Board(Layer* game, PhysicsWorld* world, Size size, Point origin){
     this->world = world;
@@ -157,10 +159,10 @@ void Board::Print(std::string message){
 void Board::LoadLevel(char* name){
     tinyxml2::XMLDocument doc;
     //doc.LoadFile(FileUtils::getInstance()->fullPathForFilename("level.xml").c_str());
-    if(customLevel)
-        doc.LoadFile(levelPath);
-    else
-        doc.LoadFile(FileUtils::getInstance()->fullPathForFilename("level.xml").c_str());
+    //if(customLevel)
+    //    doc.LoadFile(levelPath);
+   // else
+    doc.LoadFile(myLevels[0].c_str());//FileUtils::getInstance()->fullPathForFilename("level.xml").c_str());
     std::cout << "FilePath: " << FileUtils::getInstance()->fullPathForFilename("level.xml").c_str() << std::endl;
 
     tinyxml2::XMLElement* hooksNode = doc.RootElement()->FirstChildElement();
@@ -170,6 +172,7 @@ void Board::LoadLevel(char* name){
         int y;
         currentHook->QueryIntAttribute("x", &x);
         currentHook->QueryIntAttribute("y", &y);
+        Print("Loading Hook X: " + std::to_string(x) + " Y: " + std::to_string(y));
         AddHook(new Hook(Vec2(x,y)));
         currentHook = currentHook->NextSiblingElement();
     }
@@ -177,6 +180,7 @@ void Board::LoadLevel(char* name){
     tinyxml2::XMLElement* wallsNode = doc.RootElement()->FirstChildElement("Walls");
     tinyxml2::XMLElement* currentWall = wallsNode->FirstChildElement();
     while(currentWall != NULL){
+        Print("Loading Wall");
         int x;
         int y;
         int height;
@@ -185,6 +189,8 @@ void Board::LoadLevel(char* name){
         currentWall->QueryIntAttribute("y", &y);
         currentWall->QueryIntAttribute("width", &width);
         currentWall->QueryIntAttribute("height", &height);
+        Print("Loading Wall X: " + std::to_string(x) + " Y: " + std::to_string(y) + " Width: " + std::to_string(width) + " Height: " + std::to_string(height));
+
         AddWall(new Wall(Vec2(x,y),Vec2(width,height)));
         currentWall = currentWall->NextSiblingElement();
     }
@@ -192,6 +198,7 @@ void Board::LoadLevel(char* name){
     tinyxml2::XMLElement* SpikeWallsNode = doc.RootElement()->FirstChildElement("SpikeWalls");
     tinyxml2::XMLElement* currentSpikeWall = SpikeWallsNode->FirstChildElement();
     while(currentSpikeWall != NULL){
+        Print("Loading Spikewall");
         int x;
         int y;
         int height;
@@ -207,6 +214,7 @@ void Board::LoadLevel(char* name){
     tinyxml2::XMLElement* SpawnersNode = doc.RootElement()->FirstChildElement("Spawners");
     tinyxml2::XMLElement* currentSpawner = SpawnersNode->FirstChildElement();
     while(currentSpawner != NULL){
+        Print("Loading Spawner");
         int x;
         int y;
         int xVelocity;
@@ -215,6 +223,7 @@ void Board::LoadLevel(char* name){
         currentSpawner->QueryIntAttribute("y", &y);
         currentSpawner->QueryIntAttribute("xVelocity", &xVelocity);
         currentSpawner->QueryIntAttribute("yVelocity", &yVelocity);
+        Print("Loading Spawner X: " + std::to_string(x) + " Y: " + std::to_string(y));
         AddSpawner(new Spawner(Vec2(x,y),Vec2(xVelocity,yVelocity)));
         currentSpawner = currentSpawner->NextSiblingElement();
     }

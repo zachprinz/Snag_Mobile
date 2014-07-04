@@ -8,6 +8,7 @@
 
 #include "MapObject.h"
 #include "LevelEditor.h"
+#include "MainMenu.h"
 
 Vec2 MapObject::origin;
 
@@ -79,9 +80,9 @@ int MapObject::GetType(){
 }
 
 Vec2 MapObject::GetStart(){
-    return Vec2(startCoord.x * TILE_SIZE, startCoord.y * TILE_SIZE);
+    return Vec2(startCoord.x * (MainMenu::screenScale.x * 256 * 0.5), startCoord.y * (MainMenu::screenScale.x * 256 * 0.5) + GetSize().y);
 }
 
 Vec2 MapObject::GetSize(){
-    return Vec2((endCoord.x - startCoord.x) * TILE_SIZE, (endCoord.y - startCoord.y) * TILE_SIZE);
+    return Vec2((endCoord.x - startCoord.x) * (MainMenu::screenScale.x * 256 * 0.5), (endCoord.y - startCoord.y) * (MainMenu::screenScale.y * 256 * 0.5));
 }

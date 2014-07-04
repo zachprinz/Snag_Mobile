@@ -80,6 +80,7 @@ public:
     MenuItemImage* currentSelection;
     
     Sprite* shade;
+    Sprite* selectedSprite;
     static Scene* myScene;
     bool isTouched;
     Vec2 originTile;
@@ -90,11 +91,14 @@ public:
     std::vector<MapObject*> mapObjects;
     void AddMapObject(MapObject*);
     MapObject* currentMapObject;
+    std::string name;
     
     void DisableSpawner();
     void EnableSpawner();
     
     void Erase(Vec2);
+    
+    bool saveDialog;
     
     static LevelEditor* Instance;
     
@@ -103,6 +107,8 @@ public:
     
     float saveButtonsOnY;
     float saveButtonsOffY;
+    
+    void ResetSaveDialog();
     
     void Export();
 private:

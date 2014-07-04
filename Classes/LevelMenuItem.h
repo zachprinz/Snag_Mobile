@@ -23,6 +23,10 @@ public:
     cocos2d::Sprite* background;
     cocos2d::MenuItemFont* name;
     void SetOrder(int);
+    void SetName(const char*);
+    void SetPath(const char*);
+    const char* myName;
+    const char* myPath;
     
 private:
 };
