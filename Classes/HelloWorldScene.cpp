@@ -38,8 +38,7 @@ void HelloWorld::onContactPostSolve(PhysicsContact& contact){
 }
 
 bool HelloWorld::onContactBegin(PhysicsContact& contact){
-    board->onContactBegin(contact);
-    return true;
+    return board->onContactBegin(contact);
 }
 
 bool HelloWorld::init()
@@ -61,9 +60,9 @@ bool HelloWorld::init()
     currentCenter.set(Director::getInstance()->getWinSize().width / (2 * tempScale), Director::getInstance()->getWinSize().height / (2 * tempScale));
     
     board = new Board(this, world, visibleSize, origin);
-    
+    this->addChild(board->timeLabel);
     schedule(schedule_selector(HelloWorld::update));
-    
+    this->schedule(schedule_selector(HelloWorld::UpdateTimer),0.1f);
     cocos2d::Vector<MenuItem*> menuItems;
     
     auto resetButton = MenuItemImage::create("reset.png", "reset.png", this, menu_selector(HelloWorld::resetButtonCallback));
@@ -84,6 +83,10 @@ bool HelloWorld::init()
     this->addChild(menu, 1);
     
     return true;
+}
+
+void HelloWorld::UpdateTimer(float dt){
+    Board::Instance->UpdateTimer(dt);
 }
 
 void HelloWorld::resetButtonCallback(Ref* ref){

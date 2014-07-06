@@ -74,6 +74,7 @@ void User::Release(){
 void User::Reset(){
     if(isHooked)
         Release();
+    Board::Instance->time = 0.0;
     physicsSprite->setPosition(Spawner::Instance->GetPosition());
     body->setVelocity(Spawner::Instance->GetVelocity());
 }

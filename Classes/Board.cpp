@@ -13,6 +13,8 @@
 #include <iostream>
 #include <fstream>
 #include "Spawner.h"
+#include <iomanip>
+#include "MainMenu.h"
 
 USING_NS_CC;
 
@@ -41,6 +43,11 @@ Board::Board(Layer* game, PhysicsWorld* world, Size size, Point origin){
     this->origin = origin;
     this->boardSize.setSize(3000,3000);
     
+    timeLabel = Label::createWithBMFont("comfortaa_large.fnt", "0.00", TextHAlignment::LEFT);
+    timeLabel->setPosition(visibleSize.width / 2.0 - (80 * MainMenu::screenScale.x), visibleSize.height);
+    timeLabel->setAnchorPoint(Point(0.0,1.0));
+    timeLabel->setPositionZ(4);
+    
     scale = 1.0f;
     user = new User();
     //LoadLevel("level.xml");
@@ -50,6 +57,20 @@ Board::Board(Layer* game, PhysicsWorld* world, Size size, Point origin){
 void Board::SetPhysicsWorld(PhysicsWorld* world){
     this->world = world;
     this->world->setGravity(Vec2(0,-300));
+}
+
+void Board::UpdateTimer(float dt){
+    time += 0.1;
+    std::ostringstream out;
+    int prec = 2;
+    if(((int)time) % 10 >= 1)
+        prec = 3;
+    if(((int)time) % 100 >= 1)
+        prec = 4;
+    out << std::setprecision(prec) << time;
+    if(fmod(std::atof(out.str().c_str()),1.0) == 0.0)
+        out << ".0";
+    timeLabel->setString(out.str());
 }
 
 void Board::onContactPostSolve(PhysicsContact& contact){
@@ -70,10 +91,18 @@ void Board::onContactPostSolve(PhysicsContact& contact){
     if(type == 3){
         Print("Contact with hook, Ignore");
     }
+    if(type == -1){
+        Print("You've reached the goal zone! You Win!");
+    }
 }
 
-void Board::onContactBegin(PhysicsContact& contact){
+bool Board::onContactBegin(PhysicsContact& contact){
+    if(contact.getShapeB()->getBody()->getTag() == -1){
+        onWin();
+        return false;
+    }
     user->SetBackupVelocity(user->body->getVelocity());
+    return true;
 }
 
 void Board::update(float dt){
@@ -111,6 +140,10 @@ void Board::AddEntity(Entity* ent){
     ents.push_back(ent);
 }
 
+void Board::onWin(){
+    Print("You Win!");
+}
+
 void Board::AddHook(Hook* hook){
     hooks.push_back(hook);
     ents.push_back(hook);
@@ -124,6 +157,11 @@ void Board::AddSpikeWall(SpikeWall* sw){
 void Board::AddWall(Wall* wall){
     walls.push_back(wall);
     ents.push_back(wall);
+}
+
+void Board::AddGoal(Goal* goal){
+    goals.push_back(goal);
+    ents.push_back(goal);
 }
 
 void Board::AddSpawner(Spawner* spawner){
@@ -176,6 +214,7 @@ void Board::Print(std::string message){
 void Board::LoadLevel(std::string name){
     tinyxml2::XMLDocument doc;
     doc.LoadFile(name.c_str());
+    
     tinyxml2::XMLElement* hooksNode = doc.RootElement()->FirstChildElement();
     tinyxml2::XMLElement* currentHook = hooksNode->FirstChildElement();
     while(currentHook != NULL){
@@ -220,6 +259,22 @@ void Board::LoadLevel(std::string name){
         currentSpikeWall->QueryIntAttribute("height", &height);
         AddSpikeWall(new SpikeWall(Vec2(x,y),Vec2(width,height)));
         currentSpikeWall = currentSpikeWall->NextSiblingElement();
+    }
+    
+    tinyxml2::XMLElement* GoalsNode = doc.RootElement()->FirstChildElement("Goals");
+    tinyxml2::XMLElement* currentGoal = GoalsNode->FirstChildElement();
+    while(currentGoal != NULL){
+        Print("Loading Goal");
+        int x;
+        int y;
+        int height;
+        int width;
+        currentGoal->QueryIntAttribute("x", &x);
+        currentGoal->QueryIntAttribute("y", &y);
+        currentGoal->QueryIntAttribute("width", &width);
+        currentGoal->QueryIntAttribute("height", &height);
+        AddGoal(new Goal(Vec2(x,y),Vec2(width,height)));
+        currentGoal = currentGoal->NextSiblingElement();
     }
     
     tinyxml2::XMLElement* SpawnersNode = doc.RootElement()->FirstChildElement("Spawners");
