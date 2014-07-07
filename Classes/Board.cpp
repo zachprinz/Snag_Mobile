@@ -43,7 +43,7 @@ Board::Board(Layer* game, PhysicsWorld* world, Size size, Point origin){
     this->origin = origin;
     this->boardSize.setSize(3000,3000);
     
-    timeLabel = Label::createWithBMFont("dimbo", "0.00", TextHAlignment::LEFT);
+    timeLabel = Label::createWithBMFont("dimbo.fnt", "0.00", TextHAlignment::LEFT);
     timeLabel->setPosition(visibleSize.width / 2.0 - (80 * MainMenu::screenScale.x), visibleSize.height);
     timeLabel->setAnchorPoint(Point(0.0,1.0));
     timeLabel->setPositionZ(4);

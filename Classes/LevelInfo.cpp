@@ -43,44 +43,58 @@ bool LevelInfo::init() {
     background->setAnchorPoint(Point(0,0));
     background->setPosition(0,0);
     titleBackground->setAnchorPoint(Point(0,0));
-    titleBackground->setPosition(0,0);
+    titleBackground->setPosition(1.5 * 0.01 * visibleSize.width, visibleSize.height - (0.01 * visibleSize.height * 2.5));
+    titleBackground->setAnchorPoint(Point(0.0,1.0));
     authorBackground->setAnchorPoint(Point(0,0));
-    authorBackground->setPosition(0,0);
+    authorBackground->setPosition(10.5 * 0.01 * visibleSize.width,visibleSize.height - (0.01 * visibleSize.height * 17.2));
+    authorBackground->setAnchorPoint(Point(0.0,1.0));
     levelInfoBackground->setAnchorPoint(Point(0,0));
-    levelInfoBackground->setPosition(0,0);
+    levelInfoBackground->setPosition(3.3 * 0.01 * visibleSize.width,visibleSize.height - (0.01 * visibleSize.height * 31.4));
+    levelInfoBackground->setAnchorPoint(Point(0.0,1.0));
     highscoresBackground->setAnchorPoint(Point(0,0));
-    highscoresBackground->setPosition(0,0);
+    highscoresBackground->setPosition(51.5 * 0.01 * visibleSize.width,visibleSize.height - (0.01 * visibleSize.height * 18.5));
+    highscoresBackground->setAnchorPoint(Point(0.0,1.0));
     highScoresLabel->setAnchorPoint(Point(0,0));
-    highScoresLabel->setPosition(0,0);
+    highScoresLabel->setPosition(51.5 * 0.01 * visibleSize.width,visibleSize.height - (0.01 * visibleSize.height * 2.5));
+    highScoresLabel->setAnchorPoint(Point(0.0,1.0));
     
     title = Label::createWithBMFont("dimbo.fnt", "New Level 1", TextHAlignment::CENTER);
-    title->setPosition();
+    title->setPosition(26.5 * 0.01 * visibleSize.width,visibleSize.height - (0.01 * visibleSize.height * 9.5));
+    title->setAnchorPoint(Point(0.5,0.5));
     
     author = Label::createWithBMFont("dimbo.fnt", "The Gaate", TextHAlignment::CENTER);
-    author->setPosition();
+    author->setPosition(26.5 * 0.01 * visibleSize.width,visibleSize.height - (0.01 * visibleSize.height * 22.9));
+    author->setScale(0.85);
+    author->setAnchorPoint(Point(0.5,0.5));
     
-    auto playButton = MenuItemImage::create("play.png", "play.png", this, menu_selector(LevelInfo::playButtonCallback));
-    playButton->setPosition(Point());
+    auto playButton = MenuItemImage::create("LevelEditorPlay.png", "LevelEditorPlay.png", this, menu_selector(LevelInfo::playButtonCallback));
+    playButton->setPosition(Point(1.5 * 0.01 * visibleSize.width,visibleSize.height - (0.01 * visibleSize.height * 81.5)));
+    playButton->setAnchorPoint(Point(0.0,1.0));
     menuItems.pushBack(playButton);
     
     auto favoriteButton = MenuItemImage::create("FavoriteOn.png", "FavoriteOff.png", this, menu_selector(LevelInfo::favoriteButtonCallback));
-    favoriteButton->setPosition(Point());
+        favoriteButton->setAnchorPoint(Point(0.0,1.0));
+    favoriteButton->setPosition(Point(11.8 * 0.01 * visibleSize.width, visibleSize.height - (0.01 * visibleSize.height * 81.5)));
     menuItems.pushBack(favoriteButton);
     
     auto downloadButton = MenuItemImage::create("DownloadOn.png", "DownloadOff.png", this, menu_selector(LevelInfo::downloadButtonCallback));
-    downloadButton->setPosition(Point());
+        downloadButton->setAnchorPoint(Point(0.0,1.0));
+    downloadButton->setPosition(Point(21.5 * 0.01 * visibleSize.width, visibleSize.height - (0.01 * visibleSize.height * 81.5)));
     menuItems.pushBack(downloadButton);
     
     auto highscoresButton = MenuItemImage::create("LevelSelectScores.png", "LevelSelectScores.png", this, menu_selector(LevelInfo::highscoresButtonCallback));
-    highscoresButton->setPosition(Point());
+        highscoresButton->setAnchorPoint(Point(0.0,1.0));
+    highscoresButton->setPosition(Point(31.4 * 0.01 * visibleSize.width,visibleSize.height - (0.01 * visibleSize.height *  81.5)));
     menuItems.pushBack(highscoresButton);
     
     auto editButton = MenuItemImage::create("LevelSelectEdit.png", "LevelSelectEdit.png", this, menu_selector(LevelInfo::editButtonCallback));
-    editButton->setPosition(Point());
+        editButton->setAnchorPoint(Point(0.0,1.0));
+    editButton->setPosition(Point(41.2 * 0.01 * visibleSize.width, visibleSize.height - (0.01 * visibleSize.height * 81.5)));
     menuItems.pushBack(editButton);
     
     auto homeButton = MenuItemImage::create("home.png", "home.png", this, menu_selector(LevelInfo::homeButtonCallback));
-    homeButton->setPosition(Point());
+        homeButton->setAnchorPoint(Point(0.0,1.0));
+    homeButton->setPosition(Point(89.4 * 0.01 * visibleSize.width, visibleSize.height - (0.01 * visibleSize.height * 1.2)));
     menuItems.pushBack(homeButton);
     
     homeButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);

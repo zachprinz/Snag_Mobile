@@ -12,6 +12,7 @@
 #include "LevelEditor.h"
 #include "MainMenu.h"
 #include "LevelMenuItem.h"
+#include "LevelInfo.h"
 
 USING_NS_CC;
 
@@ -130,7 +131,17 @@ void LevelSelect::editCallback(Ref*){
 
 }
 void LevelSelect::playCallback(Object* sender){
-    if(HelloWorld::myScene == NULL){
+    if(LevelInfo::myScene == NULL){
+        Board::Print("Play button click registered.");
+        auto scene = LevelInfo::createScene();
+        Director::getInstance()->pushScene(scene);
+        //LevelInfo::Instance->Refresh();
+    }
+    else{
+        Director::getInstance()->pushScene(LevelInfo::myScene);
+        //LevelInfo::Instance->Refresh();
+    }
+    /*if(HelloWorld::myScene == NULL){
         Board::Print("Play button click registered.");
         auto scene = HelloWorld::createScene();
         Director::getInstance()->pushScene(scene);
@@ -161,7 +172,7 @@ void LevelSelect::playCallback(Object* sender){
                 Board::Instance->Reset(Board::Instance->onlineLevels[levelSelected]);
                 break;
         }
-    }
+    }*/
 };
 void LevelSelect::highscoresCallback(Ref*){
 
