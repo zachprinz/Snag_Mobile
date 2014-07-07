@@ -18,6 +18,7 @@
 #include "Wall.h"
 #include "SpikeWall.h"
 #include "Spawner.h"
+#include "Goal.h"
 
 USING_NS_CC;
 
@@ -28,6 +29,7 @@ public:
     static Board* Instance;
     void AddHook(Hook*);
     void AddWall(Wall*);
+    void AddGoal(Goal*);
     void AddSpikeWall(SpikeWall*);
     void AddJoint(PhysicsJointDistance*);
     void AddSpawner(Spawner*);
@@ -44,9 +46,10 @@ public:
     User* user;
     PhysicsWorld* world;
     void SetPhysicsWorld(PhysicsWorld* world);
-    void onContactBegin(PhysicsContact& contact);
+    bool onContactBegin(PhysicsContact& contact);
     void onContactPostSolve(PhysicsContact& contact);
     EventDispatcher* eventDispatcher;
+    Label* timeLabel;
     static void Print(std::string);
     static char* levelPath;
     static bool customLevel;
@@ -58,6 +61,9 @@ public:
     static std::vector<std::string> localLevelNames;
     void Reset(std::string levelPath);
     void Clear();
+    void onWin();
+    float time;
+    void UpdateTimer(float);
 private:
     void LoadLevel(std::string name);
     Sprite* background;
@@ -70,6 +76,7 @@ private:
     std::vector<Wall*> walls;
     std::vector<SpikeWall*> spikewalls;
     std::vector<Spawner*> spawners;
+    std::vector<Goal*> goals;
     float ground;
     std::vector<Entity*> ents;
 };

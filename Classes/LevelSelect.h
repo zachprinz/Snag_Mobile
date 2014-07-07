@@ -40,6 +40,10 @@ public:
     void onlineCallback(Ref*);
     void homeCallback(Ref*);
     
+    MenuItemImage* myLevelsButton;
+    MenuItemImage* localLevelsButton;
+    MenuItemImage* onlineLevelsButton;
+    
     std::vector<LevelMenuItem*> levels;
     void AddLevel(LevelMenuItem*);
     void LoadLevels();
@@ -47,14 +51,13 @@ public:
     static Scene* myScene;
     static Vec2 screenScale;
     
-    Sprite* myLevelsBackground;
-    Sprite* onlineLevelsBackground;
-    Sprite* localLevelsBackground;
+    MenuItemImage* levelsBackground;
     int currentLevelSet;
     
     void Refresh();
     
     static LevelSelect* Instance;
+    void SetLevelSetButtons(int newSet);
 private:
     
 };

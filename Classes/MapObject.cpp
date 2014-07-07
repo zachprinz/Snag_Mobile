@@ -25,6 +25,10 @@ MapObject::MapObject(Vec2 start, int type){
             sprite = Sprite::create("spikewall.png");
             sprite->setScale((float)(abs(endCoord.x - startCoord.x) * TILE_SIZE) / sprite->getTexture()->getPixelsWide(), (float)(abs(endCoord.y - startCoord.y) * TILE_SIZE) / sprite->getTexture()->getPixelsHigh());
             break;
+        case GOAL:
+            sprite = Sprite::create("goal.png");
+            sprite->setScale((float)(abs(endCoord.x - startCoord.x) * TILE_SIZE) / sprite->getTexture()->getPixelsWide(), (float)(abs(endCoord.y - startCoord.y) * TILE_SIZE) / sprite->getTexture()->getPixelsHigh());
+            break;
         case SPAWNER:
             sprite = Sprite::create("spawner.png");
             LevelEditor::Instance->DisableSpawner();
@@ -54,6 +58,9 @@ void MapObject::UpdateEndCoord(Vec2 coord){
             sprite->setScale((float)(abs(endCoord.x - startCoord.x) * TILE_SIZE) / sprite->getTexture()->getPixelsWide(), (float)(abs(endCoord.y - startCoord.y) * TILE_SIZE) / sprite->getTexture()->getPixelsHigh());
             break;
         case SPIKE_WALL:
+            sprite->setScale((float)(abs(endCoord.x - startCoord.x) * TILE_SIZE) / sprite->getTexture()->getPixelsWide(), (float)(abs(endCoord.y - startCoord.y) * TILE_SIZE) / sprite->getTexture()->getPixelsHigh());
+            break;
+        case GOAL:
             sprite->setScale((float)(abs(endCoord.x - startCoord.x) * TILE_SIZE) / sprite->getTexture()->getPixelsWide(), (float)(abs(endCoord.y - startCoord.y) * TILE_SIZE) / sprite->getTexture()->getPixelsHigh());
             break;
         case SPAWNER:

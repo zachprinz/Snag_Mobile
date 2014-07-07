@@ -47,89 +47,81 @@ bool LevelSelect::init()
     cocos2d::Vector<MenuItem*> menuItems;
     currentLevelSet = LEVELS_LOCAL;
     
-    auto onlineLevelsButton = MenuItemImage::create("LevelSelectOnlineButton.png", "LevelSelectOnlineButton.png", this, menu_selector(LevelSelect::onlineCallback));
+    onlineLevelsButton = MenuItemImage::create("LevelSelectOnlineButton.png", "LevelSelectOnlineButton.png", this, menu_selector(LevelSelect::onlineCallback));
     float availableWidth = visibleSize.width - 155 * MainMenu::screenScale.x;
-    onlineLevelsButton->setPosition(Point(availableWidth / 2.0, visibleSize.height));
+    onlineLevelsButton->setGlobalZOrder(-1);
+    onlineLevelsButton->setPosition(Point(availableWidth / 2.0 + 20, visibleSize.height - 20 - 10));
     onlineLevelsButton->setAnchorPoint(Point(0.5,1.0));
-    menuItems.pushBack(onlineLevelsButton);
     
     float tabWidth = MainMenu::screenScale.x * 566;
     
-    auto localLevelsButton = MenuItemImage::create("LevelSelectLocalButton.png", "LevelSelectLocalButton.png", this, menu_selector(LevelSelect::localCallback));
-    localLevelsButton->setPosition(Point(0, visibleSize.height));
+    localLevelsButton = MenuItemImage::create("LevelSelectLocalButton.png", "LevelSelectLocalButton.png", this, menu_selector(LevelSelect::localCallback));
+    localLevelsButton->setGlobalZOrder(-1);
+    localLevelsButton->setPosition(Point(21, visibleSize.height - 20 + 10));
     localLevelsButton->setAnchorPoint(Point(0.0,1.0));
-    menuItems.pushBack(localLevelsButton);
+
     
-    auto myLevelsButton = MenuItemImage::create("LevelSelectMyLevelsButton.png", "LevelSelectMyLevelsButton.png", this, menu_selector(LevelSelect::myLevelsCallback));
-    myLevelsButton->setPosition(Point(availableWidth + 11, visibleSize.height));
+    myLevelsButton = MenuItemImage::create("LevelSelectMyLevelsButton.png", "LevelSelectMyLevelsButton.png", this, menu_selector(LevelSelect::myLevelsCallback));
+    myLevelsButton->setGlobalZOrder(-1);
+    myLevelsButton->setPosition(Point(availableWidth + 10, visibleSize.height - 20 - 10));
     myLevelsButton->setAnchorPoint(Point(1.0,1.0));
-    menuItems.pushBack(myLevelsButton);
     
     float tabHeight = 125 * MainMenu::screenScale.y;
     
     auto scrollUpButton = MenuItemImage::create("LevelSelectScrollUp.png", "LevelSelectScrollUp.png", this, menu_selector(LevelSelect::scrollUpCallback));
-    scrollUpButton->setPosition(Point(visibleSize.width / 2.0, visibleSize.height - tabHeight - 15));//(60 * MainMenu::screenScale.y)));
+    scrollUpButton->setGlobalZOrder(1);
+    scrollUpButton->setPosition(Point(visibleSize.width / 2.0, visibleSize.height - tabHeight - 22));//(60 * MainMenu::screenScale.y)));
     scrollUpButton->setAnchorPoint(Point(0.5,1.0));
-    menuItems.pushBack(scrollUpButton);
     
     auto scrollDownButton = MenuItemImage::create("LevelSelectScrollDown.png", "LevelSelectScrollDown.png", this, menu_selector(LevelSelect::scrollDownCallback));
-    scrollDownButton->setPosition(Point(visibleSize.width / 2.0, 15));
+    scrollDownButton->setGlobalZOrder(1);
+    scrollDownButton->setPosition(Point(visibleSize.width / 2.0, 12));
     scrollDownButton->setAnchorPoint(Point(0.5,0.0));
-    menuItems.pushBack(scrollDownButton);
     
     auto homeButton = MenuItemImage::create("home.png", "home.png", this, menu_selector(LevelSelect::homeCallback));
-    homeButton->setPosition(Point(visibleSize.width - 5, visibleSize.height - 5));
+    homeButton->setGlobalZOrder(1);
+    homeButton->setPosition(Point(visibleSize.width - 10, visibleSize.height - 10));
     homeButton->setAnchorPoint(Point(1.0,1.0));
-    menuItems.pushBack(homeButton);
     
-    
-    
-    onlineLevelsBackground = Sprite::create("LevelSelectOnline.png");
-    myLevelsBackground = Sprite::create("LevelSelectMyLevels.png");
-    localLevelsBackground = Sprite::create("LevelSelectLocal.png");
-    onlineLevelsBackground->setPosition(Point(0,-5));
-    myLevelsBackground->setPosition(Point(0,-5));
-    localLevelsBackground->setPosition(Point(0,-5));
+    levelsBackground = MenuItemImage::create("LevelSelectBackground.png", "LevelSelectBackground.png", this, menu_selector(LevelSelect::homeCallback));;//Sprite::create("LevelSelectBackground.png");
+    levelsBackground->setEnabled(false);
+    levelsBackground->setGlobalZOrder(0);
+    levelsBackground->setPosition(Point(0,-10));
+
     auto background = Sprite::create("background.png");
+    background->setGlobalZOrder(-2);
     background->setPosition(Point(0,0));
     background->setAnchorPoint(Point(0,0));
     this->addChild(background);
-    background->setPositionZ(-2);
-    
-    onlineLevelsBackground->setAnchorPoint(Point(0,0));
-    myLevelsBackground->setAnchorPoint(Point(0,0));
-    localLevelsBackground->setAnchorPoint(Point(0,0));
-    this->addChild(onlineLevelsBackground);
-    this->addChild(myLevelsBackground);
-    this->addChild(localLevelsBackground);
-    onlineLevelsBackground->setVisible(false);
-    myLevelsBackground->setVisible(false);
+    levelsBackground->setAnchorPoint(Point(0,0));
 
     scrollUpButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     scrollDownButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     onlineLevelsButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     localLevelsButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     myLevelsButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    localLevelsBackground->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    myLevelsBackground->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    onlineLevelsBackground->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
+    levelsBackground->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     homeButton->setScale(MainMenu::screenScale.x * 0.75, MainMenu::screenScale.y * 0.75);
     background->setScale(visibleSize.width / background->getTexture()->getPixelsWide(), visibleSize.height / background->getTexture()->getPixelsHigh());
     
-    for(int x = 0; x < 3; x++){
-        LevelMenuItem* lvl = new LevelMenuItem("new map", visibleSize, visibleSize.width / 2.0, visibleSize.height - tabHeight - tabHeight - 55 - ((203 * MainMenu::screenScale.y + 5) * x));
-        lvl->SetTag(x);
-        menuItems.pushBack(lvl->edit);
-        menuItems.pushBack(lvl->highscores);
-        menuItems.pushBack(lvl->play);
-        this->addChild(lvl->name);
-        AddLevel(lvl);
-    }
+    menuItems.pushBack(onlineLevelsButton);
+    menuItems.pushBack(myLevelsButton);
+    menuItems.pushBack(localLevelsButton);
+    menuItems.pushBack(levelsBackground);
+    menuItems.pushBack(scrollUpButton);
+    menuItems.pushBack(scrollDownButton);
+    menuItems.pushBack(homeButton);
     
     Menu* menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0.0,0.0));
     menu->setPosition(0,0);
     this->addChild(menu, 1);
+    
+    for(int x = 0; x < 3; x++){
+        LevelMenuItem* lvl = new LevelMenuItem("new map", visibleSize, visibleSize.width / 2.0, visibleSize.height - tabHeight - tabHeight - 55 - ((203 * MainMenu::screenScale.y + 5) * x) - 5);
+        lvl->SetTag(x);
+        AddLevel(lvl);
+    }
     
     return true;
 }
@@ -184,10 +176,7 @@ void LevelSelect::homeCallback(Ref* ref){
     Director::getInstance()->pushScene(MainMenu::myScene);
 }
 void LevelSelect::localCallback(Ref*){
-    localLevelsBackground->setVisible(true);
-    onlineLevelsBackground->setVisible(false);
-    myLevelsBackground->setVisible(false);
-    currentLevelSet = LEVELS_LOCAL;
+    SetLevelSetButtons(LEVELS_LOCAL);
     for(int x = 0; x < 3; x++){
         if(Board::localLevels.size() > x){
             levels[x]->SetEnabled(true);
@@ -201,25 +190,10 @@ void LevelSelect::localCallback(Ref*){
     LoadLevels();
 };
 void LevelSelect::myLevelsCallback(Ref*){
-    localLevelsBackground->setVisible(false);
-    onlineLevelsBackground->setVisible(false);
-    myLevelsBackground->setVisible(true);
-    currentLevelSet = LEVELS_MY;
-    
+    SetLevelSetButtons(LEVELS_MY);
     tinyxml2::XMLDocument myLevelsDoc;
     myLevelsDoc.LoadFile(FileUtils::getInstance()->fullPathForFilename("MyLevels.xml").c_str());
     tinyxml2::XMLElement* level = myLevelsDoc.FirstChildElement();
-    /*for(int x = 0; x < 3; x++){
-        if(level != NULL){
-            levels[x]->SetEnabled(true);
-            levels[x]->SetName(level->Attribute("name"));
-            levels[x]->SetPath(level->Attribute("path"));
-        }
-        else
-            levels[x]->SetEnabled(false);
-        level = level->NextSiblingElement();
-    }*/
-    
     for(int x = 0; x < 3; x++){
         if(Board::myLevels.size() > x){
          levels[x]->SetEnabled(true);
@@ -232,6 +206,31 @@ void LevelSelect::myLevelsCallback(Ref*){
     
     LoadLevels();
 };
+void LevelSelect::SetLevelSetButtons(int newSet){
+    switch(currentLevelSet){
+        case LEVELS_MY:
+            myLevelsButton->setPosition(myLevelsButton->getPosition().x, myLevelsButton->getPosition().y - 20);
+            break;
+        case LEVELS_LOCAL:
+            localLevelsButton->setPosition(localLevelsButton->getPosition().x, localLevelsButton->getPosition().y - 20);
+            break;
+        case LEVELS_ONLINE:
+            onlineLevelsButton->setPosition(onlineLevelsButton->getPosition().x, onlineLevelsButton->getPosition().y - 20);
+            break;
+    }
+    currentLevelSet = newSet;
+    switch(currentLevelSet){
+        case LEVELS_MY:
+            myLevelsButton->setPosition(myLevelsButton->getPosition().x, myLevelsButton->getPosition().y + 20);
+            break;
+        case LEVELS_LOCAL:
+            localLevelsButton->setPosition(localLevelsButton->getPosition().x, localLevelsButton->getPosition().y + 20);
+            break;
+        case LEVELS_ONLINE:
+            onlineLevelsButton->setPosition(onlineLevelsButton->getPosition().x, onlineLevelsButton->getPosition().y + 20);
+            break;
+    }
+}
 void LevelSelect::Refresh(){
     switch(currentLevelSet){
         case LEVELS_MY:
@@ -246,11 +245,7 @@ void LevelSelect::Refresh(){
     }
 }
 void LevelSelect::onlineCallback(Ref*){
-    localLevelsBackground->setVisible(false);
-    onlineLevelsBackground->setVisible(true);
-    myLevelsBackground->setVisible(false);
-    currentLevelSet = LEVELS_ONLINE;
-    
+    SetLevelSetButtons(LEVELS_ONLINE);
     for(int x = 0; x < 3; x++){
         if(Board::onlineLevels.size() > x){
             levels[x]->SetEnabled(true);
@@ -266,9 +261,8 @@ void LevelSelect::onlineCallback(Ref*){
 
 void LevelSelect::AddLevel(LevelMenuItem* newLevel){
     levels.push_back(newLevel);
-    this->addChild(newLevel->background);
-    //this->addChild(newLevel->highscores);
-    //this->addChild(newLevel->play);
+    this->addChild(newLevel->menu,1);
+    this->addChild(newLevel->name);
 };
 void LevelSelect::LoadLevels(){
 

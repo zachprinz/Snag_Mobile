@@ -65,10 +65,10 @@ bool LevelEditor::init(){
     hookSelectButton->setPosition(Point(10,visibleSize.height - (10 + buttonHeight * 3)));
     menuItems.pushBack(hookSelectButton);
     
-    eraseSelectButton = MenuItemImage::create("LevelEditorErase.png", "LevelEditorErase.png", this, menu_selector(LevelEditor::EraseSelectCallback));
-    eraseSelectButton->setPosition(Point(10,visibleSize.height - (10 + buttonHeight * 4)));
-    eraseSelectButton->setAnchorPoint(Point(0.0,1.0));
-    menuItems.pushBack(eraseSelectButton);
+    goalSelectButton = MenuItemImage::create("LevelEditorGoal.png", "LevelEditorGoal.png", this, menu_selector(LevelEditor::GoalSelectCallback));
+    goalSelectButton->setPosition(Point(10,visibleSize.height - (10 + buttonHeight * 4)));
+    goalSelectButton->setAnchorPoint(Point(0.0,1.0));
+    menuItems.pushBack(goalSelectButton);
     
     homeSelectButton = MenuItemImage::create("home.png", "home.png", this, menu_selector(LevelEditor::homeButtonCallback));
     homeSelectButton->setPosition(Point(visibleSize.width  - 10, visibleSize.height - (10 + buttonHeight * 0)));
@@ -85,23 +85,23 @@ bool LevelEditor::init(){
     saveSelectButton->setAnchorPoint(Point(1.0,1.0));
     menuItems.pushBack(saveSelectButton);
     
-    playSelectButton = MenuItemImage::create("LevelEditorPlay.png", "LevelEditorPlay.png", this, menu_selector(LevelEditor::playButtonCallback));
-    playSelectButton->setPosition(Point(visibleSize.width - 10,visibleSize.height - (10 + buttonHeight * 3)));
-    playSelectButton->setAnchorPoint(Point(1.0,1.0));
-    menuItems.pushBack(playSelectButton);
+    eraseSelectButton = MenuItemImage::create("LevelEditorErase.png", "LevelEditorErase.png", this, menu_selector(LevelEditor::EraseSelectCallback));
+    eraseSelectButton->setPosition(Point(visibleSize.width - 10,visibleSize.height - (10 + buttonHeight * 3)));
+    eraseSelectButton->setAnchorPoint(Point(1.0,1.0));
+    menuItems.pushBack(eraseSelectButton);
     
     moveSelectButton = MenuItemImage::create("LevelEditorMove.png", "LevelEditorMove.png", this, menu_selector(LevelEditor::moveButtonCallback));
     moveSelectButton->setPosition(Point(visibleSize.width - 10,visibleSize.height - (10 + buttonHeight * 4)));
     moveSelectButton->setAnchorPoint(Point(1.0,1.0));
     menuItems.pushBack(moveSelectButton);
     
-    selectedLabel = Label::createWithBMFont("comfortaa_large.fnt", "Pan Tool", TextHAlignment::CENTER);
+    selectedLabel = Label::createWithBMFont("dimbo.fnt", "Pan Tool", TextHAlignment::CENTER);
     selectedLabel->setPosition(visibleSize.width / 2.0, visibleSize.height - 10 - (100 * MainMenu::screenScale.y));
     selectedLabel->setColor(Color3B(0.0,0.0,0.0));
     //selectedLabel->setEnabled(false);
     this->addChild(selectedLabel);
     
-    notice = Label::createWithBMFont("comfortaa_large.fnt", "Please add at least one spawner to your level!", TextHAlignment::CENTER);
+    notice = Label::createWithBMFont("dimbo.fnt", "Please add at least one spawner to your level!", TextHAlignment::CENTER);
     notice->setPosition(visibleSize.width / 2.0, visibleSize.height / 2.0 - 1000);
     notice->setScale(0.45);
     notice->setVisible(false);
@@ -163,7 +163,7 @@ bool LevelEditor::init(){
     homeSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     saveSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     trashSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    playSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
+    goalSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     moveSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     //selectedLabel->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     saveAcceptButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
@@ -315,7 +315,7 @@ void LevelEditor::saveButtonCallback(Ref* ref){
     wallSelectButton->setEnabled(false);
     spikeWallSelectButton->setEnabled(false);
     spawnerSelectButton->setEnabled(false);
-    playSelectButton->setEnabled(false);
+    goalSelectButton->setEnabled(false);
     homeSelectButton->setEnabled(false);
     trashSelectButton->setEnabled(false);
     saveSelectButton->setEnabled(false);
@@ -328,7 +328,7 @@ void LevelEditor::saveButtonCallback(Ref* ref){
     wallSelectButton->setVisible(false);
     spikeWallSelectButton->setVisible(false);
     spawnerSelectButton->setVisible(false);
-    playSelectButton->setVisible(false);
+    goalSelectButton->setVisible(false);
     homeSelectButton->setVisible(false);
     trashSelectButton->setVisible(false);
     saveSelectButton->setVisible(false);
@@ -359,7 +359,7 @@ void LevelEditor::ResetSaveDialog(){
     wallSelectButton->setEnabled(true);
     spikeWallSelectButton->setEnabled(true);
     spawnerSelectButton->setEnabled(true);
-    playSelectButton->setEnabled(true);
+    goalSelectButton->setEnabled(true);
     homeSelectButton->setEnabled(true);
     trashSelectButton->setEnabled(true);
     saveSelectButton->setEnabled(true);
@@ -372,7 +372,7 @@ void LevelEditor::ResetSaveDialog(){
     wallSelectButton->setVisible(true);
     spikeWallSelectButton->setVisible(true);
     spawnerSelectButton->setVisible(true);
-    playSelectButton->setVisible(true);
+    goalSelectButton->setVisible(true);
     homeSelectButton->setVisible(true);
     trashSelectButton->setVisible(true);
     saveSelectButton->setVisible(true);
@@ -390,6 +390,21 @@ void LevelEditor::moveButtonCallback(Ref* ref){
         currentTool = MOVE;
         SetToolPos();
         selectedLabel->setString("Move Object");
+    }
+    else{
+        ResetToolPos();
+        currentTool = NO_TOOL;
+        currentSelection = NULL;
+        selectedLabel->setString("Pan Tool");
+    }
+}
+void LevelEditor::GoalSelectCallback(Ref* ref){
+    if(currentSelection != goalSelectButton){
+        ResetToolPos();
+        currentSelection = goalSelectButton;
+        currentTool = GOAL;
+        SetToolPos();
+        selectedLabel->setString("Goal Area");
     }
     else{
         ResetToolPos();
@@ -430,6 +445,12 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
             break;
         }
         case SPIKE_WALL:{
+            MapObject* mapObject = new MapObject(touchStart, currentTool);
+            currentMapObject = mapObject;
+            AddMapObject(mapObject);
+            break;
+        }
+        case GOAL:{
             MapObject* mapObject = new MapObject(touchStart, currentTool);
             currentMapObject = mapObject;
             AddMapObject(mapObject);
@@ -573,13 +594,19 @@ void LevelEditor::SetToolPos(){
             break;
         case ERASE:{
             if(currentSelection != NULL){
-                currentSelection->setPosition(currentSelection->getPosition().x + 20, currentSelection->getPosition().y);
+                currentSelection->setPosition(currentSelection->getPosition().x - 20, currentSelection->getPosition().y);
             }
             break;
         }
         case MOVE:{
             if(currentSelection != NULL){
                 currentSelection->setPosition(currentSelection->getPosition().x - 20, currentSelection->getPosition().y);
+            }
+            break;
+        }
+        case GOAL:{
+            if(currentSelection != NULL){
+                currentSelection->setPosition(currentSelection->getPosition().x + 20, currentSelection->getPosition().y);
             }
             break;
         }
@@ -616,13 +643,19 @@ void LevelEditor::ResetToolPos(){
             break;
         case ERASE:{
             if(currentSelection != NULL){
-                currentSelection->setPosition(currentSelection->getPosition().x - 20, currentSelection->getPosition().y);
+                currentSelection->setPosition(currentSelection->getPosition().x + 20, currentSelection->getPosition().y);
             }
             break;
         }
         case MOVE:{
             if(currentSelection != NULL){
                 currentSelection->setPosition(currentSelection->getPosition().x + 20, currentSelection->getPosition().y);
+            }
+            break;
+        }
+        case GOAL:{
+            if(currentSelection != NULL){
+                currentSelection->setPosition(currentSelection->getPosition().x - 20, currentSelection->getPosition().y);
             }
             break;
         }
@@ -651,6 +684,7 @@ void LevelEditor::Export(){
     tinyxml2::XMLElement* spikewalls = doc.NewElement("SpikeWalls");
     tinyxml2::XMLElement* hooks = doc.NewElement("Hooks");
     tinyxml2::XMLElement* map = doc.NewElement("map");
+    tinyxml2::XMLElement* goals = doc.NewElement("Goals");
     map->SetAttribute("name", name.c_str());
     for(int x = 0; x < mapObjects.size(); x++){
         switch(mapObjects[x]->GetType()){
@@ -661,6 +695,15 @@ void LevelEditor::Export(){
                 wall->SetAttribute("width", mapObjects[x]->GetSize().x);
                 wall->SetAttribute("height", mapObjects[x]->GetSize().y);
                 walls->InsertEndChild(wall);
+                break;
+            }
+            case GOAL:{
+                tinyxml2::XMLElement* wall = doc.NewElement("goal");
+                wall->SetAttribute("x", mapObjects[x]->GetStart().x);
+                wall->SetAttribute("y", mapObjects[x]->GetStart().y);
+                wall->SetAttribute("width", mapObjects[x]->GetSize().x);
+                wall->SetAttribute("height", mapObjects[x]->GetSize().y);
+                goals->InsertEndChild(wall);
                 break;
             }
             case SPIKE_WALL:{
@@ -691,6 +734,7 @@ void LevelEditor::Export(){
         }
     }
     map->InsertFirstChild(spawners);
+    map->InsertFirstChild(goals);
     map->InsertFirstChild(spikewalls);
     map->InsertFirstChild(walls);
     map->InsertFirstChild(hooks);

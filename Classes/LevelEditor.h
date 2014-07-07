@@ -23,6 +23,7 @@
 #define ERASE 4
 #define NO_TOOL 5
 #define MOVE 6
+#define GOAL 7
 #define TILE_SIZE 40
 
 using namespace cocos2d::extension;
@@ -56,6 +57,7 @@ public:
     void selectedButtonCallback(Ref*);
     void saveAcceptCallback(Ref*);
     void saveDeclineCallback(Ref*);
+    void GoalSelectCallback(Ref*);
     
     MenuItemImage* homeSelectButton;
     MenuItemImage* hookSelectButton;
@@ -65,6 +67,7 @@ public:
     MenuItemImage* wallSelectButton;
     MenuItemImage* playSelectButton;
     MenuItemImage* moveSelectButton;
+    MenuItemImage* goalSelectButton;
     Label* selectedLabel;
     Label* notice;
     MenuItemImage* saveAcceptButton;

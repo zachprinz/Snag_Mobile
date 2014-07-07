@@ -20,7 +20,7 @@ public:
     cocos2d::MenuItemImage* edit;
     cocos2d::MenuItemImage* play;
     cocos2d::MenuItemImage* highscores;
-    cocos2d::Sprite* background;
+    cocos2d::MenuItemImage* background;
     cocos2d::Label* name;
     void SetOrder(int);
     void SetName(const char*);
@@ -29,6 +29,7 @@ public:
     const char* myPath;
     void SetEnabled(bool);
     void SetTag(int);
+    Menu* menu;
 private:
 };
 

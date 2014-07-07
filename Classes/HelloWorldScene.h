@@ -25,6 +25,7 @@ public:
     void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
     void onContactPostSolve(PhysicsContact& contact);
     bool onContactBegin(PhysicsContact& contact);
+    void UpdateTimer(float);
     
     void resetButtonCallback(Ref*);
     void homeButtonCallback(Ref*);
