@@ -17,10 +17,9 @@ Vec2 Entity::baseScale;
 float Entity::boardScale;
 Vec2 Entity::userPosition;
 
-Entity::Entity(char* texture,int x, int y){
+Entity::Entity(char* texture,int x, int y, int type){
     sprite = Sprite::create(texture);
     sprite->setPosition(Point(x,y));
-    Board::Instance->AddEntity(this);
     this->position.set(x,y);
     spriteBaseScale.set(1.0,1.0);
     imageSize = Vec2(sprite->getTexture()->getPixelsHigh(),sprite->getTexture()->getPixelsWide());
@@ -31,7 +30,6 @@ Entity::Entity(char* texture,int x, int y){
                        Vec2(imageSize.x, imageSize.y),
                        Vec2(imageSize.x, 0)};
     //boundsDebug->drawPolygon(vertices, 4, Color4F(0.0f,0.0f,1.0f,0.5f), 0, Color4F(0.2f,0.2f,0.2f,0.0f));
-    //Board::Instance->game->addChild(boundsDebug);
     //boundsDebug->setPosition(GetBounds().origin.x,GetBounds().origin.y);
 }
 
@@ -44,7 +42,6 @@ void Entity::SetUpPhysicsSprite(char* texture){
     physicsSprite->setPosition(position.x,position.y);
     physicsSprite->setVisible(false);
     physicsSprite->setScale(spriteBaseScale.x,spriteBaseScale.y);
-    Board::Instance->game->addChild(physicsSprite);
 }
 
 Sprite* Entity::GetSprite(){

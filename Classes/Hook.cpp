@@ -9,7 +9,7 @@
 #include "Hook.h"
 #include "Board.h"
 
-Hook::Hook(Vec2 position) : Entity("hook.png", position.x,position.y){
+Hook::Hook(Vec2 position) : Entity("hook.png", position.x,position.y, 2){
     this->position = position;
     SetBaseScale(Vec2(1.5,1.5));
     SetUpPhysicsSprite("hook.png");

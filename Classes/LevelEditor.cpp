@@ -8,6 +8,7 @@
 
 #include "LevelEditor.h"
 #include "MainMenu.h"
+#include "Level.h"
 #include "Board.h"
 #include "HelloWorldScene.h"
 
@@ -664,84 +665,5 @@ void LevelEditor::ResetToolPos(){
 //    doc.LoadFile(FileUtils::getInstance()->fullPathForFilename("level.xml").c_str());
 
 void LevelEditor::Export(){
-    std::string str = FileUtils::getInstance()->getWritablePath() + name + ".xml";
-    char* cstr = new char[str.length() + 1];
-    std::strcpy(cstr, str.c_str());
-    
-    Board::myLevels.push_back(str);
-    Board::myLevelNames.push_back(name);
-    
-    tinyxml2::XMLDocument myLevelsDoc;
-    myLevelsDoc.LoadFile(FileUtils::getInstance()->fullPathForFilename("MyLevels.xml").c_str());
-    tinyxml2::XMLElement* newLevel = myLevelsDoc.NewElement("level");
-    newLevel->SetAttribute("name", name.c_str());
-    newLevel->SetAttribute("path", str.c_str());
-    myLevelsDoc.InsertEndChild(newLevel);
-    
-    tinyxml2::XMLDocument doc;
-    tinyxml2::XMLElement* walls = doc.NewElement("Walls");
-    tinyxml2::XMLElement* spawners = doc.NewElement("Spawners");
-    tinyxml2::XMLElement* spikewalls = doc.NewElement("SpikeWalls");
-    tinyxml2::XMLElement* hooks = doc.NewElement("Hooks");
-    tinyxml2::XMLElement* map = doc.NewElement("map");
-    tinyxml2::XMLElement* goals = doc.NewElement("Goals");
-    map->SetAttribute("name", name.c_str());
-    for(int x = 0; x < mapObjects.size(); x++){
-        switch(mapObjects[x]->GetType()){
-            case WALL:{
-                tinyxml2::XMLElement* wall = doc.NewElement("wall");
-                wall->SetAttribute("x", mapObjects[x]->GetStart().x);
-                wall->SetAttribute("y", mapObjects[x]->GetStart().y);
-                wall->SetAttribute("width", mapObjects[x]->GetSize().x);
-                wall->SetAttribute("height", mapObjects[x]->GetSize().y);
-                walls->InsertEndChild(wall);
-                break;
-            }
-            case GOAL:{
-                tinyxml2::XMLElement* wall = doc.NewElement("goal");
-                wall->SetAttribute("x", mapObjects[x]->GetStart().x);
-                wall->SetAttribute("y", mapObjects[x]->GetStart().y);
-                wall->SetAttribute("width", mapObjects[x]->GetSize().x);
-                wall->SetAttribute("height", mapObjects[x]->GetSize().y);
-                goals->InsertEndChild(wall);
-                break;
-            }
-            case SPIKE_WALL:{
-                tinyxml2::XMLElement* wall = doc.NewElement("spikewall");
-                wall->SetAttribute("x", mapObjects[x]->GetStart().x);
-                wall->SetAttribute("y", mapObjects[x]->GetStart().y);
-                wall->SetAttribute("width", mapObjects[x]->GetSize().x);
-                wall->SetAttribute("height", mapObjects[x]->GetSize().y);
-                spikewalls->InsertEndChild(wall);
-                break;
-            }
-            case SPAWNER:{
-                tinyxml2::XMLElement* wall = doc.NewElement("spawner");
-                wall->SetAttribute("x", mapObjects[x]->GetStart().x);
-                wall->SetAttribute("y", mapObjects[x]->GetStart().y);
-                wall->SetAttribute("xVelocity", 100);
-                wall->SetAttribute("yVelocity", 600);
-                spawners->InsertEndChild(wall);
-                break;
-            }
-            case HOOK:{
-                tinyxml2::XMLElement* wall = doc.NewElement("hook");
-                wall->SetAttribute("x", mapObjects[x]->GetStart().x);
-                wall->SetAttribute("y", mapObjects[x]->GetStart().y);
-                hooks->InsertEndChild(wall);
-                break;
-            }
-        }
-    }
-    map->InsertFirstChild(spawners);
-    map->InsertFirstChild(goals);
-    map->InsertFirstChild(spikewalls);
-    map->InsertFirstChild(walls);
-    map->InsertFirstChild(hooks);
-    doc.InsertFirstChild(map);
-
-    doc.SaveFile(str.c_str());
-    Board::levelPath = cstr;
-    Board::customLevel = true;
-    std::cout << "FilePath: " << FileUtils::getInstance()->getWritablePath().c_str() << std::endl;
+    Board::myLevels.push_back(Level::createWithMapObjects(mapObjects, name));
 }

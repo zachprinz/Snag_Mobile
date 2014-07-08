@@ -17,6 +17,7 @@
 USING_NS_CC;
 
 Scene* LevelInfo::myScene;
+LevelInfo* LevelInfo::Instance;
 
 Scene* LevelInfo::createScene(){
     auto scene = Scene::create();
@@ -73,17 +74,17 @@ bool LevelInfo::init() {
     menuItems.pushBack(playButton);
     
     auto favoriteButton = MenuItemImage::create("FavoriteOn.png", "FavoriteOff.png", this, menu_selector(LevelInfo::favoriteButtonCallback));
-        favoriteButton->setAnchorPoint(Point(0.0,1.0));
+    favoriteButton->setAnchorPoint(Point(0.0,1.0));
     favoriteButton->setPosition(Point(11.8 * 0.01 * visibleSize.width, visibleSize.height - (0.01 * visibleSize.height * 81.5)));
     menuItems.pushBack(favoriteButton);
     
     auto downloadButton = MenuItemImage::create("DownloadOn.png", "DownloadOff.png", this, menu_selector(LevelInfo::downloadButtonCallback));
-        downloadButton->setAnchorPoint(Point(0.0,1.0));
+    downloadButton->setAnchorPoint(Point(0.0,1.0));
     downloadButton->setPosition(Point(21.5 * 0.01 * visibleSize.width, visibleSize.height - (0.01 * visibleSize.height * 81.5)));
     menuItems.pushBack(downloadButton);
     
     auto highscoresButton = MenuItemImage::create("LevelSelectScores.png", "LevelSelectScores.png", this, menu_selector(LevelInfo::highscoresButtonCallback));
-        highscoresButton->setAnchorPoint(Point(0.0,1.0));
+    highscoresButton->setAnchorPoint(Point(0.0,1.0));
     highscoresButton->setPosition(Point(31.4 * 0.01 * visibleSize.width,visibleSize.height - (0.01 * visibleSize.height *  81.5)));
     menuItems.pushBack(highscoresButton);
     
@@ -93,7 +94,7 @@ bool LevelInfo::init() {
     menuItems.pushBack(editButton);
     
     auto homeButton = MenuItemImage::create("home.png", "home.png", this, menu_selector(LevelInfo::homeButtonCallback));
-        homeButton->setAnchorPoint(Point(0.0,1.0));
+    homeButton->setAnchorPoint(Point(0.0,1.0));
     homeButton->setPosition(Point(89.4 * 0.01 * visibleSize.width, visibleSize.height - (0.01 * visibleSize.height * 1.2)));
     menuItems.pushBack(homeButton);
     
@@ -124,6 +125,8 @@ bool LevelInfo::init() {
     this->addChild(title);
     this->addChild(author);
     
+    Instance = this;
+    
     return true;
 }
 void LevelInfo::homeButtonCallback(Ref*){
@@ -142,8 +145,21 @@ void LevelInfo::downloadButtonCallback(Ref*){
 
 };
 void LevelInfo::playButtonCallback(Ref*){
-
+    if(HelloWorld::myScene == NULL){
+        auto scene = HelloWorld::createScene();
+        Director::getInstance()->pushScene(scene);
+        Board::Instance->Reset(currentLvl);
+    }
+    else{
+        Director::getInstance()->pushScene(HelloWorld::myScene);
+        Board::Instance->Reset(currentLvl);
+    }
 };
+void LevelInfo::Load(Level* lvl){
+    currentLvl = lvl;
+    title->setString(currentLvl->GetName());
+    author->setString(currentLvl->GetAuthor());
+}
 void LevelInfo::menuCloseCallback(Ref* pSender){
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
 	MessageBox("You pressed the close button. Windows Store Apps do not implement a close button.","Alert");

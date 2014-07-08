@@ -21,12 +21,9 @@ USING_NS_CC;
 Board* Board::Instance;
 char* Board::levelPath;
 bool Board::customLevel;
-std::vector<std::string> Board::myLevels;
-std::vector<std::string> Board::myLevelNames;
-std::vector<std::string> Board::localLevels;
-std::vector<std::string> Board::localLevelNames;
-std::vector<std::string> Board::onlineLevels;
-std::vector<std::string> Board::onlineLevelNames;
+std::vector<Level*> Board::myLevels;
+std::vector<Level*> Board::localLevels;
+std::vector<Level*> Board::onlineLevels;
 
 Board::Board(Layer* game, PhysicsWorld* world, Size size, Point origin){
     this->world = world;
@@ -50,8 +47,9 @@ Board::Board(Layer* game, PhysicsWorld* world, Size size, Point origin){
     
     scale = 1.0f;
     user = new User();
-    //LoadLevel("level.xml");
     gravity.set(0,-1);
+    
+    currentLevel = NULL;
 }
 
 void Board::SetPhysicsWorld(PhysicsWorld* world){
@@ -74,12 +72,7 @@ void Board::UpdateTimer(float dt){
 }
 
 void Board::onContactPostSolve(PhysicsContact& contact){
-    int type = contact.getShapeA()->getBody()->getTag();
-    int type2 = contact.getShapeB()->getBody()->getTag();
-    Print( "Type: " + std::to_string(type) + " Type2: " + std::to_string(type2));
-
-    //if(type == user->type)
-        type = type2;
+    int type = contact.getShapeB()->getBody()->getTag();
     if(type == Wall::type){
         Print("Contact with Wall");
         user->Bounce(contact.getContactData());
@@ -126,175 +119,62 @@ void Board::updateView(float dt){
 void Board::updateCollision(float dt){
     
 }
-void Board::onTouchEnd(){//Touch* touch, Event* event){
+void Board::onTouchEnd(){
     log("Recognised end of touch.");
     user->Release();
 }
-void Board::onTouchBegin(){//Touch* touch, Event* event){
+void Board::onTouchBegin(){
     log("Recognised touch.");
     user->Snag();
 }
-
-void Board::AddEntity(Entity* ent){
-    game->addChild(ent->GetSprite());
-    ents.push_back(ent);
-}
-
 void Board::onWin(){
     Print("You Win!");
 }
-
-void Board::AddHook(Hook* hook){
-    hooks.push_back(hook);
-    ents.push_back(hook);
-}
-
-void Board::AddSpikeWall(SpikeWall* sw){
-    spikewalls.push_back(sw);
-    ents.push_back(sw);
-}
-
-void Board::AddWall(Wall* wall){
-    walls.push_back(wall);
-    ents.push_back(wall);
-}
-
-void Board::AddGoal(Goal* goal){
-    goals.push_back(goal);
-    ents.push_back(goal);
-}
-
-void Board::AddSpawner(Spawner* spawner){
-    spawners.push_back(spawner);
-    ents.push_back(spawner);
-}
-
 void Board::AddJoint(PhysicsJointDistance* joint){
     world->addJoint(joint);
 }
 void Board::RemoveJoint(){
     world->removeAllJoints();
 }
-
 Hook* Board::GetClosestHook(Point pos){
     float smallestDistance = 9999;
     if(hooks.size() > 0) smallestDistance = hooks[0]->GetPosition().getDistance(pos);
     Hook* closestHook;
-    for(int x = 0; x < hooks.size(); x++){
-        float distance = hooks[x]->GetPosition().getDistance(pos);
-        if(distance <= smallestDistance){
-            smallestDistance = distance;
-            closestHook = hooks[x];
+    for(int x = 0; x < currentLevel->ents.size(); x++){
+        if(currentLevel->ents[x]->type == 2){
+            float distance = hooks[x]->GetPosition().getDistance(pos);
+            if(distance <= smallestDistance){
+                smallestDistance = distance;
+                closestHook = hooks[x];
+            }
         }
     }
     return closestHook;
 }
-
-void Board::Reset(std::string path){
-    Clear();
-    LoadLevel(path.c_str());
+void Board::Reset(Level* lvl){
+    if(currentLevel != NULL)
+        Clear();
+    LoadLevel(lvl);
     user->Reset();
 }
-
 void Board::Clear(){
-    spawners.clear();
-    spikewalls.clear();
-    walls.clear();
-    hooks.clear();
+    for(int x = 0; x < currentLevel->ents.size(); x++){
+        game->removeChild(currentLevel->ents[x]->GetSprite());
+        game->removeChild(currentLevel->ents[x]->physicsSprite);
+    }
 }
-
 void Board::PrintVec2(std::string name, Vec2 vec){
     //std::cout << name + ".x: " << std::to_string(vec.x) << " " + name + ".y: " << std::to_string(vec.y) << std::endl;
 }
-
 void Board::Print(std::string message){
     std::cout << message << std::endl;
 }
-
-void Board::LoadLevel(std::string name){
-    tinyxml2::XMLDocument doc;
-    doc.LoadFile(name.c_str());
-    
-    tinyxml2::XMLElement* hooksNode = doc.RootElement()->FirstChildElement();
-    tinyxml2::XMLElement* currentHook = hooksNode->FirstChildElement();
-    while(currentHook != NULL){
-        int x;
-        int y;
-        currentHook->QueryIntAttribute("x", &x);
-        currentHook->QueryIntAttribute("y", &y);
-        Print("Loading Hook X: " + std::to_string(x) + " Y: " + std::to_string(y));
-        AddHook(new Hook(Vec2(x,y)));
-        currentHook = currentHook->NextSiblingElement();
-    }
-    
-    tinyxml2::XMLElement* wallsNode = doc.RootElement()->FirstChildElement("Walls");
-    tinyxml2::XMLElement* currentWall = wallsNode->FirstChildElement();
-    while(currentWall != NULL){
-        Print("Loading Wall");
-        int x;
-        int y;
-        int height;
-        int width;
-        currentWall->QueryIntAttribute("x", &x);
-        currentWall->QueryIntAttribute("y", &y);
-        currentWall->QueryIntAttribute("width", &width);
-        currentWall->QueryIntAttribute("height", &height);
-        Print("Loading Wall X: " + std::to_string(x) + " Y: " + std::to_string(y) + " Width: " + std::to_string(width) + " Height: " + std::to_string(height));
-
-        AddWall(new Wall(Vec2(x,y),Vec2(width,height)));
-        currentWall = currentWall->NextSiblingElement();
-    }
-    
-    tinyxml2::XMLElement* SpikeWallsNode = doc.RootElement()->FirstChildElement("SpikeWalls");
-    tinyxml2::XMLElement* currentSpikeWall = SpikeWallsNode->FirstChildElement();
-    while(currentSpikeWall != NULL){
-        Print("Loading Spikewall");
-        int x;
-        int y;
-        int height;
-        int width;
-        currentSpikeWall->QueryIntAttribute("x", &x);
-        currentSpikeWall->QueryIntAttribute("y", &y);
-        currentSpikeWall->QueryIntAttribute("width", &width);
-        currentSpikeWall->QueryIntAttribute("height", &height);
-        AddSpikeWall(new SpikeWall(Vec2(x,y),Vec2(width,height)));
-        currentSpikeWall = currentSpikeWall->NextSiblingElement();
-    }
-    
-    tinyxml2::XMLElement* GoalsNode = doc.RootElement()->FirstChildElement("Goals");
-    tinyxml2::XMLElement* currentGoal = GoalsNode->FirstChildElement();
-    while(currentGoal != NULL){
-        Print("Loading Goal");
-        int x;
-        int y;
-        int height;
-        int width;
-        currentGoal->QueryIntAttribute("x", &x);
-        currentGoal->QueryIntAttribute("y", &y);
-        currentGoal->QueryIntAttribute("width", &width);
-        currentGoal->QueryIntAttribute("height", &height);
-        AddGoal(new Goal(Vec2(x,y),Vec2(width,height)));
-        currentGoal = currentGoal->NextSiblingElement();
-    }
-    
-    tinyxml2::XMLElement* SpawnersNode = doc.RootElement()->FirstChildElement("Spawners");
-    tinyxml2::XMLElement* currentSpawner = SpawnersNode->FirstChildElement();
-    while(currentSpawner != NULL){
-        Print("Loading Spawner");
-        int x;
-        int y;
-        int xVelocity;
-        int yVelocity;
-        currentSpawner->QueryIntAttribute("x", &x);
-        currentSpawner->QueryIntAttribute("y", &y);
-        currentSpawner->QueryIntAttribute("xVelocity", &xVelocity);
-        currentSpawner->QueryIntAttribute("yVelocity", &yVelocity);
-        Print("Loading Spawner X: " + std::to_string(x) + " Y: " + std::to_string(y));
-        AddSpawner(new Spawner(Vec2(x,y),Vec2(xVelocity,yVelocity)));
-        currentSpawner = currentSpawner->NextSiblingElement();
-    }
-    
-    if(spikewalls.size() == 0){
-        AddSpikeWall(new SpikeWall(Vec2(0,-100), Vec2(1,1)));
+void Board::LoadLevel(Level* lvl){
+    currentLevel = lvl;
+    for(int x = 0; x < currentLevel->ents.size(); x++){
+        if(currentLevel->ents[x]->GetSprite() != NULL)
+            game->addChild(currentLevel->ents[x]->GetSprite());
+        if(currentLevel->ents[x]->physicsSprite != NULL)
+            game->addChild(currentLevel->ents[x]->physicsSprite);
     }
 }

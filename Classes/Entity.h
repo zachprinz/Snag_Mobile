@@ -11,6 +11,11 @@
 
 #define MAX_WIDTH 2048
 #define MAX_HEIGHT 1538
+#define WALL 0
+#define SPIKE_WALL 1
+#define HOOK 2
+#define SPAWNER 3
+#define GOAL 4
 
 #include <iostream>
 #include "cocos2d.h"
@@ -19,7 +24,7 @@ USING_NS_CC;
 
 class Entity{
 public:
-    Entity(char* texture, int x = 500, int y = 300);
+    Entity(char* texture, int x = 500, int y = 300, int type = 0);
     virtual void update(float dt);
     Sprite* GetSprite();
     Point GetPosition();
@@ -34,6 +39,7 @@ public:
     virtual void SetUpPhysicsSprite(char*);
     Sprite* physicsSprite;
     PhysicsBody* body;
+    int type;
 private:
     
 protected:

@@ -9,6 +9,7 @@
 #include "LevelMenuItem.h"
 #include "LevelSelect.h"
 #include "MainMenu.h"
+#include "Level.h"
 
 LevelMenuItem::LevelMenuItem(std::string name, Size visibleSize, int x, int y){
     Vector<MenuItem*> menuItems;
@@ -58,25 +59,17 @@ LevelMenuItem::LevelMenuItem(std::string name, Size visibleSize, int x, int y){
 }
 void LevelMenuItem::SetEnabled(bool is){
     menu->setEnabled(is);
-    menu->setVisible(is);/*
-    edit->setVisible(is);
-    edit->setEnabled(is);
-    highscores->setVisible(is);
-    highscores->setEnabled(is);
-    play->setVisible(is);
-    play->setEnabled(is);
-    background->setVisible(is);*/
+    menu->setVisible(is);
     name->setVisible(is);
 }
 void LevelMenuItem::SetOrder(int){
 
 }
-void LevelMenuItem::SetName(const char* n){
-    myName = n;
-    this->name->setString(myName);
-}
-void LevelMenuItem::SetPath(const char* n){
-    myPath = n;
+void LevelMenuItem::SetLevel(Level* lvl){
+    level = lvl;
+    myName = lvl->GetName();
+    myPath = lvl->GetPath();
+    name->setString(myName);
 }
 void LevelMenuItem::SetTag(int x){
     play->setTag(x);

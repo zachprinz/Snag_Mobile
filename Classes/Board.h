@@ -19,24 +19,20 @@
 #include "SpikeWall.h"
 #include "Spawner.h"
 #include "Goal.h"
+#include "Level.h"
 
 USING_NS_CC;
 
 class Board{
 public:
     Board(Layer* game, PhysicsWorld* world, Size size, Point origin);
-    void AddEntity(Entity*);
     static Board* Instance;
-    void AddHook(Hook*);
-    void AddWall(Wall*);
-    void AddGoal(Goal*);
-    void AddSpikeWall(SpikeWall*);
     void AddJoint(PhysicsJointDistance*);
     void AddSpawner(Spawner*);
     void RemoveJoint();
     Hook* GetClosestHook(Vec2 pos);
-    void onTouchBegin();//Touch* touch, Event* event);
-    void onTouchEnd();//Touch* touch, Event* event);
+    void onTouchBegin();
+    void onTouchEnd();
     void update(float dt);
     Point center;
     Vec2 gravity;
@@ -53,19 +49,17 @@ public:
     static void Print(std::string);
     static char* levelPath;
     static bool customLevel;
-    static std::vector<std::string> myLevels;
-    static std::vector<std::string> myLevelNames;
-    static std::vector<std::string> onlineLevels;
-    static std::vector<std::string> onlineLevelNames;
-    static std::vector<std::string> localLevels;
-    static std::vector<std::string> localLevelNames;
-    void Reset(std::string levelPath);
+    static std::vector<Level*> myLevels;
+    static std::vector<Level*> onlineLevels;
+    static std::vector<Level*> localLevels;
+    void Reset(Level* lvl);
     void Clear();
     void onWin();
     float time;
     void UpdateTimer(float);
 private:
-    void LoadLevel(std::string name);
+    void LoadLevel(Level*);
+    Level* currentLevel;
     Sprite* background;
     void updateView(float dt);
     void updateCollision(float dt);

@@ -23,7 +23,7 @@ public:
     
     // implement the "static create()" method manually
     CREATE_FUNC(LevelInfo);
-    
+    static LevelInfo* Instance;
     void homeButtonCallback(Ref*);
     void favoriteButtonCallback(Ref*);
     void highscoresButtonCallback(Ref*);
@@ -33,6 +33,9 @@ public:
     
     Label* title;
     Label* author;
+    
+    void Load(Level*);
+    Level* currentLvl;
     
     static Scene* myScene;
 private:

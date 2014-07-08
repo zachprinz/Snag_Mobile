@@ -131,32 +131,36 @@ void LevelSelect::editCallback(Ref*){
 
 }
 void LevelSelect::playCallback(Object* sender){
+    Level* tempLvl;
+    int levelSelected = ((MenuItem*)(sender))->getTag();
+    switch(LevelSelect::Instance->currentLevelSet){
+        case LEVELS_MY:
+            tempLvl = (Board::Instance->myLevels[levelSelected]);
+            break;
+        case LEVELS_LOCAL:
+            tempLvl = (Board::Instance->localLevels[levelSelected]);
+            break;
+        case LEVELS_ONLINE:
+            tempLvl = (Board::Instance->onlineLevels[levelSelected]);
+            break;
+    }
     if(LevelInfo::myScene == NULL){
         Board::Print("Play button click registered.");
         auto scene = LevelInfo::createScene();
         Director::getInstance()->pushScene(scene);
-        //LevelInfo::Instance->Refresh();
+        LevelInfo::Instance->Load(tempLvl);
     }
     else{
         Director::getInstance()->pushScene(LevelInfo::myScene);
-        //LevelInfo::Instance->Refresh();
+        LevelInfo::Instance->Load(tempLvl);
     }
+    
+    
     /*if(HelloWorld::myScene == NULL){
         Board::Print("Play button click registered.");
         auto scene = HelloWorld::createScene();
         Director::getInstance()->pushScene(scene);
-        int levelSelected = ((MenuItem*)(sender))->getTag();
-        switch(LevelSelect::Instance->currentLevelSet){
-            case LEVELS_MY:
-                Board::Instance->Reset(Board::Instance->myLevels[levelSelected]);
-                break;
-            case LEVELS_LOCAL:
-                Board::Instance->Reset(Board::Instance->localLevels[levelSelected]);
-                break;
-            case LEVELS_ONLINE:
-                Board::Instance->Reset(Board::Instance->onlineLevels[levelSelected]);
-                break;
-        }
+
     }
     else{
         Director::getInstance()->pushScene(HelloWorld::myScene);
@@ -191,8 +195,7 @@ void LevelSelect::localCallback(Ref*){
     for(int x = 0; x < 3; x++){
         if(Board::localLevels.size() > x){
             levels[x]->SetEnabled(true);
-            levels[x]->SetName(Board::localLevelNames[x].c_str());
-            levels[x]->SetPath(Board::localLevels[x].c_str());
+            levels[x]->SetLevel(Board::localLevels[x]);
         }
         else
             levels[x]->SetEnabled(false);
@@ -208,8 +211,7 @@ void LevelSelect::myLevelsCallback(Ref*){
     for(int x = 0; x < 3; x++){
         if(Board::myLevels.size() > x){
          levels[x]->SetEnabled(true);
-         levels[x]->SetName(Board::myLevelNames[x].c_str());
-         levels[x]->SetPath(Board::myLevels[x].c_str());
+         levels[x]->SetLevel(Board::myLevels[x]);
      }
      else
         levels[x]->SetEnabled(false);
@@ -260,8 +262,7 @@ void LevelSelect::onlineCallback(Ref*){
     for(int x = 0; x < 3; x++){
         if(Board::onlineLevels.size() > x){
             levels[x]->SetEnabled(true);
-            levels[x]->SetName(Board::onlineLevelNames[x].c_str());
-            levels[x]->SetPath(Board::onlineLevels[x].c_str());
+            levels[x]->SetLevel(Board::onlineLevels[x]);
         }
         else
             levels[x]->SetEnabled(false);

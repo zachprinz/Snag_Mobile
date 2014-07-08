@@ -10,7 +10,7 @@
 
 int Goal::type;
 
-Goal::Goal(Vec2 position, Vec2 size) : Entity("goal.png",position.x + size.x/2.0, position.y - size.y/2.0){
+Goal::Goal(Vec2 position, Vec2 size) : Entity("goal.png",position.x + size.x/2.0, position.y - size.y/2.0, 4){
     SetBaseScale(Vec2((size.x) / imageSize.x, (size.y) / imageSize.y));
     SetUpPhysicsSprite("goal.png");
     type = -1;

@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include "cocos2d.h"
+#include "Level.h"
 
 using namespace cocos2d;
 
@@ -23,13 +24,13 @@ public:
     cocos2d::MenuItemImage* background;
     cocos2d::Label* name;
     void SetOrder(int);
-    void SetName(const char*);
-    void SetPath(const char*);
-    const char* myName;
-    const char* myPath;
+    void SetLevel(Level*);
+    std::string myName;
+    std::string myPath;
     void SetEnabled(bool);
     void SetTag(int);
     Menu* menu;
+    Level* level;
 private:
 };
 
