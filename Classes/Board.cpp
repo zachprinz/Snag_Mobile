@@ -47,6 +47,7 @@ Board::Board(Layer* game, PhysicsWorld* world, Size size, Point origin){
     
     scale = 1.0f;
     user = new User();
+    this->game->addChild(user->GetSprite());
     gravity.set(0,-1);
     
     currentLevel = NULL;
@@ -111,8 +112,8 @@ void Board::updateView(float dt){
     center.set(user->GetPosition().x, (boardSize.height / 2.0) / scale);
     user->UpdateSprite();
     user->update(dt);
-    for(int x = 0; x < ents.size(); x++){
-        ents[x]->UpdateSprite();
+    for(int x = 0; x < currentLevel->ents.size(); x++){
+        currentLevel->ents[x]->UpdateSprite();
     }
     user->UpdateSprite();
 }
@@ -138,14 +139,13 @@ void Board::RemoveJoint(){
 }
 Hook* Board::GetClosestHook(Point pos){
     float smallestDistance = 9999;
-    if(hooks.size() > 0) smallestDistance = hooks[0]->GetPosition().getDistance(pos);
     Hook* closestHook;
     for(int x = 0; x < currentLevel->ents.size(); x++){
         if(currentLevel->ents[x]->type == 2){
-            float distance = hooks[x]->GetPosition().getDistance(pos);
+            float distance = currentLevel->ents[x]->GetPosition().getDistance(pos);
             if(distance <= smallestDistance){
                 smallestDistance = distance;
-                closestHook = hooks[x];
+                closestHook = (Hook*)currentLevel->ents[x];
             }
         }
     }
@@ -171,10 +171,5 @@ void Board::Print(std::string message){
 }
 void Board::LoadLevel(Level* lvl){
     currentLevel = lvl;
-    for(int x = 0; x < currentLevel->ents.size(); x++){
-        if(currentLevel->ents[x]->GetSprite() != NULL)
-            game->addChild(currentLevel->ents[x]->GetSprite());
-        if(currentLevel->ents[x]->physicsSprite != NULL)
-            game->addChild(currentLevel->ents[x]->physicsSprite);
-    }
+    currentLevel->Add(game);
 }

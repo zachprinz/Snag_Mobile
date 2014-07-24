@@ -196,3 +196,8 @@ void Level::AddEntity(Entity* e){
 void Level::SetName(std::string n){
     name = n;
 }
+void Level::Add(Layer* game){
+    for(int x = 0; x < ents.size(); x++){
+        ents[x]->Add(game);
+    }
+}

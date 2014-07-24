@@ -68,9 +68,7 @@ bool LevelInfo::init() {
     author->setScale(0.85);
     author->setAnchorPoint(Point(0.5,0.5));
     
-    auto playButton = MenuItemImage::create("LevelEditorPlay.png", "LevelEditorPlay.png", this, menu_selector(LevelInfo::playButtonCallback));
-    playButton->setPosition(Point(1.5 * 0.01 * visibleSize.width,visibleSize.height - (0.01 * visibleSize.height * 81.5)));
-    playButton->setAnchorPoint(Point(0.0,1.0));
+    auto playButton = MainMenu::CreateButton("LevelEditorPlay.png", this, menu_selector(LevelInfo::playButtonCallback), Vec2(0.015, 1-0.815), Vec2(0,1));
     menuItems.pushBack(playButton);
     
     auto favoriteButton = MenuItemImage::create("FavoriteOn.png", "FavoriteOff.png", this, menu_selector(LevelInfo::favoriteButtonCallback));
@@ -99,7 +97,6 @@ bool LevelInfo::init() {
     menuItems.pushBack(homeButton);
     
     homeButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    playButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     favoriteButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     editButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     highscoresButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);

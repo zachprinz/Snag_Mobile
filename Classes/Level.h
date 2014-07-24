@@ -34,6 +34,7 @@ public:
     std::vector<Entity*> ents;
     void AddEntity(Entity*);
     void SetName(std::string);
+    void Add(Layer* game);
 private:
     void AddMapObject(MapObject*);
     std::string path;

@@ -60,7 +60,6 @@ bool LevelSelect::init()
     localLevelsButton->setGlobalZOrder(-1);
     localLevelsButton->setPosition(Point(21, visibleSize.height - 20 + 10));
     localLevelsButton->setAnchorPoint(Point(0.0,1.0));
-
     
     myLevelsButton = MenuItemImage::create("LevelSelectMyLevelsButton.png", "LevelSelectMyLevelsButton.png", this, menu_selector(LevelSelect::myLevelsCallback));
     myLevelsButton->setGlobalZOrder(-1);
@@ -135,13 +134,13 @@ void LevelSelect::playCallback(Object* sender){
     int levelSelected = ((MenuItem*)(sender))->getTag();
     switch(LevelSelect::Instance->currentLevelSet){
         case LEVELS_MY:
-            tempLvl = (Board::Instance->myLevels[levelSelected]);
+            tempLvl = (Board::myLevels[levelSelected]);
             break;
         case LEVELS_LOCAL:
-            tempLvl = (Board::Instance->localLevels[levelSelected]);
+            tempLvl = (Board::localLevels[levelSelected]);
             break;
         case LEVELS_ONLINE:
-            tempLvl = (Board::Instance->onlineLevels[levelSelected]);
+            tempLvl = (Board::onlineLevels[levelSelected]);
             break;
     }
     if(LevelInfo::myScene == NULL){

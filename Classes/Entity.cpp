@@ -18,8 +18,11 @@ float Entity::boardScale;
 Vec2 Entity::userPosition;
 
 Entity::Entity(char* texture,int x, int y, int type){
+    physicsSprite = NULL;
+    this->type = type;
     sprite = Sprite::create(texture);
     sprite->setPosition(Point(x,y));
+    sprite->retain();
     this->position.set(x,y);
     spriteBaseScale.set(1.0,1.0);
     imageSize = Vec2(sprite->getTexture()->getPixelsHigh(),sprite->getTexture()->getPixelsWide());
@@ -42,6 +45,7 @@ void Entity::SetUpPhysicsSprite(char* texture){
     physicsSprite->setPosition(position.x,position.y);
     physicsSprite->setVisible(false);
     physicsSprite->setScale(spriteBaseScale.x,spriteBaseScale.y);
+    physicsSprite->retain();
 }
 
 Sprite* Entity::GetSprite(){
@@ -91,4 +95,9 @@ void Entity::CalculateScale(){
     float newDistanceToGround = distanceToGround / boardScale;
     sprite->setPosition((Board::Instance->visibleSize.width / 2.0) + newDistanceToCenter, 0 - newDistanceToGround);
     SetScale(Vec2((1/boardScale),(1/boardScale)));
+}
+
+void Entity::Add(Layer* game){
+    game->addChild(sprite);
+    game->addChild(physicsSprite);
 }

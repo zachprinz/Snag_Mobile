@@ -40,6 +40,7 @@ public:
     Sprite* physicsSprite;
     PhysicsBody* body;
     int type;
+    void Add(Layer*);
 private:
     
 protected:

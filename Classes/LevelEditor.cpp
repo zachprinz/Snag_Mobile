@@ -99,7 +99,6 @@ bool LevelEditor::init(){
     selectedLabel = Label::createWithBMFont("dimbo.fnt", "Pan Tool", TextHAlignment::CENTER);
     selectedLabel->setPosition(visibleSize.width / 2.0, visibleSize.height - 10 - (100 * MainMenu::screenScale.y));
     selectedLabel->setColor(Color3B(0.0,0.0,0.0));
-    //selectedLabel->setEnabled(false);
     this->addChild(selectedLabel);
     
     notice = Label::createWithBMFont("dimbo.fnt", "Please add at least one spawner to your level!", TextHAlignment::CENTER);
@@ -143,9 +142,6 @@ bool LevelEditor::init(){
     nameBox->setMaxLength(18);
     nameBox->setPlaceHolder("level name");
     nameBox->setFontColor(Color3B::WHITE);
-    //nameBox->setReturnType(kKeyboardReturnTypeDone);
-    //nameBox->setInputMode(kEditBoxInputModeAny);
-    //nameBox->setDelegate(this);
     this->addChild(nameBox);
     
     selectedSprite = Sprite::create("LevelEditorSelected.png");
@@ -166,7 +162,6 @@ bool LevelEditor::init(){
     trashSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     goalSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     moveSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    //selectedLabel->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     saveAcceptButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     saveDeclineButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
 

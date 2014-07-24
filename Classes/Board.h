@@ -66,13 +66,7 @@ private:
     Size boardSize;
     Point origin;
     float scale;
-    std::vector<Hook*> hooks;
-    std::vector<Wall*> walls;
-    std::vector<SpikeWall*> spikewalls;
-    std::vector<Spawner*> spawners;
-    std::vector<Goal*> goals;
     float ground;
-    std::vector<Entity*> ents;
 };
 
 #endif /* defined(__Snag__Board__) */

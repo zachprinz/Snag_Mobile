@@ -40,9 +40,7 @@ public:
     void onlineCallback(Ref*);
     void homeCallback(Ref*);
     
-    MenuItemImage* myLevelsButton;
-    MenuItemImage* localLevelsButton;
-    MenuItemImage* onlineLevelsButton;
+
     
     std::vector<LevelMenuItem*> levels;
     void AddLevel(LevelMenuItem*);
@@ -59,7 +57,9 @@ public:
     static LevelSelect* Instance;
     void SetLevelSetButtons(int newSet);
 private:
-    
+    MenuItemImage* myLevelsButton;
+    MenuItemImage* localLevelsButton;
+    MenuItemImage* onlineLevelsButton;
 };
 
 #endif /* defined(__Snag__LevelSelect__) */
