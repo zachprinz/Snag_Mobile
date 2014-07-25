@@ -31,6 +31,7 @@ public:
     void SetTag(int);
     Menu* menu;
     Level* level;
+    static int count;
 private:
 };
 

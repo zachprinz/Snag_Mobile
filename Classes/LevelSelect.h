@@ -40,7 +40,8 @@ public:
     void onlineCallback(Ref*);
     void homeCallback(Ref*);
     
-
+    float tabHeightSelected;
+    float tabHeight;
     
     std::vector<LevelMenuItem*> levels;
     void AddLevel(LevelMenuItem*);

@@ -45,93 +45,60 @@ bool LevelEditor::init(){
     cocos2d::Vector<MenuItem*> menuItems;
     saveDialog = false;
     
-    spikeWallSelectButton = MenuItemImage::create("LevelEditorSpikeWall.png", "LevelEditorSpikewall.png", this, menu_selector(LevelEditor::SpikeWallSelectCallback));
-    float buttonHeight = 155 * MainMenu::screenScale.x + 22;
-    spikeWallSelectButton->setPosition(Point(10, visibleSize.height - (10 + buttonHeight * 0)));
-    spikeWallSelectButton->setAnchorPoint(Point(0.0,1.0));
+    selectedSprite = MainMenu::CreateButton("LevelEditorSelected.png", Vec2(0,1.0-0.015), Vec2(0,1));
+    selectedSprite->setPosition(visibleSize.width / 2.0, selectedSprite->getPosition().y);
+    selectedSprite->setAnchorPoint(Point(0.5,1.0));
+    auto background = Sprite::create("GRID.png");
+    background->setPosition(0,0);
+    background->setAnchorPoint(Point(0,0));
+    background->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
+    background->setGlobalZOrder(-5);
+    this->addChild(background);
+    menuItems.pushBack(selectedSprite);
+    
+    spikeWallSelectButton = MainMenu::CreateButton("LevelEditorSpikeWall.png", this, menu_selector(LevelEditor::SpikeWallSelectCallback), Vec2(0.01,1.0-0.015), Vec2(1,0));
     menuItems.pushBack(spikeWallSelectButton);
-    
-    wallSelectButton = MenuItemImage::create("LevelEditorWall.png", "LevelEditorWall.png", this, menu_selector(LevelEditor::WallSelectCallback));
-    wallSelectButton->setPosition(Point(10,visibleSize.height - (10 + buttonHeight * 1)));
-    wallSelectButton->setAnchorPoint(Point(0.0,1.0));
+    wallSelectButton = MainMenu::CreateButton("LevelEditorWall.png", this, menu_selector(LevelEditor::WallSelectCallback), Vec2(0.01,1.0-0.216), Vec2(1,0));
     menuItems.pushBack(wallSelectButton);
-    
-    spawnerSelectButton = MenuItemImage::create("LevelEditorSpawner.png", "LevelEditorSpawner.png", this, menu_selector(LevelEditor::SpawnerSelectCallback));
-    spawnerSelectButton->setPosition(Point(10,visibleSize.height - (10 + buttonHeight * 2)));
-    spawnerSelectButton->setAnchorPoint(Point(0.0,1.0));
+    spawnerSelectButton = MainMenu::CreateButton("LevelEditorSpawner.png", this, menu_selector(LevelEditor::SpawnerSelectCallback), Vec2(0.01,1.0-0.61), Vec2(1,0));
     menuItems.pushBack(spawnerSelectButton);
-    
-    hookSelectButton = MenuItemImage::create("LevelEditorHook.png", "LevelEditorHook.png", this, menu_selector(LevelEditor::HookSelectCallback));
-    hookSelectButton->setAnchorPoint(Point(0.0,1.0));
-    hookSelectButton->setPosition(Point(10,visibleSize.height - (10 + buttonHeight * 3)));
+    hookSelectButton = MainMenu::CreateButton("LevelEditorHook.png", this, menu_selector(LevelEditor::HookSelectCallback), Vec2(0.01,1.0-0.413), Vec2(1,0));
     menuItems.pushBack(hookSelectButton);
-    
-    goalSelectButton = MenuItemImage::create("LevelEditorGoal.png", "LevelEditorGoal.png", this, menu_selector(LevelEditor::GoalSelectCallback));
-    goalSelectButton->setPosition(Point(10,visibleSize.height - (10 + buttonHeight * 4)));
-    goalSelectButton->setAnchorPoint(Point(0.0,1.0));
+    goalSelectButton = MainMenu::CreateButton("LevelEditorGoal.png", this, menu_selector(LevelEditor::GoalSelectCallback), Vec2(0.01,1.0-0.8), Vec2(1,0));
     menuItems.pushBack(goalSelectButton);
-    
-    homeSelectButton = MenuItemImage::create("home.png", "home.png", this, menu_selector(LevelEditor::homeButtonCallback));
-    homeSelectButton->setPosition(Point(visibleSize.width  - 10, visibleSize.height - (10 + buttonHeight * 0)));
-    homeSelectButton->setAnchorPoint(Point(1.0,1.0));
+    homeSelectButton = MainMenu::CreateButton("home.png", this, menu_selector(LevelEditor::homeButtonCallback), Vec2(0.9,1.0-0.015), Vec2(1,0));
     menuItems.pushBack(homeSelectButton);
-    
-    trashSelectButton = MenuItemImage::create("trash.png", "trash.png", this, menu_selector(LevelEditor::trashButtonCallback));
-    trashSelectButton->setPosition(Point(visibleSize.width  - 10,visibleSize.height - (10 + buttonHeight * 2)));
-    trashSelectButton->setAnchorPoint(Point(1.0,1.0));
+    trashSelectButton = MainMenu::CreateButton("trash.png", this, menu_selector(LevelEditor::trashButtonCallback), Vec2(0.9,1.0-0.413), Vec2(1,0));
     menuItems.pushBack(trashSelectButton);
-    
-    saveSelectButton = MenuItemImage::create("save.png", "save.png", this, menu_selector(LevelEditor::saveButtonCallback));
-    saveSelectButton->setPosition(Point(visibleSize.width - 10,visibleSize.height - (10 + buttonHeight * 1)));
-    saveSelectButton->setAnchorPoint(Point(1.0,1.0));
+    saveSelectButton = MainMenu::CreateButton("save.png", this, menu_selector(LevelEditor::saveButtonCallback), Vec2(0.9,1.0-0.216), Vec2(1,0));
     menuItems.pushBack(saveSelectButton);
-    
-    eraseSelectButton = MenuItemImage::create("LevelEditorErase.png", "LevelEditorErase.png", this, menu_selector(LevelEditor::EraseSelectCallback));
-    eraseSelectButton->setPosition(Point(visibleSize.width - 10,visibleSize.height - (10 + buttonHeight * 3)));
-    eraseSelectButton->setAnchorPoint(Point(1.0,1.0));
+    eraseSelectButton = MainMenu::CreateButton("LevelEditorErase.png", this, menu_selector(LevelEditor::EraseSelectCallback), Vec2(0.9,1.0-0.61), Vec2(1,0));
     menuItems.pushBack(eraseSelectButton);
-    
-    moveSelectButton = MenuItemImage::create("LevelEditorMove.png", "LevelEditorMove.png", this, menu_selector(LevelEditor::moveButtonCallback));
-    moveSelectButton->setPosition(Point(visibleSize.width - 10,visibleSize.height - (10 + buttonHeight * 4)));
-    moveSelectButton->setAnchorPoint(Point(1.0,1.0));
+    moveSelectButton = MainMenu::CreateButton("LevelEditorMove.png", this, menu_selector(LevelEditor::moveButtonCallback), Vec2(0.9,1.0-0.8), Vec2(1,0));
     menuItems.pushBack(moveSelectButton);
-    
-    selectedLabel = Label::createWithBMFont("dimbo.fnt", "Pan Tool", TextHAlignment::CENTER);
-    selectedLabel->setPosition(visibleSize.width / 2.0, visibleSize.height - 10 - (100 * MainMenu::screenScale.y));
-    selectedLabel->setColor(Color3B(0.0,0.0,0.0));
-    this->addChild(selectedLabel);
+    selectedLabel = MainMenu::CreateLabel("Pan Tool", Vec2(0,1.0-0.015), Vec2(0,1));
+    selectedLabel->setGlobalZOrder(2);
+    selectedLabel->setPosition(0.5 * visibleSize.width, selectedLabel->getPosition().y);
+    selectedLabel->setAnchorPoint(Vec2(0.5,1.0));
     
     notice = Label::createWithBMFont("dimbo.fnt", "Please add at least one spawner to your level!", TextHAlignment::CENTER);
-    notice->setPosition(visibleSize.width / 2.0, visibleSize.height / 2.0 - 1000);
     notice->setScale(0.45);
     notice->setVisible(false);
-    notice->setColor(Color3B(0.0,0.0,0.0));
     this->addChild(notice);
     
-    saveButtonsOnY = visibleSize.height - (10 + buttonHeight * 4);
-    saveButtonsOffY = -100;
-    
-    shade = Sprite::create("shade.png");
-    shade->setAnchorPoint(Point(0,1.0));
-    shade->setPosition(Point(0,0));
-    shade->setScale(visibleSize.width / shade->getTexture()->getPixelsWide(), visibleSize.height / shade->getTexture()->getPixelsHigh());
-    shade->setPositionZ(0);
-    
-    this->addChild(shade);
-    
     cocos2d::Vector<MenuItem*> saveMenuItems;
-    
-    saveAcceptButton = MenuItemImage::create("check.png", "check.png", this, menu_selector(LevelEditor::saveAcceptCallback));
-    saveAcceptButton->setPosition(Point(visibleSize.width / 2.0 + 25,saveButtonsOffY));
-    saveAcceptButton->setAnchorPoint(Point(0.0,1.0));
+    shade = MainMenu::CreateButton("shade.png", Vec2(0,0), Vec2(0,0));
+    shade->setScale(1,1);
+    shade->setScale(visibleSize.width / shade->getBoundingBox().size.width, visibleSize.height / shade->getBoundingBox().size.height);
+    saveMenuItems.pushBack(shade);
+    saveAcceptButton = MainMenu::CreateButton("check.png", this, menu_selector(LevelEditor::saveAcceptCallback), Vec2(0.25,1.0-0.3), Vec2(1,0));
     saveMenuItems.pushBack(saveAcceptButton);
-    saveAcceptButton->setPositionZ(3);
-    
-    saveDeclineButton = MenuItemImage::create("x.png", "x.png", this, menu_selector(LevelEditor::saveDeclineCallback));
-    saveDeclineButton->setPosition(Point(visibleSize.width / 2.0 - 25,saveButtonsOffY));
-    saveDeclineButton->setAnchorPoint(Point(1.0,1.0));
+    saveDeclineButton = MainMenu::CreateButton("x.png", this, menu_selector(LevelEditor::saveDeclineCallback), Vec2(0.75,1.0-0.3), Vec2(1,0));
     saveMenuItems.pushBack(saveDeclineButton);
-    saveDeclineButton->setPositionZ(3);
+    saveButtonsOnY = saveAcceptButton->getPosition().y;
+    saveButtonsOffY = -500;
+    saveAcceptButton->setPosition(saveAcceptButton->getPosition().x, saveButtonsOffY);
+    saveDeclineButton->setPosition(saveDeclineButton->getPosition().x, saveButtonsOffY);
     
     Size editBoxSize = Size(750*MainMenu::screenScale.x, 100 * MainMenu::screenScale.y);
     Scale9Sprite* nameBoxBG = Scale9Sprite::create("line.png");
@@ -144,49 +111,16 @@ bool LevelEditor::init(){
     nameBox->setFontColor(Color3B::WHITE);
     this->addChild(nameBox);
     
-    selectedSprite = Sprite::create("LevelEditorSelected.png");
-    selectedSprite->setAnchorPoint(Point(0.5,1.0));
-    selectedSprite->setPosition(visibleSize.width / 2.0, visibleSize.height - 10);
-    
-    auto background = Sprite::create("GRID.png");
-    background->setAnchorPoint(Point(0,0));
-    
-    spikeWallSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    wallSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    selectedSprite->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    hookSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    spawnerSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    eraseSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    homeSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    saveSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    trashSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    goalSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    moveSelectButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    saveAcceptButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    saveDeclineButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-
-    
-    spikeWallSelectButton->setPositionZ(1);
-    wallSelectButton->setPositionZ(1);
-    spawnerSelectButton->setPositionZ(1);
-    hookSelectButton->setPositionZ(1);
-    eraseSelectButton->setPositionZ(1);
-    homeSelectButton->setPositionZ(1);
-
-    selectedSprite->setPositionZ(-1);
-    background->setPositionZ(-4);
-    this->addChild(background);
-    this->addChild(selectedSprite);
-    
-    Menu* menu = Menu::createWithArray(menuItems);
-    Menu* menu2 = Menu::createWithArray(saveMenuItems);
-    menu2->setAnchorPoint(Point(0.0,0.0));
-    menu2->setPosition(0,0);
-    menu2->setPositionZ(5);
+    menu = Menu::createWithArray(menuItems);
+    saveMenu = Menu::createWithArray(saveMenuItems);
+    saveMenu->setAnchorPoint(Point(0.0,0.0));
+    saveMenu->setPosition(0,0);
+    saveMenu->setGlobalZOrder(5);
     menu->setAnchorPoint(Point(0.0,0.0));
     menu->setPosition(0,0);
-    this->addChild(menu2,1);
     this->addChild(menu, 1);
+    this->addChild(saveMenu,1);
+    this->addChild(selectedLabel);
     
     currentSelection = NULL;
     
@@ -304,6 +238,7 @@ void LevelEditor::saveButtonCallback(Ref* ref){
     shade->setAnchorPoint(Point(0,0));
     saveDeclineButton->setPosition(saveDeclineButton->getPosition().x, saveButtonsOnY);
     saveAcceptButton->setPosition(saveAcceptButton->getPosition().x, saveButtonsOnY);
+        
     
     moveSelectButton->setEnabled(false);
     eraseSelectButton->setEnabled(false);

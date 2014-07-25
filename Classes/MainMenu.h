@@ -30,16 +30,20 @@ public:
     
     void playButtonCallback(Ref*);
     void levelCreatorButtonCallback(Ref*);
+    void emptyCallback(Ref*){};
     
     static Scene* myScene;
+    static MainMenu* Instance;
     static Vec2 screenScale;
     static float minScreenScale;
     static Vec2 screenSize;
     
     static MenuItemImage* CreateButton(std::string imagePath, Ref* ref, SEL_MenuHandler callback, Vec2 pos, Vec2 anchors);
+    static MenuItemImage* CreateButton(std::string imagePath, Vec2 pos, Vec2 anchors);
     static Label* CreateLabel(std::string text, Vec2 pos, Vec2 anchors);
     static Vec2 GetAdjustedScale(Vec2, Vec2);
     static Vec2 GetAdjustedPosition(Vec2, Vec2, Vec2);
+    
 private:
     
 };

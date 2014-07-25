@@ -57,6 +57,7 @@ public:
     void onWin();
     float time;
     void UpdateTimer(float);
+    void emptyCallback(Ref*);
 private:
     void LoadLevel(Level*);
     Level* currentLevel;

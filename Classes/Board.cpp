@@ -173,3 +173,4 @@ void Board::LoadLevel(Level* lvl){
     currentLevel = lvl;
     currentLevel->Add(game);
 }
+void Board::emptyCallback(Ref*){};

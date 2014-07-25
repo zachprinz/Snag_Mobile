@@ -31,13 +31,9 @@ using namespace cocos2d::extension;
 class LevelEditor : public cocos2d::Layer
 {
 public:
-    // there's no 'id' in cpp, so we recommend returning the class instance pointer
     static cocos2d::Scene* createScene();
-    // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
     virtual bool init();
     void menuCloseCallback(cocos2d::Ref* pSender);
-    
-    // implement the "static create()" method manually
     CREATE_FUNC(LevelEditor);
     
     bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
@@ -68,23 +64,24 @@ public:
     MenuItemImage* playSelectButton;
     MenuItemImage* moveSelectButton;
     MenuItemImage* goalSelectButton;
-    Label* selectedLabel;
-    Label* notice;
     MenuItemImage* saveAcceptButton;
     MenuItemImage* saveDeclineButton;
     MenuItemImage* trashSelectButton;
     MenuItemImage* saveSelectButton;
-    
+    MenuItemImage* currentSelection;
+    MenuItemImage* shade;
+    MenuItemImage* selectedSprite;
+    Label* selectedLabel;
+    Label* notice;
+    Menu* menu;
+    Menu* saveMenu;
     EditBox* nameBox;
+    
     virtual void editBoxEditingDidBegin(EditBox* editBox);
     virtual void editBoxEditingDidEnd(EditBox* editBox);
     virtual void editBoxTextChanged(EditBox* editBox, std::string &text);
     virtual void editBoxReturn(EditBox * editBox);
-    
-    MenuItemImage* currentSelection;
-    
-    Sprite* shade;
-    Sprite* selectedSprite;
+
     static Scene* myScene;
     bool isTouched;
     Vec2 originTile;
@@ -97,24 +94,16 @@ public:
     MapObject* currentMapObject;
     std::string name;
     bool noticeUp;
-    
     void DisableSpawner();
     void EnableSpawner();
-    
     void Erase(Vec2);
-    
     bool saveDialog;
-    
     static LevelEditor* Instance;
-    
     void SetToolPos();
     void ResetToolPos();
-    
     float saveButtonsOnY;
     float saveButtonsOffY;
-    
     void ResetSaveDialog();
-    
     void Export();
 private:
     
