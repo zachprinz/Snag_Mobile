@@ -48,7 +48,7 @@ bool LevelEditor::init(){
     selectedSprite = MainMenu::CreateButton("LevelEditorSelected.png", Vec2(0,1.0-0.015), Vec2(0,1));
     selectedSprite->setPosition(visibleSize.width / 2.0, selectedSprite->getPosition().y);
     selectedSprite->setAnchorPoint(Point(0.5,1.0));
-    auto background = Sprite::create("GRID.png");
+    auto background = Sprite::create("GRID2.png");
     background->setPosition(0,0);
     background->setAnchorPoint(Point(0,0));
     background->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);

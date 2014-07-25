@@ -70,37 +70,17 @@ bool LevelInfo::init() {
     
     auto playButton = MainMenu::CreateButton("LevelEditorPlay.png", this, menu_selector(LevelInfo::playButtonCallback), Vec2(0.015, 1-0.815), Vec2(0,1));
     menuItems.pushBack(playButton);
-    
-    auto favoriteButton = MenuItemImage::create("FavoriteOn.png", "FavoriteOff.png", this, menu_selector(LevelInfo::favoriteButtonCallback));
-    favoriteButton->setAnchorPoint(Point(0.0,1.0));
-    favoriteButton->setPosition(Point(11.8 * 0.01 * visibleSize.width, visibleSize.height - (0.01 * visibleSize.height * 81.5)));
+    auto favoriteButton = MainMenu::CreateButton("FavoriteOn.png", this, menu_selector(LevelInfo::favoriteButtonCallback), Vec2(0.118, 1.0-0.815), Vec2(1,0));
     menuItems.pushBack(favoriteButton);
-    
-    auto downloadButton = MenuItemImage::create("DownloadOn.png", "DownloadOff.png", this, menu_selector(LevelInfo::downloadButtonCallback));
-    downloadButton->setAnchorPoint(Point(0.0,1.0));
-    downloadButton->setPosition(Point(21.5 * 0.01 * visibleSize.width, visibleSize.height - (0.01 * visibleSize.height * 81.5)));
+    auto downloadButton = MainMenu::CreateButton("DownloadOn.png", this, menu_selector(LevelInfo::downloadButtonCallback), Vec2(0.215, 1.0-0.815), Vec2(1,0));
     menuItems.pushBack(downloadButton);
-    
-    auto highscoresButton = MenuItemImage::create("LevelSelectScores.png", "LevelSelectScores.png", this, menu_selector(LevelInfo::highscoresButtonCallback));
-    highscoresButton->setAnchorPoint(Point(0.0,1.0));
-    highscoresButton->setPosition(Point(31.4 * 0.01 * visibleSize.width,visibleSize.height - (0.01 * visibleSize.height *  81.5)));
+    auto highscoresButton = MainMenu::CreateButton("LevelSelectScores.png", this, menu_selector(LevelInfo::highscoresButtonCallback), Vec2(0.314, 1.0-0.815), Vec2(1,0));
     menuItems.pushBack(highscoresButton);
-    
-    auto editButton = MenuItemImage::create("LevelSelectEdit.png", "LevelSelectEdit.png", this, menu_selector(LevelInfo::editButtonCallback));
-        editButton->setAnchorPoint(Point(0.0,1.0));
-    editButton->setPosition(Point(41.2 * 0.01 * visibleSize.width, visibleSize.height - (0.01 * visibleSize.height * 81.5)));
+    auto editButton = MainMenu::CreateButton("LevelSelectEdit.png", this, menu_selector(LevelInfo::editButtonCallback), Vec2(0.412, 1.0-0.815), Vec2(1,0));
     menuItems.pushBack(editButton);
-    
-    auto homeButton = MenuItemImage::create("home.png", "home.png", this, menu_selector(LevelInfo::homeButtonCallback));
-    homeButton->setAnchorPoint(Point(0.0,1.0));
-    homeButton->setPosition(Point(89.4 * 0.01 * visibleSize.width, visibleSize.height - (0.01 * visibleSize.height * 1.2)));
+    auto homeButton = MainMenu::CreateButton("home.png", this, menu_selector(LevelInfo::homeButtonCallback), Vec2(0.894, 1.0-0.012), Vec2(1,0));
     menuItems.pushBack(homeButton);
     
-    homeButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    favoriteButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    editButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    highscoresButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    downloadButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     background->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     highScoresLabel->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     authorBackground->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
