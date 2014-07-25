@@ -47,23 +47,22 @@ bool LevelSelect::init()
     
     cocos2d::Vector<MenuItem*> menuItems;
     
-    onlineLevelsButton = MainMenu::CreateButton("LevelSelectOnlineButton.png", this, menu_selector(LevelSelect::onlineCallback), Vec2(0.322,1.0-0.02), Vec2(0,0));
+    onlineLevelsButton = MainMenu::CreateButton("LevelSelectOnlineButton.png", this, menu_selector(LevelSelect::onlineCallback), Vec2(0.315,1.0-0.05), Vec2(0,0));
     onlineLevelsButton->setGlobalZOrder(-1);
-    localLevelsButton = MainMenu::CreateButton("LevelSelectLocalButton.png", this, menu_selector(LevelSelect::localCallback), Vec2(0.013,1.0-0.02), Vec2(0,0));
+    localLevelsButton = MainMenu::CreateButton("LevelSelectLocalButton.png", this, menu_selector(LevelSelect::localCallback), Vec2(0.013,1.0-0.05), Vec2(0,0));
     localLevelsButton->setGlobalZOrder(-1);
-    myLevelsButton = MainMenu::CreateButton("LevelSelectMyLevelsButton.png", this, menu_selector(LevelSelect::myLevelsCallback), Vec2(0.62,1.0-0.02), Vec2(0,0));
+    myLevelsButton = MainMenu::CreateButton("LevelSelectMyLevelsButton.png", this, menu_selector(LevelSelect::myLevelsCallback), Vec2(0.62,1.0-0.05), Vec2(0,0));
     myLevelsButton->setGlobalZOrder(-1);
-    auto scrollUpButton = MainMenu::CreateButton("LevelSelectScrollUp.png", this, menu_selector(LevelSelect::scrollUpCallback), Vec2(0.022,1.0-0.152), Vec2(0,0));
-    scrollUpButton->setGlobalZOrder(1);
-    auto scrollDownButton = MainMenu::CreateButton("LevelSelectScrollDown.png", this, menu_selector(LevelSelect::scrollDownCallback), Vec2(0.022,1.0-0.91), Vec2(0,0));
-    scrollDownButton->setGlobalZOrder(1);
-    auto homeButton = MainMenu::CreateButton("home.png", this, menu_selector(LevelSelect::homeCallback), Vec2(0.925,1.0-0.007), Vec2(0,0));
+    auto homeButton = MainMenu::CreateButton("home.png", this, menu_selector(LevelSelect::homeCallback), Vec2(0.9175,1.0-0.01), Vec2(1,1));
+    homeButton->setScale(homeButton->getScaleX()*0.85, homeButton->getScaleY()*0.85);
     homeButton->setGlobalZOrder(1);
-    levelsBackground = MainMenu::CreateButton("LevelSelectBackground.png", this, menu_selector(LevelSelect::homeCallback), Vec2(0,1.0-0.124), Vec2(0,0));
+    levelsBackground = MainMenu::CreateButton("LSB.png", this, menu_selector(LevelSelect::homeCallback), Vec2(0,1.0-0.154), Vec2(0,0));
     levelsBackground->setEnabled(false);
     levelsBackground->setGlobalZOrder(0);
     
     auto background = Sprite::create("background.png");
+    background->setPosition(0,0);
+    background->setAnchorPoint(Vec2(0,0));
     background->setGlobalZOrder(-2);
     this->addChild(background);
     background->setScale(visibleSize.width / background->getTexture()->getPixelsWide(), visibleSize.height / background->getTexture()->getPixelsHigh());
@@ -72,8 +71,6 @@ bool LevelSelect::init()
     menuItems.pushBack(myLevelsButton);
     menuItems.pushBack(localLevelsButton);
     menuItems.pushBack(levelsBackground);
-    menuItems.pushBack(scrollUpButton);
-    menuItems.pushBack(scrollDownButton);
     menuItems.pushBack(homeButton);
     
     Menu* menu = Menu::createWithArray(menuItems);
@@ -123,12 +120,6 @@ void LevelSelect::playCallback(Object* sender){
 void LevelSelect::highscoresCallback(Ref*){
 
 };
-void LevelSelect::scrollUpCallback(Ref*){
-
-};
-void LevelSelect::scrollDownCallback(Ref*){
-
-};
 void LevelSelect::homeCallback(Ref* ref){
     Director::getInstance()->pushScene(MainMenu::myScene);
 }
@@ -164,25 +155,25 @@ void LevelSelect::myLevelsCallback(Ref*){
 void LevelSelect::SetLevelSetButtons(int newSet){
     switch(currentLevelSet){
         case LEVELS_MY:
-            myLevelsButton->setPosition(myLevelsButton->getPosition().x, tabHeight);
+            myLevelsButton->runAction(MoveTo::create(0.1, Point(myLevelsButton->getPosition().x, tabHeight)));
             break;
         case LEVELS_LOCAL:
-            localLevelsButton->setPosition(localLevelsButton->getPosition().x, tabHeight);
+            localLevelsButton->runAction(MoveTo::create(0.1, Point(localLevelsButton->getPosition().x, tabHeight)));
             break;
         case LEVELS_ONLINE:
-            onlineLevelsButton->setPosition(onlineLevelsButton->getPosition().x, tabHeight);
+            onlineLevelsButton->runAction(MoveTo::create(0.1, Point(onlineLevelsButton->getPosition().x, tabHeight)));
             break;
     }
     currentLevelSet = newSet;
     switch(currentLevelSet){
         case LEVELS_MY:
-            myLevelsButton->setPosition(myLevelsButton->getPosition().x, tabHeightSelected);
+            myLevelsButton->runAction(MoveTo::create(0.1, Point(myLevelsButton->getPosition().x, tabHeightSelected)));
             break;
         case LEVELS_LOCAL:
-            localLevelsButton->setPosition(localLevelsButton->getPosition().x, tabHeightSelected);
+            localLevelsButton->runAction(MoveTo::create(0.1, Point(localLevelsButton->getPosition().x, tabHeightSelected)));
             break;
         case LEVELS_ONLINE:
-            onlineLevelsButton->setPosition(onlineLevelsButton->getPosition().x, tabHeightSelected);
+            onlineLevelsButton->runAction(MoveTo::create(0.1, Point(onlineLevelsButton->getPosition().x, tabHeightSelected)));
             break;
     }
 }

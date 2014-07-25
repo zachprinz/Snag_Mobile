@@ -65,17 +65,11 @@ bool HelloWorld::init()
     this->schedule(schedule_selector(HelloWorld::UpdateTimer),0.1f);
     cocos2d::Vector<MenuItem*> menuItems;
     
-    auto resetButton = MenuItemImage::create("reset.png", "reset.png", this, menu_selector(HelloWorld::resetButtonCallback));
-    resetButton->setPosition(Point(15,visibleSize.height - 15));//57 + (visibleSize.width - 100) / 4.0,- 100));
-    resetButton->setAnchorPoint(Point(0.0,1.0));
+    auto resetButton = MainMenu::CreateButton("reset.png", this, menu_selector(HelloWorld::resetButtonCallback), Vec2(0.02, 1.0-0.02), Vec2(1,1));
     menuItems.pushBack(resetButton);
-    auto homeButton = MenuItemImage::create("home.png", "home.png", this, menu_selector(HelloWorld::homeButtonCallback));
-    homeButton->setPosition(Point(visibleSize.width  - 15, visibleSize.height -15));//52 + ((visibleSize.width - 100) / 4.0) * 3,- 100));
-    homeButton->setAnchorPoint(Point(1.0,1.0));
+    auto homeButton = MainMenu::CreateButton("home.png", this, menu_selector(HelloWorld::homeButtonCallback), Vec2(1.0-0.02, 1.0-0.02), Vec2(1,1));
+    homeButton->setAnchorPoint(Point(1,1));
     menuItems.pushBack(homeButton);
-    
-    resetButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
-    homeButton->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     
     Menu* menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0.0,0.0));

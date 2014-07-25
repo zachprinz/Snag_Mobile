@@ -14,27 +14,28 @@
 int LevelMenuItem::count;
 
 LevelMenuItem::LevelMenuItem(std::string name, Size visibleSize, int x2, int y2){
-    float yPositions2[] = {0.232,0.462,0.69};
-    float xPosition2 = 0.022;
+    float yPositions2[] = {0.212,0.452,0.68};
+    float xPosition2 = 0.021;
     float x = xPosition2;
     float y = yPositions2[count];
     count++;
     Vector<MenuItem*> menuItems;
     
     background = MainMenu::CreateButton("LevelSelectLevelBackground.png", LevelSelect::myScene, menu_selector(LevelSelect::editCallback), Vec2(x,1.0-y), Vec2(0,0));
+    background->setScale(background->getScaleX()*0.99, background->getScaleY());
     background->setGlobalZOrder(1);
     background->setEnabled(false);
     menuItems.pushBack(background);
     
-    edit = MainMenu::CreateButton("LevelSelectEdit.png", LevelSelect::myScene, menu_selector(LevelSelect::editCallback), Vec2(x+0.848, 1.0-(y+0.022)), Vec2(0,0));
+    edit = MainMenu::CreateButton("LevelSelectEdit.png", LevelSelect::myScene, menu_selector(LevelSelect::editCallback), Vec2(x+0.848, 1.0-(y+0.022)), Vec2(1,0));
     edit->setGlobalZOrder(2);
     menuItems.pushBack(edit);
     
-    highscores = MainMenu::CreateButton("LevelSelectScores.png", LevelSelect::myScene, menu_selector(LevelSelect::highscoresCallback), Vec2(x+0.645, 1.0-(y+0.022)), Vec2(0,0));
+    highscores = MainMenu::CreateButton("LevelSelectScores.png", LevelSelect::myScene, menu_selector(LevelSelect::highscoresCallback), Vec2(x+0.645, 1.0-(y+0.022)), Vec2(1,0));
     highscores->setGlobalZOrder(2);
     menuItems.pushBack(highscores);
     
-    play = MainMenu::CreateButton("LevelSelectPlay.png", LevelSelect::myScene, menu_selector(LevelSelect::playCallback), Vec2(x+0.744, 1.0-(y+0.022)), Vec2(0,0));
+    play = MainMenu::CreateButton("LevelSelectPlay.png", LevelSelect::myScene, menu_selector(LevelSelect::playCallback), Vec2(x+0.747, 1.0-(y+0.022)), Vec2(1,0));
     play->setGlobalZOrder(2);
     menuItems.pushBack(play);
     

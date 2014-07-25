@@ -70,15 +70,15 @@ bool LevelInfo::init() {
     
     auto playButton = MainMenu::CreateButton("LevelEditorPlay.png", this, menu_selector(LevelInfo::playButtonCallback), Vec2(0.015, 1-0.815), Vec2(0,1));
     menuItems.pushBack(playButton);
-    auto favoriteButton = MainMenu::CreateButton("FavoriteOn.png", this, menu_selector(LevelInfo::favoriteButtonCallback), Vec2(0.118, 1.0-0.815), Vec2(1,0));
+    auto favoriteButton = MainMenu::CreateButton("FavoriteOn.png", this, menu_selector(LevelInfo::favoriteButtonCallback), Vec2(0.118, 1.0-0.815), Vec2(0,1));
     menuItems.pushBack(favoriteButton);
-    auto downloadButton = MainMenu::CreateButton("DownloadOn.png", this, menu_selector(LevelInfo::downloadButtonCallback), Vec2(0.215, 1.0-0.815), Vec2(1,0));
+    auto downloadButton = MainMenu::CreateButton("DownloadOn.png", this, menu_selector(LevelInfo::downloadButtonCallback), Vec2(0.215, 1.0-0.815), Vec2(0,1));
     menuItems.pushBack(downloadButton);
-    auto highscoresButton = MainMenu::CreateButton("LevelSelectScores.png", this, menu_selector(LevelInfo::highscoresButtonCallback), Vec2(0.314, 1.0-0.815), Vec2(1,0));
+    auto highscoresButton = MainMenu::CreateButton("LevelSelectScores.png", this, menu_selector(LevelInfo::highscoresButtonCallback), Vec2(0.314, 1.0-0.815), Vec2(0,1));
     menuItems.pushBack(highscoresButton);
-    auto editButton = MainMenu::CreateButton("LevelSelectEdit.png", this, menu_selector(LevelInfo::editButtonCallback), Vec2(0.412, 1.0-0.815), Vec2(1,0));
+    auto editButton = MainMenu::CreateButton("LevelSelectEdit.png", this, menu_selector(LevelInfo::editButtonCallback), Vec2(0.412, 1.0-0.815), Vec2(0,1));
     menuItems.pushBack(editButton);
-    auto homeButton = MainMenu::CreateButton("home.png", this, menu_selector(LevelInfo::homeButtonCallback), Vec2(0.894, 1.0-0.012), Vec2(1,0));
+    auto homeButton = MainMenu::CreateButton("home.png", this, menu_selector(LevelInfo::homeButtonCallback), Vec2(0.894, 1.0-0.012), Vec2(0,1));
     menuItems.pushBack(homeButton);
     
     background->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
