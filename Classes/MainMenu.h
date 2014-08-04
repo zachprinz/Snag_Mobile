@@ -29,7 +29,6 @@ public:
     void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
     
     void playButtonCallback(Ref*);
-    void levelCreatorButtonCallback(Ref*);
     void emptyCallback(Ref*){};
     
     static Scene* myScene;

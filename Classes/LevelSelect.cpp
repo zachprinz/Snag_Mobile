@@ -40,7 +40,8 @@ bool LevelSelect::init()
     Board::customLevel = false;
     Instance = this;
     
-    currentLevelSet = LEVELS_LOCAL;
+    currentLevelSet = LEVELS_RISING;
+    page = 0;
     
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -85,6 +86,14 @@ bool LevelSelect::init()
     title->setGlobalZOrder(0);
     auto background = MainMenu::CreateButton("LSBackground.png", Vec2(0,1.0-0.0), Vec2(0,0));
     background->setGlobalZOrder(0);
+    previewTitle = MainMenu::CreateLabel("Select A", Vec2(0,0), Vec2(0,0));
+    previewTitle->setGlobalZOrder(0);
+    previewTitle->setPosition(Vec2(levelTitle->getBoundingBox().getMidX(), levelTitle->getBoundingBox().getMidY()));
+    previewTitle->setVisible(false);
+    previewAuthor = MainMenu::CreateLabel("Level", Vec2(0,0), Vec2(0,0));
+    previewAuthor->setPosition(Vec2(levelAuthor->getBoundingBox().getMidX(), levelAuthor->getBoundingBox().getMidY()));
+    previewAuthor->setGlobalZOrder(0);
+    previewAuthor->setVisible(false);
     
     menuItems.pushBack(background);
     menuItems.pushBack(previewBackground);
@@ -105,171 +114,157 @@ bool LevelSelect::init()
     menuItems.pushBack(playButton);
     menuItems.pushBack(highscoresButton);
     menuItems.pushBack(title);
-
     
     Menu* menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0.0,0.0));
     menu->setPosition(0,0);
     this->addChild(menu, 1);
+    this->addChild(previewTitle, 1);
+    this->addChild(previewAuthor, 1);
     
-    //for(int x = 0; x < 3; x++){
-    //    LevelMenuItem* lvl = new LevelMenuItem("new map", visibleSize, 0, 0);
-    ////    lvl->SetTag(x);
-    //    AddLevel(lvl);
-    //}
-    //tabHeight = onlineLevelsButton->getPosition().y;
-    //tabHeightSelected = tabHeight + 20;
+    currentLevelsTab = risingLevels;
+    
+    for(int x = 0; x < 4; x++){
+        LevelMenuItem* lvl = new LevelMenuItem(std::to_string(x) + ") New Map");
+        lvl->SetTag(x);
+        levels.push_back(lvl);
+        this->addChild(lvl->menu,1);
+        this->addChild(lvl->name,1);
+    }
+    
+    tabHeight = socialLevels->getPosition().y;
+    tabHeightSelected = tabHeight - 20;
+    currentLevelsTab->setPositionY(tabHeightSelected);
     return true;
 }
-
 void LevelSelect::editCallback(Ref*){
 
 }
-void LevelSelect::playCallback(Object* sender){
-    Level* tempLvl;
-    int levelSelected = ((MenuItem*)(sender))->getTag();
-    switch(LevelSelect::Instance->currentLevelSet){
-        case LEVELS_MY:
-            tempLvl = (Board::myLevels[levelSelected]);
-            break;
-        case LEVELS_LOCAL:
-            tempLvl = (Board::localLevels[levelSelected]);
-            break;
-        case LEVELS_ONLINE:
-            tempLvl = (Board::onlineLevels[levelSelected]);
-            break;
-    }
-    if(LevelInfo::myScene == NULL){
-        Board::Print("Play button click registered.");
-        auto scene = LevelInfo::createScene();
-        Director::getInstance()->pushScene(scene);
-        LevelInfo::Instance->Load(tempLvl);
-    }
-    else{
-        Director::getInstance()->pushScene(LevelInfo::myScene);
-        LevelInfo::Instance->Load(tempLvl);
-    }
-};
 void LevelSelect::highscoresCallback(Ref*){
 
-};
-void LevelSelect::customCallback(Ref*){
-    SetLevelSetButtons(LEVELS_LOCAL);
-    for(int x = 0; x < 3; x++){
-        if(Board::localLevels.size() > x){
-            levels[x]->SetEnabled(true);
-            levels[x]->SetLevel(Board::localLevels[x]);
-        }
-        else
-            levels[x]->SetEnabled(false);
-    }
-    
-    LoadLevels();
-};
-void LevelSelect::favoritedCallback(Ref*){
-    SetLevelSetButtons(LEVELS_MY);
-    tinyxml2::XMLDocument myLevelsDoc;
-    myLevelsDoc.LoadFile(FileUtils::getInstance()->fullPathForFilename("MyLevels.xml").c_str());
-    tinyxml2::XMLElement* level = myLevelsDoc.FirstChildElement();
-    for(int x = 0; x < 3; x++){
-        if(Board::myLevels.size() > x){
-         levels[x]->SetEnabled(true);
-         levels[x]->SetLevel(Board::myLevels[x]);
-     }
-     else
-        levels[x]->SetEnabled(false);
-     }
-    
-    LoadLevels();
-};
-void LevelSelect::SetLevelSetButtons(int newSet){
-    switch(currentLevelSet){
-        case LEVELS_MY:
-            break;
-        case LEVELS_LOCAL:
-            //localLevelsButton->runAction(MoveTo::create(0.1, Point(localLevelsButton->getPosition().x, tabHeight)));
-            break;
-        case LEVELS_ONLINE:
-            break;
-    }
-    currentLevelSet = newSet;
-    switch(currentLevelSet){
-        case LEVELS_MY:
-            break;
-        case LEVELS_LOCAL:
-            break;
-        case LEVELS_ONLINE:
-            break;
-    }
 }
-void LevelSelect::Refresh(){
-    switch(currentLevelSet){
-        case LEVELS_MY:
-            //myLevelsCallback(NULL);
-            break;
-        case LEVELS_LOCAL:
-            //localCallback(NULL);
-            break;
-        case LEVELS_ONLINE:
-            //onlineCallback(NULL);
-            break;
-    }
-}
-void LevelSelect::socialCallback(Ref*){
-    SetLevelSetButtons(LEVELS_ONLINE);
-    for(int x = 0; x < 3; x++){
-        if(Board::onlineLevels.size() > x){
-            levels[x]->SetEnabled(true);
-            levels[x]->SetLevel(Board::onlineLevels[x]);
-        }
-        else
-            levels[x]->SetEnabled(false);
-    }
-    
-    LoadLevels();
-};
-void LevelSelect::risingCallback(Ref*){
-    SetLevelSetButtons(LEVELS_ONLINE);
-    for(int x = 0; x < 3; x++){
-        if(Board::onlineLevels.size() > x){
-            levels[x]->SetEnabled(true);
-            levels[x]->SetLevel(Board::onlineLevels[x]);
-        }
-        else
-            levels[x]->SetEnabled(false);
-    }
-    
-    LoadLevels();
-};
-
-void LevelSelect::AddLevel(LevelMenuItem* newLevel){
-    levels.push_back(newLevel);
-};
-void LevelSelect::LoadLevels(){
-
-};
 void LevelSelect::scrollRightCallback(Ref*){
-    
+    if(Board::levels[currentLevelSet].size() > (page+1)*4){
+        page++;
+        LoadLevels();
+    }
 }
 void LevelSelect::scrollLeftCallback(Ref*){
-    
+    if(page > 0){
+        page--;
+        LoadLevels();
+    }
 }
 void LevelSelect::newLevelCallback(Ref*){
-    
+    if(LevelEditor::myScene == NULL){
+        auto scene = LevelEditor::createScene();
+        Director::getInstance()->pushScene(scene);
+    }
+    else{
+        Director::getInstance()->pushScene(LevelEditor::myScene);
+    }
 }
 void LevelSelect::facebookCallback(Ref*){
     
 }
-
-void LevelSelect::menuCloseCallback(Ref* pSender)
-{
+void LevelSelect::favoriteCallback(Ref*){
+    
+}
+void LevelSelect::selectCallback(Ref* ref){
+    int tag = ((MenuItemImage*)ref)->getTag();
+    selectedLevel = levels[tag]->level;
+    SetPreview();
+}
+void LevelSelect::playCallback(Ref* sender){
+    if(selectedLevel != NULL){
+        if(HelloWorld::myScene == NULL){
+            auto scene = HelloWorld::createScene();
+            Director::getInstance()->pushScene(scene);
+            Board::Instance->Reset(selectedLevel);
+        }
+        else{
+            Director::getInstance()->pushScene(HelloWorld::myScene);
+            Board::Instance->Reset(selectedLevel);
+        }
+    }
+}
+void LevelSelect::customCallback(Ref*){
+    currentLevelSet = LEVELS_CUSTOM;
+    LoadLevels();
+    SetLevelSetButtons();
+}
+void LevelSelect::favoritedCallback(Ref*){
+    currentLevelSet = LEVELS_FAVORITED;
+    LoadLevels();
+    SetLevelSetButtons();
+}
+void LevelSelect::socialCallback(Ref*){
+    currentLevelSet = LEVELS_SOCIAL;
+    LoadLevels();
+    SetLevelSetButtons();
+}
+void LevelSelect::risingCallback(Ref*){
+    currentLevelSet = LEVELS_RISING;
+    LoadLevels();
+    SetLevelSetButtons();
+}
+void LevelSelect::SetLevelSetButtons(){
+    currentLevelsTab->runAction(MoveTo::create(0.1, Point(currentLevelsTab->getPosition().x, tabHeight)));
+    switch(currentLevelSet){
+        case LEVELS_RISING:
+            currentLevelsTab = risingLevels;
+            break;
+        case LEVELS_FAVORITED:
+            currentLevelsTab = favoritedLevels;
+            break;
+        case LEVELS_SOCIAL:
+            currentLevelsTab = socialLevels;
+            break;
+        case LEVELS_CUSTOM:
+            currentLevelsTab = customLevels;
+            break;
+    }
+    currentLevelsTab->runAction(MoveTo::create(0.1, Point(currentLevelsTab->getPosition().x, tabHeightSelected)));
+}
+void LevelSelect::Refresh(){
+    switch(currentLevelSet){
+        case LEVELS_RISING:
+            risingCallback(NULL);
+            break;
+        case LEVELS_FAVORITED:
+            favoritedCallback(NULL);
+            break;
+        case LEVELS_SOCIAL:
+            socialCallback(NULL);
+            break;
+        case LEVELS_CUSTOM:
+            customCallback(NULL);
+            break;
+    }
+}
+void LevelSelect::LoadLevels(){
+    for(int x = 0; x < 4; x++){
+        levels[x]->SetEnabled(false);
+    }
+    if(Board::levels.size() > 0){
+        for(int x = page * 4; x < Board::levels[currentLevelSet].size() && x < ((page*4)+4); x++){
+            levels[x%4]->SetEnabled(true);
+            levels[x%4]->SetLevel(Board::levels[currentLevelSet][x], page);
+        }
+    }
+};
+void LevelSelect::SetPreview(){
+    previewTitle->setVisible(true);
+    previewAuthor->setVisible(true);
+    previewTitle->setString(selectedLevel->GetName());
+    previewAuthor->setString(selectedLevel->GetAuthor());
+}
+void LevelSelect::menuCloseCallback(Ref* pSender){
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
 	MessageBox("You pressed the close button. Windows Store Apps do not implement a close button.","Alert");
     return;
 #endif
-    
     Director::getInstance()->end();
-    
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
     exit(0);
 #endif

@@ -15,9 +15,10 @@
 #include "CocosGUI.h"
 #include "LevelMenuItem.h"
 
-#define LEVELS_ONLINE 1
-#define LEVELS_LOCAL 2
-#define LEVELS_MY 3
+#define LEVELS_CUSTOM 0
+#define LEVELS_SOCIAL 1
+#define LEVELS_FAVORITED 2
+#define LEVELS_RISING 3
 
 USING_NS_CC;
 
@@ -32,7 +33,7 @@ public:
     CREATE_FUNC(LevelSelect);
     
     void editCallback(Ref*);
-    void playCallback(Object*);
+    void playCallback(Ref*);
     void highscoresCallback(Ref*);
     void scrollLeftCallback(Ref*);
     void scrollRightCallback(Ref*);
@@ -42,12 +43,13 @@ public:
     void favoritedCallback(Ref*);
     void newLevelCallback(Ref*);
     void facebookCallback(Ref*);
+    void favoriteCallback(Ref*);
+    void selectCallback(Ref*);
     
     float tabHeightSelected;
     float tabHeight;
     
     std::vector<LevelMenuItem*> levels;
-    void AddLevel(LevelMenuItem*);
     void LoadLevels();
     
     static Scene* myScene;
@@ -59,12 +61,18 @@ public:
     void Refresh();
     
     static LevelSelect* Instance;
-    void SetLevelSetButtons(int newSet);
+    void SetLevelSetButtons();
+    Level* selectedLevel;
+    int page;
 private:
+    void SetPreview();
+    MenuItemImage* currentLevelsTab;
     MenuItemImage* customLevels;
     MenuItemImage* socialLevels;
     MenuItemImage* risingLevels;
     MenuItemImage* favoritedLevels;
+    Label* previewTitle;
+    Label* previewAuthor;
 };
 
 #endif /* defined(__Snag__LevelSelect__) */

@@ -1,4 +1,5 @@
 #include "HelloWorldScene.h"
+#include "LevelSelect.h"
 #include "MainMenu.h"
 
 USING_NS_CC;
@@ -88,7 +89,16 @@ void HelloWorld::resetButtonCallback(Ref* ref){
 }
 
 void HelloWorld::homeButtonCallback(Ref* ref){
-    Director::getInstance()->pushScene(MainMenu::myScene);
+    if(LevelSelect::myScene == NULL){
+        Board::Print("Play button click registered.");
+        auto scene = LevelSelect::createScene();
+        Director::getInstance()->pushScene(scene);
+        LevelSelect::Instance->Refresh();
+    }
+    else{
+        Director::getInstance()->pushScene(LevelSelect::myScene);
+        LevelSelect::Instance->Refresh();
+    }
 }
 
 bool HelloWorld::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){

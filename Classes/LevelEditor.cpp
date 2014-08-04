@@ -11,6 +11,7 @@
 #include "Level.h"
 #include "Board.h"
 #include "HelloWorldScene.h"
+#include "LevelSelect.h"
 
 USING_NS_CC;
 
@@ -226,7 +227,16 @@ void LevelEditor::EraseSelectCallback(Ref*){
     }
 };
 void LevelEditor::homeButtonCallback(Ref* ref){
-    Director::getInstance()->pushScene(MainMenu::myScene);
+    if(LevelSelect::myScene == NULL){
+        Board::Print("Play button click registered.");
+        auto scene = LevelSelect::createScene();
+        Director::getInstance()->pushScene(scene);
+        LevelSelect::Instance->Refresh();
+    }
+    else{
+        Director::getInstance()->pushScene(LevelSelect::myScene);
+        LevelSelect::Instance->Refresh();
+    }
 }
 void LevelEditor::saveButtonCallback(Ref* ref){
     bool hasSpawner = false;
@@ -569,5 +579,5 @@ void LevelEditor::ResetToolPos(){
 }
 
 void LevelEditor::Export(){
-    Board::myLevels.push_back(Level::createWithMapObjects(mapObjects, name));
+    Board::AddCustomLevel(Level::createWithMapObjects(mapObjects, name));
 }

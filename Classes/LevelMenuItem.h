@@ -17,14 +17,12 @@ using namespace cocos2d;
 
 class LevelMenuItem{
 public:
-    LevelMenuItem(std::string, Size visibleSize,int x,  int y);
-    cocos2d::MenuItemImage* edit;
-    cocos2d::MenuItemImage* play;
-    cocos2d::MenuItemImage* highscores;
+    LevelMenuItem(std::string);
+    cocos2d::MenuItemImage* favorited;
     cocos2d::MenuItemImage* background;
     cocos2d::Label* name;
     void SetOrder(int);
-    void SetLevel(Level*);
+    void SetLevel(Level*, int page);
     std::string myName;
     std::string myPath;
     void SetEnabled(bool);

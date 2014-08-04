@@ -21,9 +21,33 @@ USING_NS_CC;
 Board* Board::Instance;
 char* Board::levelPath;
 bool Board::customLevel;
-std::vector<Level*> Board::myLevels;
-std::vector<Level*> Board::localLevels;
-std::vector<Level*> Board::onlineLevels;
+std::vector<std::vector<Level*>> Board::levels;
+void Board::AddCustomLevel(Level* level){
+    SetUpLevels();
+    levels[LEVELS_CUSTOM].push_back(level);
+};
+void Board::AddRisingLevel(Level* level){
+    SetUpLevels();
+    levels[LEVELS_RISING].push_back(level);
+};
+void Board::AddSocialLevel(Level* level){
+    SetUpLevels();
+    levels[LEVELS_SOCIAL].push_back(level);
+};
+void Board::AddFavoritedLevel(Level* level){
+    SetUpLevels();
+    levels[LEVELS_FAVORITED].push_back(level);
+};
+void Board::SetUpLevels(){
+    if(!areLevelsSetUp){
+        for(int x = 0; x < 4; x++){
+            std::vector<Level*> levelVector;
+            levels.push_back(levelVector);
+        }
+        areLevelsSetUp = true;
+    }
+};
+bool Board::areLevelsSetUp;
 
 Board::Board(Layer* game, PhysicsWorld* world, Size size, Point origin){
     this->world = world;

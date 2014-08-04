@@ -8,6 +8,10 @@
 
 #ifndef __Snag__Board__
 #define __Snag__Board__
+#define LEVELS_CUSTOM 0
+#define LEVELS_SOCIAL 1
+#define LEVELS_FAVORITED 2
+#define LEVELS_RISING 3
 
 #include <iostream>
 #include "cocos2d.h"
@@ -49,9 +53,13 @@ public:
     static void Print(std::string);
     static char* levelPath;
     static bool customLevel;
-    static std::vector<Level*> myLevels;
-    static std::vector<Level*> onlineLevels;
-    static std::vector<Level*> localLevels;
+    static std::vector<std::vector<Level*>> levels;
+    static void AddCustomLevel(Level*);
+    static void AddRisingLevel(Level*);
+    static void AddSocialLevel(Level*);
+    static void AddFavoritedLevel(Level*);
+    static void SetUpLevels();
+    static bool areLevelsSetUp;
     void Reset(Level* lvl);
     void Clear();
     void onWin();

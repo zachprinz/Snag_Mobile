@@ -55,10 +55,9 @@ bool MainMenu::init()
     background->setPositionZ(-2);
     menuItems.pushBack(background);
     
-    auto playButton = MainMenu::CreateButton("MainMenuPlay.png", this, menu_selector(MainMenu::playButtonCallback), Vec2(0.075, 1.0-0.66), Vec2(1,1));
+    auto playButton = MainMenu::CreateButton("MainMenuPlay.png", this, menu_selector(MainMenu::playButtonCallback), Vec2(0.5, 1.0-0.66), Vec2(1,1));
+    playButton->setAnchorPoint(Vec2(0.5,1));
     menuItems.pushBack(playButton);
-    auto levelCreatorButton = MainMenu::CreateButton("MainMenuLevelCreator.png", this, menu_selector(MainMenu::levelCreatorButtonCallback), Vec2(0.514, 1-0.66), Vec2(1,1));
-    menuItems.pushBack(levelCreatorButton);
     
     Menu* menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0.0,0.0));
@@ -80,17 +79,6 @@ void MainMenu::playButtonCallback(Ref* pSender){
         LevelSelect::Instance->Refresh();
     }
 }
-
-void MainMenu::levelCreatorButtonCallback(Ref* pSender){
-    if(LevelEditor::myScene == NULL){
-        auto scene = LevelEditor::createScene();
-        Director::getInstance()->pushScene(scene);
-    }
-    else{
-        Director::getInstance()->pushScene(LevelEditor::myScene);
-    }
-}
-
 bool MainMenu::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
     return true;
 }
@@ -117,7 +105,7 @@ Label* MainMenu::CreateLabel(std::string text, Vec2 pos, Vec2 anchors){
     Label* temp = Label::createWithBMFont("dimbo.fnt", text, TextHAlignment::CENTER);
     Vec2 tempScale = GetAdjustedScale(pos, anchors);
     temp->setPosition(GetAdjustedPosition(pos, anchors, tempScale));
-    temp->setAnchorPoint(Point(0,1));
+    temp->setAnchorPoint(Point(0.5,0.5));
     temp->retain();
     temp->setColor(Color3B(0.0,0.0,0.0));
     //temp->setFontScale(tempScale);
