@@ -51,13 +51,21 @@ bool MainMenu::init()
     if(adjustedScale.y < adjustedScale.x)
         minScreenScale = adjustedScale.y;
     
-    auto background = MainMenu::CreateButton("MainMenu.png", Vec2(0,1), Vec2(0,0));
+    auto background = MainMenu::CreateButton("MMBackground.png", Vec2(0,1), Vec2(0,0));
     background->setPositionZ(-2);
     menuItems.pushBack(background);
+    auto ballAndHook = MainMenu::CreateButton("MMHookAndUser.png", Vec2(0,0),Vec2(0,1));
+    ballAndHook->setAnchorPoint(Vec2(0.5,ballAndHook->getAnchorPoint().y));
+    ballAndHook->setPosition(Vec2(background->getBoundingBox().getMidX(), (1.0-0.07)*screenSize.y));
+    menuItems.pushBack(ballAndHook);
     
-    auto playButton = MainMenu::CreateButton("MainMenuPlay.png", this, menu_selector(MainMenu::playButtonCallback), Vec2(0.5, 1.0-0.66), Vec2(1,1));
+    auto playButton = MainMenu::CreateButton("MMPlay.png", this, menu_selector(MainMenu::playButtonCallback), Vec2(0.5, 1.0-0.69), Vec2(1,1));
     playButton->setAnchorPoint(Vec2(0.5,1));
     menuItems.pushBack(playButton);
+    auto title = MainMenu::CreateButton("MMSnag.png", Vec2(0,0), Vec2(0,1));
+    title->setAnchorPoint(Vec2(0.5,title->getAnchorPoint().y));
+    title->setPosition(Vec2(background->getBoundingBox().getMidX(), (1.0-0.05)*screenSize.y));
+    menuItems.pushBack(title);
     
     Menu* menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0.0,0.0));

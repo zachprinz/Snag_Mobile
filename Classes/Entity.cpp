@@ -27,7 +27,7 @@ Entity::Entity(char* texture,int x, int y, int type){
     spriteBaseScale.set(1.0,1.0);
     imageSize = Vec2(sprite->getTexture()->getPixelsHigh(),sprite->getTexture()->getPixelsWide());
     auto tempDebug = DrawNode::create();
-    boundsDebug = tempDebug;
+    //boundsDebug = tempDebug;
     Vec2 vertices[] = {Vec2(0,0),
                        Vec2(0,imageSize.y),
                        Vec2(imageSize.x, imageSize.y),
@@ -58,7 +58,7 @@ Point Entity::GetPosition(){
 
 void Entity::update(float dt){
     //boundsDebug->setPosition(GetBounds().origin.x,GetBounds().origin.y);
-    //UpdateSprite();
+    UpdateSprite();
 }
 
 void Entity::SetScale(Vec2 scale){
