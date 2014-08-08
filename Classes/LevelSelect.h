@@ -62,6 +62,7 @@ public:
     
     static LevelSelect* Instance;
     void SetLevelSetButtons();
+    void SetLevelSet(int);
     Level* selectedLevel;
     int page;
 private:
@@ -75,6 +76,15 @@ private:
     MenuItemImage* uploadButton;
     Label* previewTitle;
     Label* previewAuthor;
+    void FetchSocialLevels();
+    void FetchCustomLevels();
+    void FetchRisingLevels();
+    void FetchFavoritedLevels();
+    void fetchSocialCallback(Node* sender, Value data);
+    void fetchFavoritedCallback(Node* sender, Value data);
+    void fetchRisingCallback(Node* sender, Value data);
+    void fetchCustomCallback(Node* sender, Value data);
+    void doneFetching(Node* sender, Value data);
 };
 
 #endif /* defined(__Snag__LevelSelect__) */

@@ -13,6 +13,7 @@
 #include "MainMenu.h"
 #include "LevelMenuItem.h"
 #include "LevelInfo.h"
+#include "NDKHelper/NDKHelper.h"
 
 USING_NS_CC;
 
@@ -138,6 +139,15 @@ bool LevelSelect::init()
     tabHeight = socialLevels->getPosition().y;
     tabHeightSelected = tabHeight - 20;
     currentLevelsTab->setPositionY(tabHeightSelected);
+    
+    //-- Set Up Newtork Stuff --//
+    NDKHelper::addSelector("LevelSelect", "fetchCustomCallback", CC_CALLBACK_2(LevelSelect::fetchCustomCallback, this), this);
+    NDKHelper::addSelector("LevelSelect", "fetchSocialCallback", CC_CALLBACK_2(LevelSelect::fetchSocialCallback, this), this);
+    NDKHelper::addSelector("LevelSelect", "fetchFavoritedCallback", CC_CALLBACK_2(LevelSelect::fetchFavoritedCallback, this), this);
+    NDKHelper::addSelector("LevelSelect", "fetchRisingCallback", CC_CALLBACK_2(LevelSelect::fetchRisingCallback, this), this);
+    NDKHelper::addSelector("LevelSelect", "doneFetching", CC_CALLBACK_2(LevelSelect::doneFetching, this), this);
+    //--------------------------//
+    
     return true;
 }
 void LevelSelect::editCallback(Ref*){
@@ -159,13 +169,8 @@ void LevelSelect::scrollLeftCallback(Ref*){
     }
 }
 void LevelSelect::newLevelCallback(Ref*){
-    if(LevelEditor::myScene == NULL){
-        auto scene = LevelEditor::createScene();
-        Director::getInstance()->pushScene(scene);
-    }
-    else{
-        Director::getInstance()->pushScene(LevelEditor::myScene);
-    }
+    sendMessageWithParams("newLevel", Value());
+    Refresh();
 }
 void LevelSelect::facebookCallback(Ref*){
     
@@ -192,24 +197,25 @@ void LevelSelect::playCallback(Ref* sender){
     }
 }
 void LevelSelect::customCallback(Ref*){
-    currentLevelSet = LEVELS_CUSTOM;
-    LoadLevels();
+    SetLevelSet(LEVELS_CUSTOM);
     SetLevelSetButtons();
 }
 void LevelSelect::favoritedCallback(Ref*){
-    currentLevelSet = LEVELS_FAVORITED;
-    LoadLevels();
+    SetLevelSet(LEVELS_FAVORITED);
     SetLevelSetButtons();
 }
 void LevelSelect::socialCallback(Ref*){
-    currentLevelSet = LEVELS_SOCIAL;
-    LoadLevels();
+    SetLevelSet(LEVELS_SOCIAL);
     SetLevelSetButtons();
 }
 void LevelSelect::risingCallback(Ref*){
-    currentLevelSet = LEVELS_RISING;
-    LoadLevels();
+    SetLevelSet(LEVELS_RISING);
     SetLevelSetButtons();
+}
+void LevelSelect::SetLevelSet(int set){
+    page = 0;
+    currentLevelSet = set;
+    LoadLevels();
 }
 void LevelSelect::SetLevelSetButtons(){
     currentLevelsTab->runAction(MoveTo::create(0.1, Point(currentLevelsTab->getPosition().x, tabHeight)));
@@ -230,25 +236,74 @@ void LevelSelect::SetLevelSetButtons(){
     currentLevelsTab->runAction(MoveTo::create(0.1, Point(currentLevelsTab->getPosition().x, tabHeightSelected)));
 }
 void LevelSelect::Refresh(){
-    switch(currentLevelSet){
-        case LEVELS_RISING:
-            risingCallback(NULL);
-            break;
-        case LEVELS_FAVORITED:
-            favoritedCallback(NULL);
-            break;
-        case LEVELS_SOCIAL:
-            socialCallback(NULL);
-            break;
-        case LEVELS_CUSTOM:
-            customCallback(NULL);
-            break;
-    }
+    SetLevelSet(currentLevelSet);
 }
 void LevelSelect::LoadLevels(){
     for(int x = 0; x < 4; x++){
         levels[x]->SetEnabled(false);
     }
+    switch(currentLevelSet){
+        case LEVELS_RISING:
+            FetchRisingLevels();
+            break;
+        case LEVELS_FAVORITED:
+            FetchFavoritedLevels();
+            break;
+        case LEVELS_SOCIAL:
+            FetchSocialLevels();
+            break;
+        case LEVELS_CUSTOM:
+            FetchCustomLevels();
+            break;
+    }
+};
+void LevelSelect::FetchSocialLevels(){
+    Board::SetUpLevels();
+    Board::levels[LEVELS_SOCIAL].clear();
+    sendMessageWithParams("fetchCustomLevels", Value());
+};
+void LevelSelect::FetchCustomLevels(){
+    Board::SetUpLevels();
+    Board::levels[LEVELS_CUSTOM].clear();
+    sendMessageWithParams("fetchCustomLevels", Value());
+};
+void LevelSelect::FetchRisingLevels(){
+    Board::SetUpLevels();
+    Board::levels[LEVELS_RISING].clear();
+    sendMessageWithParams("fetchCustomLevels", Value());
+};
+void LevelSelect::FetchFavoritedLevels(){
+    Board::SetUpLevels();
+    Board::levels[LEVELS_FAVORITED].clear();
+    sendMessageWithParams("fetchCustomLevels", Value());
+};
+void LevelSelect::fetchSocialCallback(Node* sender, Value data){
+    if (!data.isNull() && data.getType() == Value::Type::MAP) {
+        ValueMap valueMap = data.asValueMap();
+        Board::AddSocialLevel(Level::createWithValueMap(valueMap));
+    }
+};
+void LevelSelect::fetchFavoritedCallback(Node* sender, Value data){
+    if (!data.isNull() && data.getType() == Value::Type::MAP) {
+        ValueMap valueMap = data.asValueMap();
+        Board::AddFavoritedLevel(Level::createWithValueMap(valueMap));
+    }
+};
+void LevelSelect::fetchRisingCallback(Node* sender, Value data){
+    if (!data.isNull() && data.getType() == Value::Type::MAP) {
+        ValueMap valueMap = data.asValueMap();
+        Board::AddRisingLevel(Level::createWithValueMap(valueMap));
+    }
+};
+void LevelSelect::fetchCustomCallback(Node* sender, Value data){
+    if (!data.isNull() && data.getType() == Value::Type::MAP) {
+        printf("Returned with a custom level!");
+        ValueMap valueMap = data.asValueMap();
+        Board::AddCustomLevel(Level::createWithValueMap(valueMap));
+    }
+};
+void LevelSelect::doneFetching(Node* sender, Value data){
+    printf("\nDone Fetching\n");
     if(Board::levels.size() > 0){
         for(int x = page * 4; x < Board::levels[currentLevelSet].size() && x < ((page*4)+4); x++){
             levels[x%4]->SetEnabled(true);

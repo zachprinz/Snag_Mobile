@@ -24,7 +24,7 @@ USING_NS_CC;
 
 class Entity{
 public:
-    Entity(char* texture, int x = 500, int y = 300, int type = 0);
+    Entity(char* texture, int x = 500, int y = 300, Vec2 size = Vec2(0,0), int type = 0);
     virtual void update(float dt);
     Sprite* GetSprite();
     Point GetPosition();
@@ -41,6 +41,11 @@ public:
     PhysicsBody* body;
     int type;
     void Add(Layer*);
+    void SetType(int);
+    std::string typeString;
+    Vec2 GetSize();
+    Vec2 size;
+    int GetType();
 private:
     
 protected:

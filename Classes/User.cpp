@@ -76,7 +76,7 @@ void User::Reset(){
         Release();
     Board::Instance->time = 0.0;
     physicsSprite->setPosition(Spawner::Instance->GetPosition());
-    body->setVelocity(Spawner::Instance->GetVelocity());
+    body->setVelocity(Spawner::Instance->GetStartVelocity());
 }
 
 void User::CalculateScale(){

@@ -26,7 +26,9 @@ using namespace cocos2d;
 
 class MapObject{
 public:
+    static MapObject* CreateWithPosAndSize(Vec2,Vec2,int);
     MapObject(Vec2, int);
+    MapObject(Vec2, Vec2, int);
     void UpdateEndCoord(cocos2d::Vec2);
     cocos2d::Sprite* GetSprite();
     void SetOriginTile(Vec2);

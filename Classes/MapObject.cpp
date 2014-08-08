@@ -12,6 +12,12 @@
 
 Vec2 MapObject::origin;
 
+MapObject* MapObject::CreateWithPosAndSize(Vec2 pos, Vec2 size, int type){
+    Vec2 startCoord = Vec2(pos.x / TILE_SIZE, pos.y / TILE_SIZE);
+    MapObject* mapObject = new MapObject(startCoord, type);
+    mapObject->UpdateEndCoord(Vec2(startCoord.x + (size.x / TILE_SIZE), startCoord.y + (size.y / TILE_SIZE)));
+}
+
 MapObject::MapObject(Vec2 start, int type){
     this->type = type;
     this->startCoord = start;
@@ -45,7 +51,6 @@ MapObject::MapObject(Vec2 start, int type){
     sprite->setAnchorPoint(Point(0,0));
     sprite->setPositionZ(-3);
     SetOriginTile(origin);
-    
 }
 void MapObject::UpdateEndCoord(Vec2 coord){
     this->endCoord = coord;

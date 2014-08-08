@@ -370,6 +370,9 @@ void LevelEditor::playButtonCallback(Ref* ref){
     
 }
 void LevelEditor::trashButtonCallback(Ref* ref){
+    Clear();
+}
+void LevelEditor::Clear(){
     for(int x = 0; x < mapObjects.size(); x++){
         this->removeChild(mapObjects[x]->GetSprite());
     }
@@ -465,6 +468,14 @@ void LevelEditor::onTouchMoved(Touch* touch, Event* event){
 
     }
 }
+void LevelEditor::SetLevel(Level* lvl){
+    currentLevel = lvl;
+    Clear();
+    mapObjects = lvl->GetMapObjects();
+    for(int x = 0; x < mapObjects.size(); x++){
+        this->addChild(mapObjects[x]->GetSprite());
+    }
+}
 Vec2 LevelEditor::PixelToTile(Point pos){
     Vec2 ret = Vec2(floor((float)pos.x / TILE_SIZE), floor((float)pos.y / TILE_SIZE));
     ret.x += originTile.x;
@@ -545,7 +556,6 @@ void LevelEditor::SetToolPos(){
     }
     }
 }
-
 void LevelEditor::ResetToolPos(){
     if(currentSelection != NULL){
     auto setAction = MoveTo::create(0.1, Point(currentSelection->getPosition().x + 20, currentSelection->getPosition().y));
@@ -577,7 +587,8 @@ void LevelEditor::ResetToolPos(){
     }
     }
 }
-
 void LevelEditor::Export(){
-    Board::AddCustomLevel(Level::createWithMapObjects(mapObjects, name));
+    for(int x = 0; x < mapObjects.size(); x++){
+        currentLevel->AddEntity(mapObjects[x]);
+    }
 }

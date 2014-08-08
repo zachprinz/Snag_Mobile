@@ -17,9 +17,10 @@ Vec2 Entity::baseScale;
 float Entity::boardScale;
 Vec2 Entity::userPosition;
 
-Entity::Entity(char* texture,int x, int y, int type){
+Entity::Entity(char* texture,int x, int y, Vec2 size, int type){
     physicsSprite = NULL;
-    this->type = type;
+    SetType(type);
+    this->size = size;
     sprite = Sprite::create(texture);
     sprite->setPosition(Point(x,y));
     sprite->retain();
@@ -56,6 +57,10 @@ Point Entity::GetPosition(){
     return position;
 }
 
+Vec2 Entity::GetSize(){
+    return size;
+}
+
 void Entity::update(float dt){
     //boundsDebug->setPosition(GetBounds().origin.x,GetBounds().origin.y);
     UpdateSprite();
@@ -67,6 +72,27 @@ void Entity::SetScale(Vec2 scale){
 
 Vec2 Entity::GetScale(){
     return scale;
+}
+
+void Entity::SetType(int t){
+    type = t;
+    switch(t){
+        case WALL:
+            typeString = "Wall";
+            break;
+        case GOAL:
+            typeString = "Goal";
+            break;
+        case SPIKE_WALL:
+            typeString = "SpikeWall";
+            break;
+        case SPAWNER:
+            typeString = "Spawner";
+            break;
+        case HOOK:
+            typeString = "Hook";
+            break;
+    }
 }
 
 void Entity::SetBaseScale(Vec2 scale){
@@ -83,6 +109,10 @@ Rect Entity::GetBounds(){
 
 void Entity::UpdateSprite(){
     this->CalculateScale();
+}
+
+int Entity::GetType(){
+    return type;
 }
 
 void Entity::CalculateScale(){

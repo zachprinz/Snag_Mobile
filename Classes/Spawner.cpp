@@ -11,14 +11,14 @@
 
 Spawner* Spawner::Instance;
 
-Spawner::Spawner(Vec2 pos, Vec2 vel) : Entity("spawner.png", pos.x, pos.y, 3){
+Spawner::Spawner(Vec2 pos, Vec2 vel) : Entity("spawner.png", pos.x, pos.y,Vec2(0,0), 3){
     velocity = vel;
     Instance = this;
     //Board::Instance->user->Reset();
     SetUpPhysicsSprite("spawner.png");
 }
 
-Vec2 Spawner::GetVelocity(){
+Vec2 Spawner::GetStartVelocity(){
     return velocity;
 }
 

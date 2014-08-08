@@ -82,6 +82,9 @@ public:
     virtual void editBoxTextChanged(EditBox* editBox, std::string &text);
     virtual void editBoxReturn(EditBox * editBox);
 
+    Level* currentLevel;
+    void SetLevel(Level*);
+    
     static Scene* myScene;
     bool isTouched;
     Vec2 originTile;
@@ -105,6 +108,7 @@ public:
     float saveButtonsOffY;
     void ResetSaveDialog();
     void Export();
+    void Clear();
 private:
     
 };
