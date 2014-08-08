@@ -71,6 +71,8 @@ private:
     MenuItemImage* socialLevels;
     MenuItemImage* risingLevels;
     MenuItemImage* favoritedLevels;
+    MenuItemImage* highscoresButton;
+    MenuItemImage* uploadButton;
     Label* previewTitle;
     Label* previewAuthor;
 };

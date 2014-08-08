@@ -42,7 +42,13 @@ public:
     static Label* CreateLabel(std::string text, Vec2 pos, Vec2 anchors);
     static Vec2 GetAdjustedScale(Vec2, Vec2);
     static Vec2 GetAdjustedPosition(Vec2, Vec2, Vec2);
+    void userCheckCallback(Node* sender, Value data);
+    void checkForUser();
+    void goToLogIn();
+    void goToLevelSelect();
     
+    Label* notice;
+    Menu* menu;
 private:
     
 };

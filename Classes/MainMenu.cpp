@@ -11,6 +11,9 @@
 #include "HelloWorldScene.h"
 #include "LevelEditor.h"
 #include "LevelSelect.h"
+#include "LogInMenu.h"
+#include "NDKHelper/NDKHelper.h"
+#include "String.h"
 
 USING_NS_CC;
 #define MAX_SCALE 1.5;
@@ -23,8 +26,7 @@ float MainMenu::minScreenScale;
 Vec2 MainMenu::screenScale;
 MainMenu* MainMenu::Instance;
 
-Scene* MainMenu::createScene()
-{
+Scene* MainMenu::createScene(){
     auto scene = Scene::create();
     auto layer = MainMenu::create();
     myScene = scene;
@@ -53,7 +55,7 @@ bool MainMenu::init()
     
     auto background = MainMenu::CreateButton("MMBackground.png", Vec2(0,1), Vec2(0,0));
     background->setPositionZ(-2);
-    menuItems.pushBack(background);
+    this->addChild(background,1);
     auto ballAndHook = MainMenu::CreateButton("MMHookAndUser.png", Vec2(0,0),Vec2(0,1));
     ballAndHook->setAnchorPoint(Vec2(0.5,ballAndHook->getAnchorPoint().y));
     ballAndHook->setPosition(Vec2(background->getBoundingBox().getMidX(), (1.0-0.07)*screenSize.y));
@@ -67,17 +69,49 @@ bool MainMenu::init()
     title->setPosition(Vec2(background->getBoundingBox().getMidX(), (1.0-0.05)*screenSize.y));
     menuItems.pushBack(title);
     
-    Menu* menu = Menu::createWithArray(menuItems);
+    menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0.0,0.0));
     menu->setPosition(0,0);
     this->addChild(menu, 1);
+    
+    notice = Label::createWithBMFont("dimbo.fnt", "Searching for an account", TextHAlignment::CENTER);
+    notice->setScale(1);
+    notice->setVisible(false);
+    notice->setPosition(Vec2(visibleSize.width /2.0, visibleSize.height / 2.0));
+    notice->setAnchorPoint(Vec2(0.5,0.5));
+    this->addChild(notice,1);
+    
+    //-- Set Up Newtork Stuff --//
+    NDKHelper::addSelector("MainMenu", "userCheckCallback", CC_CALLBACK_2(MainMenu::userCheckCallback, this), this);
+    //--------------------------//
     
     return true;
 }
 
 void MainMenu::playButtonCallback(Ref* pSender){
+    menu->setVisible(false);
+    notice->setVisible(true);
+    checkForUser();
+}
+void MainMenu::checkForUser(){
+    sendMessageWithParams("checkForUser", Value());
+}
+void MainMenu::userCheckCallback(Node* sender, Value data){
+    if (!data.isNull() && data.getType() == Value::Type::MAP) {
+        ValueMap valueMap = data.asValueMap();
+        std::string response = valueMap["responce"].asString();
+        if(response.compare("true") == 0){
+            printf("Found a user account for this device!");
+            goToLevelSelect();
+        }
+        else{
+            printf("Couldn't find a user account for this device.");
+            goToLogIn();
+        }
+    }
+}
+void MainMenu::goToLevelSelect(){
     if(LevelSelect::myScene == NULL){
-        Board::Print("Play button click registered.");
         auto scene = LevelSelect::createScene();
         Director::getInstance()->pushScene(scene);
         LevelSelect::Instance->Refresh();
@@ -85,6 +119,15 @@ void MainMenu::playButtonCallback(Ref* pSender){
     else{
         Director::getInstance()->pushScene(LevelSelect::myScene);
         LevelSelect::Instance->Refresh();
+    }
+}
+void MainMenu::goToLogIn(){
+    if(LogInMenu::myScene == NULL){
+        auto scene = LogInMenu::createScene();
+        Director::getInstance()->pushScene(scene);
+    }
+    else{
+        Director::getInstance()->pushScene(LogInMenu::myScene);
     }
 }
 bool MainMenu::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
