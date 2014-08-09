@@ -53,7 +53,7 @@ bool LevelSelect::init()
     risingLevels->setGlobalZOrder(0);
     socialLevels = MainMenu::CreateButton("LSSocialTab.png", this, menu_selector(LevelSelect::socialCallback), Vec2(0.151,1.0-0.105), Vec2(0,0));
     socialLevels->setGlobalZOrder(0);
-    favoritedLevels = MainMenu::CreateButton("LSFavTab.png", this, menu_selector(LevelSelect::favoritedCallback), Vec2(0.29,1.0-0.105), Vec2(0,0));
+    favoritedLevels = MainMenu::CreateButton("LSFavoritedTab.png", this, menu_selector(LevelSelect::favoritedCallback), Vec2(0.29,1.0-0.105), Vec2(0,0));
     favoritedLevels->setGlobalZOrder(0);
     customLevels = MainMenu::CreateButton("LSCustomTab.png", this, menu_selector(LevelSelect::customCallback), Vec2(0.423,1.0-0.105), Vec2(0,0));
     customLevels->setGlobalZOrder(0);
@@ -73,13 +73,13 @@ bool LevelSelect::init()
     previewWindow->setGlobalZOrder(0);
     auto playButton = MainMenu::CreateButton("LSPlay.png", this, menu_selector(LevelSelect::playCallback), Vec2(0.587,1.0-0.808), Vec2(0,0));
     playButton->setGlobalZOrder(0);
-    highscoresButton = MainMenu::CreateButton("LSHighscores.png", this, menu_selector(LevelSelect::highscoresCallback), Vec2(0.681,1.0-0.808), Vec2(0,0));
+    highscoresButton = MainMenu::CreateButton("LSHighscores.png", this, menu_selector(LevelSelect::highscoresCallback), Vec2(0.69,1.0-0.808), Vec2(0,0));
     highscoresButton->setGlobalZOrder(0);
-    uploadButton = MainMenu::CreateButton("DownloadOn.png", this, menu_selector(LevelSelect::highscoresCallback), Vec2(0.681,1.0-0.808), Vec2(0,0));
+    uploadButton = MainMenu::CreateButton("DownloadOn.png", this, menu_selector(LevelSelect::uploadCallback), Vec2(0.69,1.0-0.808), Vec2(0,0));
     uploadButton->setVisible(false);
     uploadButton->setGlobalZOrder(0);
-    auto facebookButton = MainMenu::CreateButton("LSFacebook.png", this, menu_selector(LevelSelect::facebookCallback), Vec2(0.789,1.0-0.808), Vec2(0,0));
-    facebookButton->setGlobalZOrder(0);
+    auto infoButton = MainMenu::CreateButton("info.png", this, menu_selector(LevelSelect::infoCallback), Vec2(0.789,1.0-0.808), Vec2(0,0));
+    infoButton->setGlobalZOrder(0);
     auto editButton = MainMenu::CreateButton("LSEdit.png", this, menu_selector(LevelSelect::editCallback), Vec2(0.887,1.0-0.808), Vec2(0,0));
     editButton->setGlobalZOrder(0);
     auto selectBackground = MainMenu::CreateButton("LSSelectBackground.png",  Vec2(0.01,1.0-0.206), Vec2(0,0));
@@ -113,10 +113,11 @@ bool LevelSelect::init()
     menuItems.pushBack(previewWindow);
     menuItems.pushBack(levelTitle);
     menuItems.pushBack(levelAuthor);
-    menuItems.pushBack(facebookButton);
+    menuItems.pushBack(infoButton);
     menuItems.pushBack(editButton);
     menuItems.pushBack(playButton);
     menuItems.pushBack(highscoresButton);
+    menuItems.pushBack(uploadButton);
     menuItems.pushBack(title);
     
     Menu* menu = Menu::createWithArray(menuItems);
@@ -134,6 +135,7 @@ bool LevelSelect::init()
         levels.push_back(lvl);
         this->addChild(lvl->menu,1);
         this->addChild(lvl->name,1);
+        this->addChild(lvl->favorites,1);
     }
     
     tabHeight = socialLevels->getPosition().y;
@@ -146,6 +148,7 @@ bool LevelSelect::init()
     NDKHelper::addSelector("LevelSelect", "fetchFavoritedCallback", CC_CALLBACK_2(LevelSelect::fetchFavoritedCallback, this), this);
     NDKHelper::addSelector("LevelSelect", "fetchRisingCallback", CC_CALLBACK_2(LevelSelect::fetchRisingCallback, this), this);
     NDKHelper::addSelector("LevelSelect", "doneFetching", CC_CALLBACK_2(LevelSelect::doneFetching, this), this);
+    NDKHelper::addSelector("LevelSelect", "favCallback", CC_CALLBACK_2(LevelSelect::favCallback, this), this);
     //--------------------------//
     
     return true;
@@ -168,6 +171,15 @@ void LevelSelect::goToLevelEditor(){
 void LevelSelect::highscoresCallback(Ref*){
 
 }
+void LevelSelect::uploadCallback(Ref*){
+    selectedLevel->makePublic();
+    if(currentLevelSet == LEVELS_CUSTOM && selectedLevel->GetStatus().compare("Public") == 0){
+        uploadButton->setVisible(false);
+        uploadButton->setEnabled(false);
+        highscoresButton->setVisible(true);
+        highscoresButton->setEnabled(true);
+    }
+}
 void LevelSelect::scrollRightCallback(Ref*){
     if(Board::levels[currentLevelSet].size() > (page+1)*4){
         page++;
@@ -184,12 +196,26 @@ void LevelSelect::newLevelCallback(Ref*){
     sendMessageWithParams("newLevel", Value());
     Refresh();
 }
-void LevelSelect::facebookCallback(Ref*){
+void LevelSelect::infoCallback(Ref*){
     
 }
-void LevelSelect::favoriteCallback(Ref*){
-    
+void LevelSelect::favoriteCallback(Ref* ref){
+    int tag = ((MenuItemImage*)ref)->getTag();
+    if(levels[tag]->level->GetIsFavorited() == false){
+        std::string favoritedID = levels[tag]->level->GetID();
+        ValueMap valueMap;
+        valueMap["id"] = favoritedID;
+        Value parameters = Value(valueMap);
+        sendMessageWithParams("favorite", parameters);
+        tag = ((MenuItemImage*)ref)->getTag();
+        selectedLevel = levels[tag]->level;
+        levels[tag]->SetFavorited(true);
+        SetPreview();
+    }
 }
+void LevelSelect::favCallback(Node* sender, Value data){
+    //selectedLevel;
+};
 void LevelSelect::selectCallback(Ref* ref){
     int tag = ((MenuItemImage*)ref)->getTag();
     selectedLevel = levels[tag]->level;
@@ -282,12 +308,12 @@ void LevelSelect::FetchCustomLevels(){
 void LevelSelect::FetchRisingLevels(){
     Board::SetUpLevels();
     Board::levels[LEVELS_RISING].clear();
-    sendMessageWithParams("fetchCustomLevels", Value());
+    sendMessageWithParams("fetchRisingLevels", Value());
 };
 void LevelSelect::FetchFavoritedLevels(){
     Board::SetUpLevels();
     Board::levels[LEVELS_FAVORITED].clear();
-    sendMessageWithParams("fetchCustomLevels", Value());
+    sendMessageWithParams("fetchFavoritedLevels", Value());
 };
 void LevelSelect::fetchSocialCallback(Node* sender, Value data){
     if (!data.isNull() && data.getType() == Value::Type::MAP) {
@@ -321,9 +347,27 @@ void LevelSelect::doneFetching(Node* sender, Value data){
             levels[x%4]->SetEnabled(true);
             levels[x%4]->SetLevel(Board::levels[currentLevelSet][x], page);
         }
+        selectedLevel = levels[0]->level;
+        SetPreview();
     }
 };
 void LevelSelect::SetPreview(){
+    if(currentLevelSet == LEVELS_CUSTOM && selectedLevel->GetStatus().compare("Private") == 0){
+        uploadButton->setVisible(true);
+        uploadButton->setEnabled(true);
+        highscoresButton->setVisible(false);
+        highscoresButton->setEnabled(false);
+    }
+    if(currentLevelSet == LEVELS_CUSTOM && selectedLevel->GetStatus().compare("Public") == 0){
+        uploadButton->setVisible(false);
+        uploadButton->setEnabled(false);
+        highscoresButton->setVisible(true);
+        highscoresButton->setEnabled(true);
+    }
+    if(currentLevelSet != LEVELS_CUSTOM){
+        highscoresButton->setVisible(true);
+        highscoresButton->setEnabled(true);
+    }
     previewTitle->setVisible(true);
     previewAuthor->setVisible(true);
     previewTitle->setString(selectedLevel->GetName());

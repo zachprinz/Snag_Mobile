@@ -58,7 +58,7 @@ bool LogInMenu::init()
     logInButton->setAnchorPoint(Vec2(0.5,1));
     menuItems.pushBack(logInButton);
     
-    auto registerButton = MainMenu::CreateButton("LIRegister.png", this, menu_selector(LogInMenu::registerButtonCallback), Vec2(0.34, 1.0-0.75), Vec2(0,0));
+    auto registerButton = MainMenu::CreateButton("LIRegister.png", this, menu_selector(LogInMenu::registerButtonCallback), Vec2(0.24, 1.0-0.75), Vec2(0,0));
     registerButton->setAnchorPoint(Vec2(0.5,1));
     menuItems.pushBack(registerButton);
     

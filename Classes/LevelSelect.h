@@ -42,9 +42,10 @@ public:
     void socialCallback(Ref*);
     void favoritedCallback(Ref*);
     void newLevelCallback(Ref*);
-    void facebookCallback(Ref*);
+    void infoCallback(Ref*);
     void favoriteCallback(Ref*);
     void selectCallback(Ref*);
+    void uploadCallback(Ref*);
     
     float tabHeightSelected;
     float tabHeight;
@@ -86,6 +87,7 @@ private:
     void fetchRisingCallback(Node* sender, Value data);
     void fetchCustomCallback(Node* sender, Value data);
     void doneFetching(Node* sender, Value data);
+    void favCallback(Node* sender, Value data);
 };
 
 #endif /* defined(__Snag__LevelSelect__) */

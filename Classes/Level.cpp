@@ -124,6 +124,11 @@ void Level::AddToMap(Layer* game){
         mapObjects[x]->Add(game);
     }
 }
+void Level::makePublic(){
+    map["status"] = "Public";
+    Value parameters = Value(map);
+    sendMessageWithParams("saveLevelInfo", parameters);
+}
 ValueMap Level::getValueMap(){
     return map;
 };
@@ -136,6 +141,20 @@ std::string Level::GetName(){
 std::string Level::GetAuthor(){
     return author;
     //Todo, Include author info
+}
+int Level::GetFavorites(){
+    return std::atoi(map["favorites"].asString().c_str());
+}
+std::string Level::GetStatus(){
+    return map["status"].asString();
+}
+std::string Level::GetID(){
+    return map["id"].asString();
+}
+bool Level::GetIsFavorited(){
+    if(map["favorited"].asString().compare("true") == 0)
+        return true;
+    return false;
 }
 void Level::SetName(std::string n){
     name = n;

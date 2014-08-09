@@ -41,6 +41,11 @@ public:
     std::vector<MapObject*> GetMapObjects();
     std::vector<Entity*> ents;
     void Save();
+    void makePublic();
+    std::string GetStatus();
+    std::string GetID();
+    int GetFavorites();
+    bool GetIsFavorited();
 private:
     void CreateFromMapValues();
     bool hasMapObjects;
