@@ -36,6 +36,7 @@ public:
     int GetType();
     Vec2 GetStart();
     Vec2 GetSize();
+    void Add(Layer* game);
 private:
     cocos2d::Vec2 startCoord;
     cocos2d::Vec2 endCoord;

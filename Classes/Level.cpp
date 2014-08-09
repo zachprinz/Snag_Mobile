@@ -81,17 +81,27 @@ void Level::AddMapValue(Entity* ent, Vec2 pos, Vec2 size){
 void Level::CreateFromMapValues(){
     ents.clear();
     mapObjects.clear();
-    for(int x = 0; x < entCount; x++){
-        std::string pre = "entity" + std::to_string(x);
-        Vec2 pos(map[pre + "x"].asInt(),map[pre + "y"].asInt());
-        Vec2 size(map[pre + "width"].asInt(), map[pre + "height"].asInt());
-        Vec2 vel(map[pre + "velocityX"].asInt(), map[pre + "velocityY"].asInt());
-        printf("\n%s\n",map[pre+"type"].asString().c_str());
-        int type = std::atoi(map[pre + "type"].asString().c_str());
+    ValueVector entities = map["entities"].asValueVector();
+    int count = std::atoi(map["entcount"].asString().c_str());
+    for (int i = 0; i < count; i++) {
+        int z = i*7;
+        Vec2 pos;
+        Vec2 size;
+        Vec2 velocity;
+        int type;
+        type = std::atoi(entities.at(z).asString().c_str());
+        pos.x = std::atof(entities.at(z+1).asString().c_str());
+        pos.y = std::atof(entities.at(z+2).asString().c_str());
+        size.x = std::atof(entities.at(z+3).asString().c_str());
+        size.y = std::atof(entities.at(z+4).asString().c_str());
+        velocity.x = std::atof(entities.at(z+5).asString().c_str());
+        velocity.y = std::atof(entities.at(z+6).asString().c_str());
+        printf("\nType: %i\nPos: (%f, %f)\nSize: (%f, %f)\nVelocity: (%f, %f)\n", type, pos.x, pos.y, size.x, size.y, velocity.x, velocity.y);
         AddEntity(MapObject::CreateWithPosAndSize(pos,size,type));
     }
     hasMapObjects = true;
 }
+ 
 std::vector<MapObject*> Level::GetMapObjects(){
     if(hasMapObjects)
         return mapObjects;
@@ -104,8 +114,14 @@ void Level::Save(){
     sendMessageWithParams("saveLevel", parameters);
 }
 void Level::Add(Layer* game){
+    GetMapObjects();
     for(int x = 0; x < ents.size(); x++){
         ents[x]->Add(game);
+    }
+}
+void Level::AddToMap(Layer* game){
+    for(int x = 0; x < ents.size(); x++){
+        mapObjects[x]->Add(game);
     }
 }
 ValueMap Level::getValueMap(){

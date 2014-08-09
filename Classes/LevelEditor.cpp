@@ -476,6 +476,7 @@ void LevelEditor::SetLevel(Level* lvl){
     for(int x = 0; x < mapObjects.size(); x++){
         this->addChild(mapObjects[x]->GetSprite());
     }
+    //currentLevel->AddToMap(this);
 }
 Vec2 LevelEditor::PixelToTile(Point pos){
     Vec2 ret = Vec2(floor((float)pos.x / TILE_SIZE), floor((float)pos.y / TILE_SIZE));

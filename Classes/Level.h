@@ -28,6 +28,7 @@ public:
     
     void AddEntity(MapObject*);
     void Add(Layer* game);
+    void AddToMap(Layer* game);
 
     void SetName(std::string);
     void SetAuthor(std::string);

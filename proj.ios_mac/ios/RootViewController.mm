@@ -213,17 +213,17 @@
             NSInteger count = [(NSString*)[parameters objectForKey:@"entcount"] integerValue];
             level[@"entcount"] = [parameters objectForKey:@"entcount"];
             level[@"name"] = [parameters objectForKey:@"name"];
-            NSLog([parameters objectForKey:@"name"]);
+            NSMutableArray* entities =[[NSMutableArray alloc]init];
             for(int x = 1; x < count+1; x++){
-                level[[NSString stringWithFormat:@"entity%lix",(long)x]] = [parameters objectForKey:[NSString stringWithFormat:@"entity%lix",(long)x]];
-                level[[NSString stringWithFormat:@"entity%liy",(long)x]] = [parameters objectForKey:[NSString stringWithFormat:@"entity%liy",(long)x]];
-                level[[NSString stringWithFormat:@"entity%liwidth",(long)x]] = [parameters objectForKey:[NSString stringWithFormat:@"entity%liwidth",(long)x]];
-                level[[NSString stringWithFormat:@"entity%liheight",(long)x]] = [parameters objectForKey:[NSString stringWithFormat:@"entity%liheight",(long)x]];
-                level[[NSString stringWithFormat:@"entity%livelocityX",(long)x]] = [parameters objectForKey:[NSString stringWithFormat:@"entity%livelocityX",(long)x]];
-                level[[NSString stringWithFormat:@"entity%livelocityY",(long)x]] = [parameters objectForKey:[NSString stringWithFormat:@"entity%livelocityY",(long)x]];
-                level[[NSString stringWithFormat:@"entity%litypeString",(long)x]] = [parameters objectForKey:[NSString stringWithFormat:@"entity%litypeString",(long)x]];
-                level[[NSString stringWithFormat:@"entity%litype",(long)x]] = [parameters objectForKey:[NSString stringWithFormat:@"entity%litype",(long)x]];
+                [entities addObject:[parameters objectForKey:[NSString stringWithFormat:@"entity%litype",(long)x]]];
+                [entities addObject:[parameters objectForKey:[NSString stringWithFormat:@"entity%lix",(long)x]]];
+                [entities addObject:[parameters objectForKey:[NSString stringWithFormat:@"entity%liy",(long)x]]];
+                [entities addObject:[parameters objectForKey:[NSString stringWithFormat:@"entity%liwidth",(long)x]]];
+                [entities addObject:[parameters objectForKey:[NSString stringWithFormat:@"entity%liheight",(long)x]]];
+                [entities addObject:[parameters objectForKey:[NSString stringWithFormat:@"entity%livelocityX",(long)x]]];
+                [entities addObject:[parameters objectForKey:[NSString stringWithFormat:@"entity%livelocityY",(long)x]]];
             }
+            level[@"entities"] = entities;
             [level saveInBackground];
         }];
     }

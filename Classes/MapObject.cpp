@@ -16,6 +16,7 @@ MapObject* MapObject::CreateWithPosAndSize(Vec2 pos, Vec2 size, int type){
     Vec2 startCoord = Vec2(pos.x / TILE_SIZE, pos.y / TILE_SIZE);
     MapObject* mapObject = new MapObject(startCoord, type);
     mapObject->UpdateEndCoord(Vec2(startCoord.x + (size.x / TILE_SIZE), startCoord.y + (size.y / TILE_SIZE)));
+    return mapObject;
 }
 
 MapObject::MapObject(Vec2 start, int type){
@@ -41,7 +42,8 @@ MapObject::MapObject(Vec2 start, int type){
         case SPAWNER:
             sprite = Sprite::create("spawner.png");
             sprite->retain();
-            LevelEditor::Instance->DisableSpawner();
+            if(LevelEditor::Instance != nullptr)
+                LevelEditor::Instance->DisableSpawner();
             break;
         case HOOK:
             sprite = Sprite::create("hook.png");
@@ -103,4 +105,7 @@ Vec2 MapObject::GetStart(){
 
 Vec2 MapObject::GetSize(){
     return Vec2((endCoord.x - startCoord.x) * (MainMenu::screenScale.x * 256 * 0.5), (endCoord.y - startCoord.y) * (MainMenu::screenScale.y * 256 * 0.5));
+}
+void MapObject::Add(Layer* game){
+    game->addChild(sprite);
 }
