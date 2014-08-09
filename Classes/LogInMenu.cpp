@@ -41,6 +41,13 @@ bool LogInMenu::init()
     cocos2d::Vector<MenuItem*> menuItems;
     
     auto background = MainMenu::CreateButton("MMBackground.png", Vec2(0,1), Vec2(0,0));
+    if(visibleSize.width <= ((Sprite*)background->getNormalImage())->getTextureRect().size.width && visibleSize.height <= ((Sprite*)background->getNormalImage())->getTextureRect().size.height){
+        background->setNormalImage(Sprite::create("MMBackground.png", Rect(0,0,visibleSize.width, visibleSize.height)));
+    }
+    if(background->getScaleX() < 1.0)
+        background->setScaleX(1.0);
+    if(background->getScaleY() < 1.0)
+        background->setScaleY(1.0);
     background->setPositionZ(-2);
     menuItems.pushBack(background);
     
