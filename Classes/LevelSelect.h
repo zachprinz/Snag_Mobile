@@ -66,6 +66,7 @@ public:
     Level* selectedLevel;
     int page;
 private:
+    void goToLevelEditor();
     void SetPreview();
     MenuItemImage* currentLevelsTab;
     MenuItemImage* customLevels;

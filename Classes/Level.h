@@ -39,11 +39,12 @@ public:
     ValueMap getValueMap();
     std::vector<MapObject*> GetMapObjects();
     std::vector<Entity*> ents;
+    void Save();
 private:
     void CreateFromMapValues();
     bool hasMapObjects;
     void AddMapObject(MapObject*);
-    void AddMapValue(Entity*);
+    void AddMapValue(Entity*, Vec2,Vec2);
     void SetMap(ValueMap);
     ValueMap map;
     std::string path;

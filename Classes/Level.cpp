@@ -14,6 +14,7 @@
 #include "MapObject.h"
 #include "Hook.h"
 #include "Spawner.h"
+#include "NDKHelper/NDKHelper.h"
 
 Level* Level::createWithValueMap(ValueMap map){
     Level* level = new Level();
@@ -53,37 +54,40 @@ void Level::AddEntity(MapObject* e){
             ent = new Hook(pos);
             break;
     }
-    AddMapValue(ent);
     ents.push_back(ent);
+    AddMapValue(ent, pos, size);
 }
-void Level::AddMapValue(Entity* ent){
-    std::string pre = "Entity_" + std::to_string(entCount) + "_";
+void Level::AddMapValue(Entity* ent, Vec2 pos, Vec2 size){
+    std::string pre = "entity" + std::to_string(ents.size());
     map[pre + "typeString"] = ent->typeString;
-    map[pre + "type"] = ent->GetType();
-    map[pre + "x"] = ent->GetPosition().x;
-    map[pre + "y"] = ent->GetPosition().y;
-    map[pre + "width"] = 0;
-    map[pre + "height"] = 0;
-    map[pre + "velocityX"] = 0;
-    map[pre + "velocityY"] = 0;
+    map[pre + "type"] = std::to_string(ent->GetType());
+    map[pre + "random"] = 123;
+    map[pre + "x"] = std::to_string(pos.x);
+    map[pre + "y"] = std::to_string(pos.y);
+    map[pre + "width"] = "0";
+    map[pre + "height"] = "0";
+    map[pre + "velocityX"] = "0";
+    map[pre + "velocityY"] = "0";
     if(ent->GetType() == WALL || ent->GetType() == SPIKE_WALL || ent->GetType() == GOAL){
-        map[pre + "width"] = ent->GetSize().x;
-        map[pre + "height"] = ent->GetSize().y;
+        map[pre + "width"] = std::to_string(ent->GetSize().x);
+        map[pre + "height"] = std::to_string(ent->GetSize().y);
     }
     if(ent->GetType() == SPAWNER){
-        map[pre + "velocityX"] = ((Spawner*)ent)->GetStartVelocity().x;
-        map[pre + "velocityY"] = ((Spawner*)ent)->GetStartVelocity().y;
+        map[pre + "velocityX"] = std::to_string(((Spawner*)ent)->GetStartVelocity().x);
+        map[pre + "velocityY"] = std::to_string(((Spawner*)ent)->GetStartVelocity().y);
     }
-    entCount++;
-    map["count"] = entCount;
+    map["entcount"] = std::to_string(ents.size());
 }
 void Level::CreateFromMapValues(){
+    ents.clear();
+    mapObjects.clear();
     for(int x = 0; x < entCount; x++){
-        std::string pre = "Entity_" + std::to_string(x) + "_";
+        std::string pre = "entity" + std::to_string(x);
         Vec2 pos(map[pre + "x"].asInt(),map[pre + "y"].asInt());
         Vec2 size(map[pre + "width"].asInt(), map[pre + "height"].asInt());
         Vec2 vel(map[pre + "velocityX"].asInt(), map[pre + "velocityY"].asInt());
-        int type = map[pre + "type"].asInt();
+        printf("\n%s\n",map[pre+"type"].asString().c_str());
+        int type = std::atoi(map[pre + "type"].asString().c_str());
         AddEntity(MapObject::CreateWithPosAndSize(pos,size,type));
     }
     hasMapObjects = true;
@@ -93,6 +97,11 @@ std::vector<MapObject*> Level::GetMapObjects(){
         return mapObjects;
     CreateFromMapValues();
     return mapObjects;
+}
+void Level::Save(){
+    map["name"] = name;
+    Value parameters = Value(map);
+    sendMessageWithParams("saveLevel", parameters);
 }
 void Level::Add(Layer* game){
     for(int x = 0; x < ents.size(); x++){
@@ -126,7 +135,7 @@ void Level::SetHighscoresID(std::string h){
 }
 void Level::SetMap(ValueMap map){
     this->map = map;
-    entCount = map["count"].asInt();
+    entCount = std::atoi(map["entcount"].asString().c_str());
     hasMapObjects = false;
     if(entCount == 0)
         hasMapObjects = true;

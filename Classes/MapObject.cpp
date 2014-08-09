@@ -25,28 +25,34 @@ MapObject::MapObject(Vec2 start, int type){
     switch(type){
         case WALL:
             sprite = Sprite::create("wall.png");
+            sprite->retain();
             sprite->setScale((float)(abs(endCoord.x - startCoord.x) * TILE_SIZE) / sprite->getTexture()->getPixelsWide(), (float)(abs(endCoord.y - startCoord.y) * TILE_SIZE) / sprite->getTexture()->getPixelsHigh());
             break;
         case SPIKE_WALL:
             sprite = Sprite::create("spikewall.png");
+            sprite->retain();
             sprite->setScale((float)(abs(endCoord.x - startCoord.x) * TILE_SIZE) / sprite->getTexture()->getPixelsWide(), (float)(abs(endCoord.y - startCoord.y) * TILE_SIZE) / sprite->getTexture()->getPixelsHigh());
             break;
         case GOAL:
             sprite = Sprite::create("goal.png");
+            sprite->retain();
             sprite->setScale((float)(abs(endCoord.x - startCoord.x) * TILE_SIZE) / sprite->getTexture()->getPixelsWide(), (float)(abs(endCoord.y - startCoord.y) * TILE_SIZE) / sprite->getTexture()->getPixelsHigh());
             break;
         case SPAWNER:
             sprite = Sprite::create("spawner.png");
+            sprite->retain();
             LevelEditor::Instance->DisableSpawner();
             break;
         case HOOK:
             sprite = Sprite::create("hook.png");
+            sprite->retain();
             break;
         case NO_TOOL:
             break;
         case ERASE:
             break;
     }
+    
     sprite->setPosition(startCoord.x * TILE_SIZE, startCoord.y * TILE_SIZE);
     sprite->setAnchorPoint(Point(0,0));
     sprite->setPositionZ(-3);

@@ -31,6 +31,7 @@ bool LevelEditor::init(){
     if(!Layer::init()){
         return false;
     }
+    Instance = this;
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     originTile = Vec2(0,0);
@@ -588,7 +589,9 @@ void LevelEditor::ResetToolPos(){
     }
 }
 void LevelEditor::Export(){
+    currentLevel->SetName(name);
     for(int x = 0; x < mapObjects.size(); x++){
         currentLevel->AddEntity(mapObjects[x]);
     }
+    currentLevel->Save();
 }

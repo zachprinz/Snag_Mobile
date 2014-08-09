@@ -151,7 +151,19 @@ bool LevelSelect::init()
     return true;
 }
 void LevelSelect::editCallback(Ref*){
-
+    if(selectedLevel != nullptr)
+        goToLevelEditor();
+}
+void LevelSelect::goToLevelEditor(){
+    if(LevelEditor::myScene == NULL){
+        auto scene = LevelEditor::createScene();
+        LevelEditor::Instance->SetLevel(selectedLevel);
+        Director::getInstance()->pushScene(scene);
+    }
+    else{
+        LevelEditor::Instance->SetLevel(selectedLevel);
+        Director::getInstance()->pushScene(LevelEditor::myScene);
+    }
 }
 void LevelSelect::highscoresCallback(Ref*){
 

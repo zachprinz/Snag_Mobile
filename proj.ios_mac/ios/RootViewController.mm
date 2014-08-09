@@ -189,13 +189,44 @@
     level[@"name"] = @"new level";
     NSString* author = [PFUser currentUser].username;
     level[@"author"] = author;
-    level[@"count"] = @0;
+    level[@"entcount"] = @"0";
     level[@"status"] = @"Private";
-    [level saveInBackground];
-    //PFRelation *relation = [user relationForKey:@"levels"];
-    //[relation addObject:level];
-    //[user saveInBackground];
-    NSLog(@"\nFinished Creating a new Level.\n");
+    [level saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+        if (succeeded) {
+            level[@"id"] = [level objectId];
+            [level saveInBackground];
+            NSLog(@"\nFinished Creating a new Level.\n");
+        } else {
+            NSLog(@"%@", error);
+        }
+    }];
+
+}
+
+- (void)saveLevel:(NSObject *)parametersObject
+{
+    NSDictionary *parameters = (NSDictionary *)parametersObject;
+    if(parameters != nil){
+        NSString* levelID = (NSString *)[parameters objectForKey:@"id"];
+        PFQuery *query = [PFQuery queryWithClassName:@"Level"];
+        [query getObjectInBackgroundWithId:levelID block:^(PFObject *level, NSError *error) {
+            NSInteger count = [(NSString*)[parameters objectForKey:@"entcount"] integerValue];
+            level[@"entcount"] = [parameters objectForKey:@"entcount"];
+            level[@"name"] = [parameters objectForKey:@"name"];
+            NSLog([parameters objectForKey:@"name"]);
+            for(int x = 1; x < count+1; x++){
+                level[[NSString stringWithFormat:@"entity%lix",(long)x]] = [parameters objectForKey:[NSString stringWithFormat:@"entity%lix",(long)x]];
+                level[[NSString stringWithFormat:@"entity%liy",(long)x]] = [parameters objectForKey:[NSString stringWithFormat:@"entity%liy",(long)x]];
+                level[[NSString stringWithFormat:@"entity%liwidth",(long)x]] = [parameters objectForKey:[NSString stringWithFormat:@"entity%liwidth",(long)x]];
+                level[[NSString stringWithFormat:@"entity%liheight",(long)x]] = [parameters objectForKey:[NSString stringWithFormat:@"entity%liheight",(long)x]];
+                level[[NSString stringWithFormat:@"entity%livelocityX",(long)x]] = [parameters objectForKey:[NSString stringWithFormat:@"entity%livelocityX",(long)x]];
+                level[[NSString stringWithFormat:@"entity%livelocityY",(long)x]] = [parameters objectForKey:[NSString stringWithFormat:@"entity%livelocityY",(long)x]];
+                level[[NSString stringWithFormat:@"entity%litypeString",(long)x]] = [parameters objectForKey:[NSString stringWithFormat:@"entity%litypeString",(long)x]];
+                level[[NSString stringWithFormat:@"entity%litype",(long)x]] = [parameters objectForKey:[NSString stringWithFormat:@"entity%litype",(long)x]];
+            }
+            [level saveInBackground];
+        }];
+    }
 }
 
 - (void)fetchCustomLevels:(NSObject *)parametersObject
