@@ -71,7 +71,6 @@ Board::Board(Layer* game, PhysicsWorld* world, Size size, Point origin){
     
     scale = 1.0f;
     user = new User();
-    this->game->addChild(user->GetSprite());
     gravity.set(0,-1);
     
     currentLevel = NULL;
@@ -196,5 +195,6 @@ void Board::Print(std::string message){
 void Board::LoadLevel(Level* lvl){
     currentLevel = lvl;
     currentLevel->Add(game);
+    user->Add(game);
 }
 void Board::emptyCallback(Ref*){};

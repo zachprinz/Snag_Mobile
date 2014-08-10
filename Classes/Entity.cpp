@@ -28,13 +28,11 @@ Entity::Entity(char* texture,int x, int y, Vec2 size, int type){
     spriteBaseScale.set(1.0,1.0);
     imageSize = Vec2(sprite->getTexture()->getPixelsHigh(),sprite->getTexture()->getPixelsWide());
     auto tempDebug = DrawNode::create();
-    //boundsDebug = tempDebug;
-    Vec2 vertices[] = {Vec2(0,0),
-                       Vec2(0,imageSize.y),
-                       Vec2(imageSize.x, imageSize.y),
-                       Vec2(imageSize.x, 0)};
-    //boundsDebug->drawPolygon(vertices, 4, Color4F(0.0f,0.0f,1.0f,0.5f), 0, Color4F(0.2f,0.2f,0.2f,0.0f));
-    //boundsDebug->setPosition(GetBounds().origin.x,GetBounds().origin.y);
+    boundsDebug = tempDebug;
+    Vec2 vertices[] = {Vec2(0,0),Vec2(0,imageSize.y),Vec2(imageSize.x, imageSize.y),Vec2(imageSize.x, 0)};
+    boundsDebug->drawPolygon(vertices, 4, Color4F(0.0f,0.0f,1.0f,0.5f), 0, Color4F(0.2f,0.2f,0.2f,0.0f));
+    boundsDebug->setPosition(GetBounds().origin.x,GetBounds().origin.y);
+    boundsDebug->retain();
 }
 
 void Entity::SetUpPhysicsSprite(char* texture){
@@ -62,7 +60,7 @@ Vec2 Entity::GetSize(){
 }
 
 void Entity::update(float dt){
-    //boundsDebug->setPosition(GetBounds().origin.x,GetBounds().origin.y);
+    boundsDebug->setPosition(GetBounds().origin.x,GetBounds().origin.y);
     UpdateSprite();
 }
 
@@ -97,7 +95,7 @@ void Entity::SetType(int t){
 
 void Entity::SetBaseScale(Vec2 scale){
     spriteBaseScale = scale;
-    //boundsDebug->setScale(spriteBaseScale.x, spriteBaseScale.y);
+    boundsDebug->setScale(spriteBaseScale.x, spriteBaseScale.y);
 }
 
 Rect Entity::GetBounds(){
@@ -108,6 +106,7 @@ Rect Entity::GetBounds(){
 }
 
 void Entity::UpdateSprite(){
+    //boundsDebug->setPosition(GetBounds().origin.x,GetBounds().origin.y);
     this->CalculateScale();
 }
 
@@ -116,8 +115,9 @@ int Entity::GetType(){
 }
 
 void Entity::CalculateScale(){
-    if(physicsSprite != NULL)
+    if(physicsSprite != NULL){
         position = physicsSprite->getPosition();
+    }
     //Board::PrintVec2("userPosition",userPosition);
     float distanceToCenter = position.x - userPosition.x;
     float newDistanceToCenter = distanceToCenter / boardScale;
@@ -130,4 +130,6 @@ void Entity::CalculateScale(){
 void Entity::Add(Layer* game){
     game->addChild(sprite);
     game->addChild(physicsSprite);
+    if(type != SPAWNER && type != HOOK)
+        game->addChild(boundsDebug);
 }

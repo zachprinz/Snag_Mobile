@@ -49,7 +49,8 @@ bool HelloWorld::init()
     }
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    
+    SpikeWall::type = 1;
+    Wall::type = 0;
     auto listener = EventListenerTouchOneByOne::create();
     listener->setSwallowTouches(true);
     listener->onTouchBegan = CC_CALLBACK_2(HelloWorld::onTouchBegan, this);

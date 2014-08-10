@@ -16,6 +16,8 @@ Spawner::Spawner(Vec2 pos, Vec2 vel) : Entity("spawner.png", pos.x, pos.y,Vec2(0
     Instance = this;
     //Board::Instance->user->Reset();
     SetUpPhysicsSprite("spawner.png");
+    body->setContactTestBitmask(false);
+    body->setCategoryBitmask(false);
 }
 
 Vec2 Spawner::GetStartVelocity(){

@@ -67,6 +67,7 @@ public:
     Level* selectedLevel;
     int page;
 private:
+    void showLoading();
     void goToLevelEditor();
     void SetPreview();
     MenuItemImage* currentLevelsTab;
@@ -76,6 +77,7 @@ private:
     MenuItemImage* favoritedLevels;
     MenuItemImage* highscoresButton;
     MenuItemImage* uploadButton;
+    Sprite* loading;
     Label* previewTitle;
     Label* previewAuthor;
     void FetchSocialLevels();

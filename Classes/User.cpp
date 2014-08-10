@@ -31,7 +31,7 @@ User::User() : Entity("user.png"){
 void User::SetUpPhysicsSprite(char* texture){
     physicsSprite = Sprite::create(texture);
     physicsSprite->setTag(5);
-    body = PhysicsBody::createCircle(imageSize.x * spriteBaseScale.x * 0.5);
+    body = PhysicsBody::createCircle(sprite->getTextureRect().size.width * spriteBaseScale.x * 0.25);
     body->setVelocity(Vec2(100,300));//Vec2(Spawner::Instance->GetVelocity().x,Spawner::Instance->GetVelocity().y));
     body->setMass(10.0f);
     body->setDynamic(true);
@@ -42,13 +42,14 @@ void User::SetUpPhysicsSprite(char* texture){
     physicsSprite->setPosition(position.x,position.y);
     physicsSprite->setVisible(false);
     physicsSprite->setScale(spriteBaseScale.x,spriteBaseScale.y);
-    Board::Instance->game->addChild(physicsSprite);
+    physicsSprite->retain();
 }
 
 void User::update(float dt){
     if(position.y < -400)//(abs(body->getVelocity().x) < 0.1 && abs(body->getVelocity().y) < 0.1) || position.y < -200)
         Reset();
     userPosition = position;
+    printf("\nUserPosition: (%f, %f)", GetBounds().origin.x, GetBounds().origin.y);
     Board::PrintVec2("UserPosition", GetBounds().origin);
 }
 

@@ -46,10 +46,10 @@ public:
     Vec2 GetSize();
     Vec2 size;
     int GetType();
+    virtual void CalculateScale();
 private:
     
 protected:
-    virtual void CalculateScale();
     static Vec2 baseScale;
     Vec2 spriteBaseScale;
     Sprite* sprite;

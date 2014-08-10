@@ -133,7 +133,7 @@ bool LevelSelect::init()
     this->addChild(menu, 1);
     this->addChild(previewTitle, 1);
     this->addChild(previewAuthor, 1);
-    
+
     currentLevelsTab = risingLevels;
     
     for(int x = 0; x < 4; x++){
@@ -144,6 +144,12 @@ bool LevelSelect::init()
         this->addChild(lvl->name,1);
         this->addChild(lvl->favorites,1);
     }
+    
+    loading = Sprite::create("Loading.png");
+    loading->setPosition(levels[1]->background->getBoundingBox().getMinY(), levels[1]->background->getBoundingBox().getMidX());
+    loading->setAnchorPoint(Vec2(0.5, 0.5));
+    loading->setVisible(false);
+    this->addChild(loading,1);
     
     tabHeight = socialLevels->getPosition().y;
     tabHeightSelected = tabHeight - 20;
@@ -303,25 +309,33 @@ void LevelSelect::LoadLevels(){
     }
 };
 void LevelSelect::FetchSocialLevels(){
+    showLoading();
     Board::SetUpLevels();
     Board::levels[LEVELS_SOCIAL].clear();
     sendMessageWithParams("fetchCustomLevels", Value());
 };
 void LevelSelect::FetchCustomLevels(){
+    showLoading();
     Board::SetUpLevels();
     Board::levels[LEVELS_CUSTOM].clear();
     sendMessageWithParams("fetchCustomLevels", Value());
 };
 void LevelSelect::FetchRisingLevels(){
+    showLoading();
     Board::SetUpLevels();
     Board::levels[LEVELS_RISING].clear();
     sendMessageWithParams("fetchRisingLevels", Value());
 };
 void LevelSelect::FetchFavoritedLevels(){
+    showLoading();
     Board::SetUpLevels();
     Board::levels[LEVELS_FAVORITED].clear();
     sendMessageWithParams("fetchFavoritedLevels", Value());
 };
+void LevelSelect::showLoading(){
+    loading->setVisible(true);
+    loading->runAction(Repeat::create(RotateBy::create(1.5, 360),1));
+}
 void LevelSelect::fetchSocialCallback(Node* sender, Value data){
     if (!data.isNull() && data.getType() == Value::Type::MAP) {
         ValueMap valueMap = data.asValueMap();
@@ -349,6 +363,8 @@ void LevelSelect::fetchCustomCallback(Node* sender, Value data){
 };
 void LevelSelect::doneFetching(Node* sender, Value data){
     printf("\nDone Fetching\n");
+    loading->setVisible(false);
+    loading->stopAllActions();
     if(Board::levels.size() > 0){
         for(int x = page * 4; x < Board::levels[currentLevelSet].size() && x < ((page*4)+4); x++){
             levels[x%4]->SetEnabled(true);

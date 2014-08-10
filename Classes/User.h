@@ -30,9 +30,10 @@ public:
     void SetBackupVelocity(Vec2);
     Point GetPhysicsPosition();
     void UpdateBounce();
+    void CalculateScale();
+
 private:
     Vec2 backupVelocity;
-    void CalculateScale();
     PhysicsJointDistance* joint;
     Hook* hook;
     bool isHooked;
