@@ -11,7 +11,7 @@
 
 #include <iostream>
 #include "cocos2d.h"
-#include "Board.h"
+#include "Game.h"
 class LevelInfo : public cocos2d::Layer
 {
 public:

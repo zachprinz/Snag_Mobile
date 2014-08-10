@@ -12,36 +12,36 @@
 #include <iostream>
 #include "cocos2d.h"
 #include "Entity.h"
-#include "Hook.h"
 
 USING_NS_CC;
 
 class User : public Entity{
 public:
+    static int type;
     User();
+    void SetUpPhysicsSprite(std::string, float);
+    virtual void Add(Layer*);
+    
     void Snag();
     void Release();
     void update(float dt);
     void collide(Vec2);
     void Reset();
-    void SetUpPhysicsSprite(char*);
-    static int type;
     void Bounce(const PhysicsContactData* data);
-    void SetBackupVelocity(Vec2);
-    Point GetPhysicsPosition();
+    void SetBackupVelocity();
     void UpdateBounce();
-    void CalculateScale();
-
+    void CalculateScale(Vec2 userPosition, float boardScale);
+    Vec2 GetPhysicalPosition();
 private:
     Vec2 backupVelocity;
+    Vec2 closestPosition;
     PhysicsJointDistance* joint;
-    Hook* hook;
+    Sprite* line;
+    Entity* hook;
+    Entity* closest;
     bool isHooked;
     void updatePhysics(float dt);
-    Vec2 closestPosition;
-    Sprite* line;
     float lineBaseScale;
-    Hook* closest;
     float GetAngle(Vec2 a, Vec2 b);
 };
 

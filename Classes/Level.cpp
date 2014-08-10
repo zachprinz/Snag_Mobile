@@ -7,14 +7,9 @@
 //
 
 #include "Level.h"
-#include "tinyxml2.h"
-#include "Goal.h"
-#include "Wall.h"
-#include "SpikeWall.h"
 #include "MapObject.h"
-#include "Hook.h"
-#include "Spawner.h"
 #include "NDKHelper/NDKHelper.h"
+#include "User.h"
 
 Level* Level::createWithValueMap(ValueMap map){
     Level* level = new Level();
@@ -31,37 +26,22 @@ void Level::AddEntity(MapObject* e){
     mapObjects.push_back(e);
     Entity* ent;
     Vec2 pos = e->GetStart();
-    Vec2 size;
-    Vec2 vel;
+    Vec2 size(0,0);
+    Vec2 vel(0,0);
     if(e->GetType() == WALL || e->GetType() == SPIKE_WALL || e->GetType() == GOAL)
         size = e->GetSize();
-    if(e->GetType() == SPAWNER)
+    if(e->GetType() == SPAWNER){
         vel.set(100,600);
-    switch(e->GetType()){
-        case WALL:
-            ent = new Wall(pos,size);
-            break;
-        case GOAL:
-            ent = new Goal(pos,size);
-            break;
-        case SPIKE_WALL:
-            ent = new SpikeWall(pos, size);
-            break;
-        case SPAWNER:
-            ent = new Spawner(pos, vel);
-            break;
-        case HOOK:
-            ent = new Hook(pos);
-            break;
+        launchVelocity = Vec2(100,600);
+        launchPosition = pos;
     }
+    ent = new Entity(pos,size,vel,e->GetType());
     ents.push_back(ent);
     AddMapValue(ent, pos, size);
 }
 void Level::AddMapValue(Entity* ent, Vec2 pos, Vec2 size){
     std::string pre = "entity" + std::to_string(ents.size());
-    map[pre + "typeString"] = ent->typeString;
     map[pre + "type"] = std::to_string(ent->GetType());
-    map[pre + "random"] = 123;
     map[pre + "x"] = std::to_string(pos.x);
     map[pre + "y"] = std::to_string(pos.y);
     map[pre + "width"] = "0";
@@ -73,8 +53,8 @@ void Level::AddMapValue(Entity* ent, Vec2 pos, Vec2 size){
         map[pre + "height"] = std::to_string(ent->GetSize().y);
     }
     if(ent->GetType() == SPAWNER){
-        map[pre + "velocityX"] = std::to_string(((Spawner*)ent)->GetStartVelocity().x);
-        map[pre + "velocityY"] = std::to_string(((Spawner*)ent)->GetStartVelocity().y);
+        map[pre + "velocityX"] = std::to_string(ent->GetLaunchVelocity().x);
+        map[pre + "velocityY"] = std::to_string(ent->GetLaunchVelocity().y);
     }
     map["entcount"] = std::to_string(ents.size());
 }
@@ -113,10 +93,18 @@ void Level::Save(){
     Value parameters = Value(map);
     sendMessageWithParams("saveLevel", parameters);
 }
-void Level::Add(Layer* game){
+void Level::Add(Game* game){
     GetMapObjects();
+    user = new User();
+    user->Add(game);
     for(int x = 0; x < ents.size(); x++){
         ents[x]->Add(game);
+    }
+}
+void Level::Remove(Game* game){
+    GetMapObjects();
+    for(int x = 0; x < ents.size(); x++){
+        ents[x]->Remove(game);
     }
 }
 void Level::AddToMap(Layer* game){
@@ -134,6 +122,12 @@ ValueMap Level::getValueMap(){
 };
 std::string Level::GetPath(){
     return path;
+}
+Vec2 Level::GetLaunchVelocity(){
+    return launchVelocity;
+}
+Vec2 Level::GetLaunchPosition(){
+    return launchPosition;
 }
 std::string Level::GetName(){
     return name;

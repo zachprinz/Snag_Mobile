@@ -10,7 +10,7 @@
 #define __Snag__LevelSelect__
 
 #include <iostream>
-#include "Board.h"
+#include "Game.h"
 #include "cocos2d.h"
 #include "CocosGUI.h"
 #include "LevelMenuItem.h"

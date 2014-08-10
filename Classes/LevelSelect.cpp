@@ -7,8 +7,7 @@
 //
 
 #include "LevelSelect.h"
-#include "Board.h"
-#include "HelloWorldScene.h"
+#include "Game.h"
 #include "LevelEditor.h"
 #include "MainMenu.h"
 #include "LevelMenuItem.h"
@@ -38,7 +37,6 @@ bool LevelSelect::init()
     if(!Layer::init()){
         return false;
     }
-    Board::customLevel = false;
     Instance = this;
     
     currentLevelSet = LEVELS_RISING;
@@ -194,7 +192,7 @@ void LevelSelect::uploadCallback(Ref*){
     }
 }
 void LevelSelect::scrollRightCallback(Ref*){
-    if(Board::levels[currentLevelSet].size() > (page+1)*4){
+    if(Game::levels[currentLevelSet].size() > (page+1)*4){
         page++;
         LoadLevels();
     }
@@ -236,14 +234,14 @@ void LevelSelect::selectCallback(Ref* ref){
 }
 void LevelSelect::playCallback(Ref* sender){
     if(selectedLevel != NULL){
-        if(HelloWorld::myScene == NULL){
-            auto scene = HelloWorld::createScene();
+        if(Game::myScene == NULL){
+            auto scene = Game::createScene();
             Director::getInstance()->pushScene(scene);
-            Board::Instance->Reset(selectedLevel);
+            Game::Instance->Reset(selectedLevel);
         }
         else{
-            Director::getInstance()->pushScene(HelloWorld::myScene);
-            Board::Instance->Reset(selectedLevel);
+            Director::getInstance()->pushScene(Game::myScene);
+            Game::Instance->Reset(selectedLevel);
         }
     }
 }
@@ -310,26 +308,26 @@ void LevelSelect::LoadLevels(){
 };
 void LevelSelect::FetchSocialLevels(){
     showLoading();
-    Board::SetUpLevels();
-    Board::levels[LEVELS_SOCIAL].clear();
+    Game::SetUpLevels();
+    Game::levels[LEVELS_SOCIAL].clear();
     sendMessageWithParams("fetchCustomLevels", Value());
 };
 void LevelSelect::FetchCustomLevels(){
     showLoading();
-    Board::SetUpLevels();
-    Board::levels[LEVELS_CUSTOM].clear();
+    Game::SetUpLevels();
+    Game::levels[LEVELS_CUSTOM].clear();
     sendMessageWithParams("fetchCustomLevels", Value());
 };
 void LevelSelect::FetchRisingLevels(){
     showLoading();
-    Board::SetUpLevels();
-    Board::levels[LEVELS_RISING].clear();
+    Game::SetUpLevels();
+    Game::levels[LEVELS_RISING].clear();
     sendMessageWithParams("fetchRisingLevels", Value());
 };
 void LevelSelect::FetchFavoritedLevels(){
     showLoading();
-    Board::SetUpLevels();
-    Board::levels[LEVELS_FAVORITED].clear();
+    Game::SetUpLevels();
+    Game::levels[LEVELS_FAVORITED].clear();
     sendMessageWithParams("fetchFavoritedLevels", Value());
 };
 void LevelSelect::showLoading(){
@@ -339,36 +337,36 @@ void LevelSelect::showLoading(){
 void LevelSelect::fetchSocialCallback(Node* sender, Value data){
     if (!data.isNull() && data.getType() == Value::Type::MAP) {
         ValueMap valueMap = data.asValueMap();
-        Board::AddSocialLevel(Level::createWithValueMap(valueMap));
+        Game::AddSocialLevel(Level::createWithValueMap(valueMap));
     }
 };
 void LevelSelect::fetchFavoritedCallback(Node* sender, Value data){
     if (!data.isNull() && data.getType() == Value::Type::MAP) {
         ValueMap valueMap = data.asValueMap();
-        Board::AddFavoritedLevel(Level::createWithValueMap(valueMap));
+        Game::AddFavoritedLevel(Level::createWithValueMap(valueMap));
     }
 };
 void LevelSelect::fetchRisingCallback(Node* sender, Value data){
     if (!data.isNull() && data.getType() == Value::Type::MAP) {
         ValueMap valueMap = data.asValueMap();
-        Board::AddRisingLevel(Level::createWithValueMap(valueMap));
+        Game::AddRisingLevel(Level::createWithValueMap(valueMap));
     }
 };
 void LevelSelect::fetchCustomCallback(Node* sender, Value data){
     if (!data.isNull() && data.getType() == Value::Type::MAP) {
         printf("Returned with a custom level!");
         ValueMap valueMap = data.asValueMap();
-        Board::AddCustomLevel(Level::createWithValueMap(valueMap));
+        Game::AddCustomLevel(Level::createWithValueMap(valueMap));
     }
 };
 void LevelSelect::doneFetching(Node* sender, Value data){
     printf("\nDone Fetching\n");
     loading->setVisible(false);
     loading->stopAllActions();
-    if(Board::levels.size() > 0){
-        for(int x = page * 4; x < Board::levels[currentLevelSet].size() && x < ((page*4)+4); x++){
+    if(Game::levels.size() > 0){
+        for(int x = page * 4; x < Game::levels[currentLevelSet].size() && x < ((page*4)+4); x++){
             levels[x%4]->SetEnabled(true);
-            levels[x%4]->SetLevel(Board::levels[currentLevelSet][x], page);
+            levels[x%4]->SetLevel(Game::levels[currentLevelSet][x], page);
         }
         selectedLevel = levels[0]->level;
         SetPreview();

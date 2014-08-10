@@ -10,12 +10,8 @@
 #define __Snag__Level__
 
 #include <iostream>
-#include "Wall.h"
-#include "SpikeWall.h"
-#include "Hook.h"
-#include "Spawner.h"
-#include "Goal.h"
 #include "MapObject.h"
+#include "Game.h"
 #include "cocos2d.h"
 
 USING_NS_CC;
@@ -27,8 +23,9 @@ public:
     Level();
     
     void AddEntity(MapObject*);
-    void Add(Layer* game);
+    void Add(Game* game);
     void AddToMap(Layer* game);
+    void Remove(Game* game);
 
     void SetName(std::string);
     void SetAuthor(std::string);
@@ -46,6 +43,9 @@ public:
     std::string GetID();
     int GetFavorites();
     bool GetIsFavorited();
+    User* user;
+    Vec2 GetLaunchVelocity();
+    Vec2 GetLaunchPosition();
 private:
     void CreateFromMapValues();
     bool hasMapObjects;
@@ -59,6 +59,8 @@ private:
     std::string objectID;
     std::string highscoresID;
     std::vector<MapObject*> mapObjects;
+    Vec2 launchVelocity;
+    Vec2 launchPosition;
     int entCount;
 };
 

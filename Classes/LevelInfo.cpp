@@ -8,8 +8,7 @@
 
 #include "LevelInfo.h"
 #include "LevelInfo.h"
-#include "Board.h"
-#include "HelloWorldScene.h"
+#include "Game.h"
 #include "LevelEditor.h"
 #include "LevelSelect.h"
 #include "MainMenu.h"
@@ -122,14 +121,14 @@ void LevelInfo::downloadButtonCallback(Ref*){
 
 };
 void LevelInfo::playButtonCallback(Ref*){
-    if(HelloWorld::myScene == NULL){
-        auto scene = HelloWorld::createScene();
+    if(Game::myScene == NULL){
+        auto scene = Game::createScene();
         Director::getInstance()->pushScene(scene);
-        Board::Instance->Reset(currentLvl);
+        Game::Instance->Reset(currentLvl);
     }
     else{
-        Director::getInstance()->pushScene(HelloWorld::myScene);
-        Board::Instance->Reset(currentLvl);
+        Director::getInstance()->pushScene(Game::myScene);
+        Game::Instance->Reset(currentLvl);
     }
 };
 void LevelInfo::Load(Level* lvl){

@@ -7,8 +7,7 @@
 //
 
 #include "MainMenu.h"
-#include "Board.h"
-#include "HelloWorldScene.h"
+#include "Game.h"
 #include "LevelEditor.h"
 #include "LevelSelect.h"
 #include "LogInMenu.h"

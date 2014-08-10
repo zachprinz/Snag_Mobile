@@ -45,7 +45,6 @@ LevelMenuItem::LevelMenuItem(std::string name){
     menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0,0));
     menu->setPosition(0,0);
-    Board::Print("\nCreated a new Level Menu Item.\n");
 }
 void LevelMenuItem::SetEnabled(bool is){
     menu->setEnabled(is);

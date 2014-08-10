@@ -9,8 +9,7 @@
 #include "LevelEditor.h"
 #include "MainMenu.h"
 #include "Level.h"
-#include "Board.h"
-#include "HelloWorldScene.h"
+#include "Game.h"
 #include "LevelSelect.h"
 
 USING_NS_CC;
@@ -229,7 +228,6 @@ void LevelEditor::EraseSelectCallback(Ref*){
 };
 void LevelEditor::homeButtonCallback(Ref* ref){
     if(LevelSelect::myScene == NULL){
-        Board::Print("Play button click registered.");
         auto scene = LevelSelect::createScene();
         Director::getInstance()->pushScene(scene);
         LevelSelect::Instance->Refresh();
@@ -439,7 +437,6 @@ void LevelEditor::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
         if(currentMapObject->GetSprite()->getBoundingBox().size.width < TILE_SIZE || currentMapObject->GetSprite()->getBoundingBox().size.height < TILE_SIZE){
             for(int x = 0; x < mapObjects.size(); x++){
                 if(currentMapObject == mapObjects[x]){
-                    Board::Print("Deleted object");
                     this->removeChild(mapObjects[x]->GetSprite());
                     mapObjects.erase(mapObjects.begin() + x);
                     break;

@@ -10,10 +10,9 @@
 #define __Snag__LevelEditor__
 
 #include <iostream>
-#include "Board.h"
+#include "Game.h"
 #include "cocos2d.h"
 #include "MapObject.h"
-#include "tinyxml2.h"
 #include "cocos-ext.h"
 
 #define WALL 0

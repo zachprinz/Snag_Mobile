@@ -10,7 +10,7 @@
 #define __Snag__MainMenu__
 
 #include <iostream>
-#include "Board.h"
+#include "Game.h"
 #include "cocos2d.h"
 
 class MainMenu : public cocos2d::Layer

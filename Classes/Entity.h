@@ -22,41 +22,42 @@
 
 USING_NS_CC;
 
+class Game;
 class Entity{
-public:
-    Entity(char* texture, int x = 500, int y = 300, Vec2 size = Vec2(0,0), int type = 0);
-    virtual void update(float dt);
+public:    
+    static Entity* createWall(Vec2, Vec2);
+    static Entity* createSpikeWall(Vec2, Vec2);
+    static Entity* createGoal(Vec2, Vec2);
+    static Entity* createHook(Vec2);
+    static Entity* createSpawner(Vec2, Vec2);
+    
+    Entity(Vec2 pos, Vec2 size, Vec2 vel, int type);
+    
+    virtual void SetUpPhysicsSprite(std::string, float);
+    virtual void CalculateScale(Vec2 userPosition, float boardScale);
+    virtual void update(Vec2 userPosition, float boardScale);
+    virtual void Add(Game* a);
+    virtual void Remove(Game* a);
+    void draw();
+    
+    Vec2 GetSize();
     Sprite* GetSprite();
     Point GetPosition();
-    void SetScale(Vec2);
-    Vec2 GetScale();
-    virtual Rect GetBounds();
-    void SetBaseScale(Vec2 scale);
-    void draw();
-    static Vec2 userPosition;
-    static float boardScale;
-    void UpdateSprite();
-    virtual void SetUpPhysicsSprite(char*);
-    Sprite* physicsSprite;
-    PhysicsBody* body;
-    int type;
-    void Add(Layer*);
-    void SetType(int);
-    std::string typeString;
-    Vec2 GetSize();
-    Vec2 size;
+    Vec2 GetLaunchVelocity();
+    Rect GetBounds();
+    Sprite* GetPhysicsSprite();
     int GetType();
-    virtual void CalculateScale();
-private:
-    
 protected:
-    static Vec2 baseScale;
-    Vec2 spriteBaseScale;
+    Vec2 size;
+    Vec2 baseScale;
+    Vec2 launchVelocity;
     Sprite* sprite;
     Point position;
-    Vec2 scale;
     Vec2 imageSize;
     DrawNode* boundsDebug;
+    PhysicsBody* body;
+    Sprite* physicsSprite;
+    int type;
 };
 
 #endif /* defined(__Snag__Entity__) */

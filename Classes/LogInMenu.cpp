@@ -7,8 +7,7 @@
 //
 
 #include "LogInMenu.h"
-#include "Board.h"
-#include "HelloWorldScene.h"
+#include "Game.h"
 #include "MainMenu.h"
 #include "LevelSelect.h"
 #include "NDKHelper/NDKHelper.h"
