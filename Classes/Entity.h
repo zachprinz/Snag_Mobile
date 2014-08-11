@@ -33,8 +33,7 @@ public:
     
     Entity(Vec2 pos, Vec2 size, Vec2 vel, int type);
     
-    virtual void SetUpPhysicsSprite(std::string, float);
-    virtual void CalculateScale(Vec2 userPosition, float boardScale);
+    virtual void SetUpPhysicsSprite(std::string, Vec2);
     virtual void update(Vec2 userPosition, float boardScale);
     virtual void Add(Game* a);
     virtual void Remove(Game* a);
@@ -44,10 +43,10 @@ public:
     Sprite* GetSprite();
     Point GetPosition();
     Vec2 GetLaunchVelocity();
-    Rect GetBounds();
     Sprite* GetPhysicsSprite();
     int GetType();
 protected:
+    virtual void CalculateScale(Vec2 userPosition, float boardScale);
     Vec2 size;
     Vec2 baseScale;
     Vec2 launchVelocity;

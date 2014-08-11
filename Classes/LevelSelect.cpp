@@ -144,6 +144,7 @@ bool LevelSelect::init()
     }
     
     loading = Sprite::create("Loading.png");
+    loading->setScale(0.5,0.5);
     loading->setPosition(levels[1]->background->getBoundingBox().getMinY(), levels[1]->background->getBoundingBox().getMidX());
     loading->setAnchorPoint(Vec2(0.5, 0.5));
     loading->setVisible(false);

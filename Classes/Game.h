@@ -28,7 +28,7 @@ public:
     virtual bool init();
     void menuCloseCallback(cocos2d::Ref* pSender);
     CREATE_FUNC(Game);
-    
+    void setPhyWorld(PhysicsWorld* world2);
     bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
     void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
     void onContactPostSolve(PhysicsContact& contact);
@@ -47,6 +47,7 @@ public:
     Entity* GetClosestHook(Vec2 pos);
     Level* currentLevel;
 private:
+    PhysicsWorld* world;
     Size visibleSize;
     Label* timeLabel;
     void LoadLevel(Level*);

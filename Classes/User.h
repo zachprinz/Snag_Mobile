@@ -19,7 +19,7 @@ class User : public Entity{
 public:
     static int type;
     User();
-    void SetUpPhysicsSprite(std::string, float);
+    virtual void SetUpPhysicsSprite(std::string, Vec2);
     virtual void Add(Layer*);
     
     void Snag();
@@ -30,9 +30,9 @@ public:
     void Bounce(const PhysicsContactData* data);
     void SetBackupVelocity();
     void UpdateBounce();
-    void CalculateScale(Vec2 userPosition, float boardScale);
     Vec2 GetPhysicalPosition();
 private:
+    void CalculateScale(Vec2 userPosition, float boardScale);
     Vec2 backupVelocity;
     Vec2 closestPosition;
     PhysicsJointDistance* joint;

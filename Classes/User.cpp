@@ -17,12 +17,13 @@
 int User::type;
 
 User::User() : Entity(Vec2(150,150), Vec2(0,0), Vec2(0,0), 5){
+    SetUpPhysicsSprite("user.png", Vec2(0.5,0.5));
     isHooked = false;
     line = Sprite::create("line.png");
     line->setAnchorPoint(Vec2(0,0.5));
     line->setPositionZ(-1);
 }
-void User::SetUpPhysicsSprite(std::string texture, float scale){
+void User::SetUpPhysicsSprite(std::string texture, Vec2 scale){
     body = PhysicsBody::createCircle(sprite->getBoundingBox().size.width / 2.0);
     body->setMass(10.0f);
     body->setDynamic(true);
@@ -74,8 +75,9 @@ void User::CalculateScale(Vec2 userPosition, float boardScale){
     position = physicsSprite->getPosition();
     float distanceToGround = 0 - position.y;
     float newDistanceToGround = distanceToGround / boardScale;
-    sprite->setPosition((MainMenu::screenSize.x / 2.0), 0 -newDistanceToGround);
+    sprite->setPosition((MainMenu::screenSize.x / 2.0), 0 - newDistanceToGround);
     sprite->setScale((baseScale.x/boardScale),(baseScale.y/boardScale));
+    printf("\nUser Position: (%f, %f)", sprite->getPosition().x, sprite->getPosition().y);
     if(isHooked){
         line->setPosition(closest->GetSprite()->getPosition());
         line->setScale(lineBaseScale*(1/boardScale), 10.0 * (1/boardScale));

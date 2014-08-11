@@ -20,15 +20,15 @@ USING_NS_CC;
 #define USER 5
 
 Entity* Entity::createWall(Vec2 pos, Vec2 size){
-    Entity* ent = new Entity(pos, size, Vec2(0,0), WALL);
+    Entity* ent = new Entity(Vec2(pos.x + size.x/2.0, pos.y - size.y/2.0), size, Vec2(0,0), WALL);
     return ent;
 }
 Entity* Entity::createSpikeWall(Vec2 pos, Vec2 size){
-    Entity* ent = new Entity(pos, size, Vec2(0,0), SPIKE_WALL);
+    Entity* ent = new Entity(Vec2(pos.x + size.x/2.0, pos.y - size.y/2.0), size, Vec2(0,0), SPIKE_WALL);
     return ent;
 }
 Entity* Entity::createGoal(Vec2 pos, Vec2 size){
-    Entity* ent = new Entity(pos, size, Vec2(0,0), GOAL);
+    Entity* ent = new Entity(Vec2(pos.x + size.x/2.0, pos.y - size.y/2.0), size, Vec2(0,0), GOAL);
     return ent;
 }
 Entity* Entity::createHook(Vec2 pos){
@@ -43,14 +43,21 @@ Entity* Entity::createSpawner(Vec2 pos, Vec2 vel){
 Entity::Entity(Vec2 pos, Vec2 size, Vec2 vel, int type){
     std::string textures[6] = {"wall.png", "spikewall.png", "hook.png", "spawner.png", "goal.png", "user.png"};
     float baseScales[6] = {1,1,1.5,1,1,0.5};
+    this->baseScale = Vec2(baseScales[type],baseScales[type]);
     this->type = type;
     this->size = size;
     this->position = pos;
     sprite = Sprite::create(textures[type]);
     sprite->retain();
-    SetUpPhysicsSprite(textures[type], baseScales[type]);
+    if(size.x != 0 && size.y != 0){
+        baseScale.x = size.x / sprite->getBoundingBox().size.width;
+        baseScale.y = size.y / sprite->getBoundingBox().size.height;
+    }
+    sprite->setScale(baseScale.x, baseScale.y);
+    if(type != USER)
+        this->SetUpPhysicsSprite(textures[type], baseScale);
 }
-void Entity::SetUpPhysicsSprite(std::string texture, float scale){
+void Entity::SetUpPhysicsSprite(std::string texture, Vec2 scale){
     body = PhysicsBody::createBox(Size(sprite->getBoundingBox().size));
     body->setMass(PHYSICS_INFINITY);
     body->setDynamic(false);
@@ -73,13 +80,15 @@ void Entity::update(Vec2 userPosition, float boardScale){
     this->CalculateScale(userPosition, boardScale);
 }
 void Entity::CalculateScale(Vec2 userPosition, float boardScale){
-    position = physicsSprite->getPosition();
-    float distanceToCenter = position.x - userPosition.x;
-    float newDistanceToCenter = distanceToCenter / boardScale;
-    float distanceToGround = 0 - position.y;
-    float newDistanceToGround = distanceToGround / boardScale;
-    sprite->setPosition((MainMenu::screenSize.x / 2.0) + newDistanceToCenter, 0 - newDistanceToGround);
-    sprite->setScale(baseScale.x/boardScale, baseScale.y/boardScale);
+    if(type != USER){
+        position = physicsSprite->getPosition();
+        float distanceToCenter = position.x - userPosition.x;
+        float newDistanceToCenter = distanceToCenter / boardScale;
+        float distanceToGround = 0 - position.y;
+        float newDistanceToGround = distanceToGround / boardScale;
+        sprite->setPosition((MainMenu::screenSize.x / 2.0) + newDistanceToCenter, 0 - newDistanceToGround);
+        sprite->setScale(baseScale.x/boardScale, baseScale.y/boardScale);
+    }
 }
 void Entity::Add(Game* game){
     game->addChild(sprite);
@@ -88,9 +97,6 @@ void Entity::Add(Game* game){
 void Entity::Remove(Game* game){
     game->removeChild(sprite);
     game->removeChild(physicsSprite);
-}
-Rect Entity::GetBounds(){
-    return physicsSprite->getBoundingBox();
 }
 Sprite* Entity::GetSprite(){
     return sprite;

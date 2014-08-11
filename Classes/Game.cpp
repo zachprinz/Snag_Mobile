@@ -42,19 +42,21 @@ void Game::update(float dt){
     float dist = userPos.y;
     if(dist < visibleSize.height)
         dist = visibleSize.height;
-    scale = 1.0 / ((visibleSize.height - visibleSize.height * 0.15) / dist);
+    scale = 1.0 / ((visibleSize.height - (visibleSize.height * 0.15)) / dist);
     currentLevel->user->update(scale);
+    userPos = currentLevel->user->GetPhysicalPosition();
     for(int x = 0; x < currentLevel->ents.size(); x++){
         currentLevel->ents[x]->update(userPos, scale);
     }
     currentLevel->user->update(scale);
+    printf("\nScale: %f", scale);
 }
 Scene* Game::myScene;
 
 Scene* Game::createScene() {
-    auto scene = Scene::createWithPhysics();
-    scene->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+    auto scene = Scene::createWithPhysics();    
     auto layer = Game::create();
+    layer->setPhyWorld(scene->getPhysicsWorld());
     myScene = scene;
     scene->addChild(layer);
     return scene;
@@ -105,6 +107,12 @@ void Game::LoadLevel(Level* lvl){
     currentLevel = lvl;
     currentLevel->Add(this);
 }
+void Game::setPhyWorld(PhysicsWorld* world2){
+    world = world2;
+    world->setSpeed(3.0);
+    world->setGravity(Vec2(0,-300));
+}
+
 bool Game::init(){
     if(!Layer::init()){
         return false;
@@ -121,7 +129,7 @@ bool Game::init(){
     this->schedule(schedule_selector(Game::UpdateTimer),0.1f);
 
     Instance = this;
-    //this->getScene()->getPhysicsWorld()->setSpeed(3.0);
+
     auto contactListener = EventListenerPhysicsContact::create();
     contactListener->onContactPostSolve = CC_CALLBACK_1(Game::onContactPostSolve, this);
     contactListener->onContactBegin = CC_CALLBACK_1(Game::onContactBegin, this);
@@ -166,10 +174,10 @@ void Game::menuCloseCallback(Ref* pSender) {
     #endif
 }
 void Game::AddJoint(PhysicsJointDistance* joint){
-    this->AddJoint(joint);
+    world->addJoint(joint);
 };
 void Game::RemoveAllJoints(){
-    this->RemoveAllJoints();
+    world->removeAllJoints();
 };
 void Game::UpdateTimer(float dt){
     time += 0.1;
@@ -199,8 +207,9 @@ void Game::homeButtonCallback(Ref* ref){
     }
 }
 bool Game::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
+    currentLevel->user->Snag();
     return true;
 }
 void Game::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
-    
+    currentLevel->user->Release();
 }
