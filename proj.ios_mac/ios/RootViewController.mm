@@ -252,6 +252,22 @@
         }];
     }
 }
+- (void)deleteLevel:(NSObject *)parametersObject
+{
+    NSDictionary *parameters = (NSDictionary *)parametersObject;
+    if(parameters != nil){
+        NSString* levelID = (NSString *)[parameters objectForKey:@"id"];
+        PFQuery *query = [PFQuery queryWithClassName:@"Level"];
+        [query getObjectInBackgroundWithId:levelID block:^(PFObject *level, NSError *error) {
+            [level deleteInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                if(succeeded){
+                    NSDictionary *found = [[NSDictionary alloc] initWithObjectsAndKeys:@"false", @"responce", nil];
+                    [IOSNDKHelper sendMessage:@"levelDeletedCallback" withParameters:found];
+                }
+            }];
+        }];
+    }
+}
 - (void)favorite:(NSObject *)parametersObject
 {
     NSDictionary *parameters = (NSDictionary *)parametersObject;

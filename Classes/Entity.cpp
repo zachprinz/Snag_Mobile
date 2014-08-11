@@ -20,7 +20,7 @@ USING_NS_CC;
 #define USER 5
 
 Entity* Entity::createWall(Vec2 pos, Vec2 size){
-    Entity* ent = new Entity(Vec2(pos.x + size.x/2.0, pos.y - size.y/2.0), size, Vec2(0,0), WALL);
+    Entity* ent = new Entity(Vec2(pos.x + (size.x/2.0), pos.y - (size.y/2.0)), size, Vec2(0,0), WALL);
     return ent;
 }
 Entity* Entity::createSpikeWall(Vec2 pos, Vec2 size){
@@ -91,6 +91,7 @@ void Entity::CalculateScale(Vec2 userPosition, float boardScale){
     }
 }
 void Entity::Add(Game* game){
+    sprite->setGlobalZOrder(2);
     game->addChild(sprite);
     game->addChild(physicsSprite);
 }

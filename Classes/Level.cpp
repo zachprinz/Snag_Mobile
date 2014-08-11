@@ -35,7 +35,19 @@ void Level::AddEntity(MapObject* e){
         launchVelocity = Vec2(100,600);
         launchPosition = pos;
     }
-    ent = new Entity(pos,size,vel,e->GetType());
+    switch(e->GetType()){
+        case WALL:
+            ent = Entity::createWall(pos,size);
+            break;
+        case SPIKE_WALL:
+            ent = Entity::createSpikeWall(pos,size);
+            break;
+        case GOAL:
+            ent = Entity::createGoal(pos,size);
+        default:
+            ent = new Entity(pos, size, vel, e->GetType());
+    }
+    
     ents.push_back(ent);
     AddMapValue(ent, pos, size);
 }
@@ -95,8 +107,6 @@ void Level::Save(){
 }
 void Level::Add(Game* game){
     GetMapObjects();
-    user = new User();
-    user->Add(game);
     for(int x = 0; x < ents.size(); x++){
         ents[x]->Add(game);
     }

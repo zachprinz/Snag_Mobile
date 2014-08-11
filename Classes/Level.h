@@ -43,7 +43,6 @@ public:
     std::string GetID();
     int GetFavorites();
     bool GetIsFavorited();
-    User* user;
     Vec2 GetLaunchVelocity();
     Vec2 GetLaunchPosition();
 private:

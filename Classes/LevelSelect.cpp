@@ -76,9 +76,9 @@ bool LevelSelect::init()
     uploadButton = MainMenu::CreateButton("DownloadOn.png", this, menu_selector(LevelSelect::uploadCallback), Vec2(0.69,1.0-0.808), Vec2(0,0));
     uploadButton->setVisible(false);
     uploadButton->setGlobalZOrder(0);
-    auto infoButton = MainMenu::CreateButton("info.png", this, menu_selector(LevelSelect::infoCallback), Vec2(0.789,1.0-0.808), Vec2(0,0));
-    infoButton->setGlobalZOrder(0);
-    auto editButton = MainMenu::CreateButton("LSEdit.png", this, menu_selector(LevelSelect::editCallback), Vec2(0.887,1.0-0.808), Vec2(0,0));
+    auto deleteButton = MainMenu::CreateButton("Delete.png", this, menu_selector(LevelSelect::deleteCallback), Vec2(0.887,1.0-0.808), Vec2(0,0));
+    deleteButton->setGlobalZOrder(0);
+    auto editButton = MainMenu::CreateButton("LSEdit.png", this, menu_selector(LevelSelect::editCallback), Vec2(0.789,1.0-0.808), Vec2(0,0));
     editButton->setGlobalZOrder(0);
     auto selectBackground = MainMenu::CreateButton("LSSelectBackground.png",  Vec2(0.01,1.0-0.206), Vec2(0,0));
     selectBackground->setGlobalZOrder(0);
@@ -118,7 +118,7 @@ bool LevelSelect::init()
     menuItems.pushBack(previewWindow);
     menuItems.pushBack(levelTitle);
     menuItems.pushBack(levelAuthor);
-    menuItems.pushBack(infoButton);
+    menuItems.pushBack(deleteButton);
     menuItems.pushBack(editButton);
     menuItems.pushBack(playButton);
     menuItems.pushBack(highscoresButton);
@@ -161,7 +161,11 @@ bool LevelSelect::init()
     NDKHelper::addSelector("LevelSelect", "fetchRisingCallback", CC_CALLBACK_2(LevelSelect::fetchRisingCallback, this), this);
     NDKHelper::addSelector("LevelSelect", "doneFetching", CC_CALLBACK_2(LevelSelect::doneFetching, this), this);
     NDKHelper::addSelector("LevelSelect", "favCallback", CC_CALLBACK_2(LevelSelect::favCallback, this), this);
+    NDKHelper::addSelector("LevelSelect", "levelDeletedCallback", CC_CALLBACK_2(LevelSelect::levelDeletedCallback, this), this);
     //--------------------------//
+    
+    deletePopUp = new PopUp("Delete Level", "Are you sure you want to\ndelete this level?", this, menu_selector(LevelSelect::deleteAcceptCallback), menu_selector(LevelSelect::deleteDeclineCallback));
+    deletePopUp->Add(this);
     
     return true;
 }
@@ -182,6 +186,19 @@ void LevelSelect::goToLevelEditor(){
 }
 void LevelSelect::highscoresCallback(Ref*){
 
+}
+void LevelSelect::deleteAcceptCallback(Ref*){
+    ValueMap valueMap;
+    valueMap["id"] = selectedLevel->GetID();
+    Value parameters = Value(valueMap);
+    sendMessageWithParams("deleteLevel", parameters);
+    deletePopUp->Close();
+}
+void LevelSelect::deleteDeclineCallback(Ref*){
+    deletePopUp->Close();
+}
+void LevelSelect::levelDeletedCallback(Node* sender, Value data){
+    Refresh();
 }
 void LevelSelect::uploadCallback(Ref*){
     selectedLevel->makePublic();
@@ -208,8 +225,8 @@ void LevelSelect::newLevelCallback(Ref*){
     sendMessageWithParams("newLevel", Value());
     Refresh();
 }
-void LevelSelect::infoCallback(Ref*){
-    
+void LevelSelect::deleteCallback(Ref*){
+    deletePopUp->Show();
 }
 void LevelSelect::favoriteCallback(Ref* ref){
     int tag = ((MenuItemImage*)ref)->getTag();

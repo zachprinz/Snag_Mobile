@@ -38,18 +38,17 @@ void Game::SetUpLevels(){
     }
 };
 void Game::update(float dt){
-    Vec2 userPos = currentLevel->user->GetPhysicalPosition();
+    Vec2 userPos = user->GetPhysicalPosition();
     float dist = userPos.y;
     if(dist < visibleSize.height)
         dist = visibleSize.height;
     scale = 1.0 / ((visibleSize.height - (visibleSize.height * 0.15)) / dist);
-    currentLevel->user->update(scale);
-    userPos = currentLevel->user->GetPhysicalPosition();
+    user->update(scale);
+    userPos = user->GetPhysicalPosition();
     for(int x = 0; x < currentLevel->ents.size(); x++){
         currentLevel->ents[x]->update(userPos, scale);
     }
-    currentLevel->user->update(scale);
-    printf("\nScale: %f", scale);
+    user->update(scale);
 }
 Scene* Game::myScene;
 
@@ -65,16 +64,16 @@ Scene* Game::createScene() {
 void Game::onContactPostSolve(PhysicsContact& contact){
     int type = contact.getShapeB()->getBody()->getTag();
     if(type == WALL)
-        currentLevel->user->Bounce(contact.getContactData());
+        user->Bounce(contact.getContactData());
     if(type == SPIKE_WALL)
-        currentLevel->user->Reset();
+        user->Reset();
 }
 bool Game::onContactBegin(PhysicsContact& contact){
     if(contact.getShapeB()->getBody()->getTag() == -1){
         onWin();
         return false;
     }
-    currentLevel->user->SetBackupVelocity();
+    user->SetBackupVelocity();
     return true;
 }
 void Game::onWin(){
@@ -98,7 +97,7 @@ void Game::Reset(Level* lvl){
     if(currentLevel != NULL)
         Clear();
     LoadLevel(lvl);
-    currentLevel->user->Reset();
+    user->Reset();
 }
 void Game::Clear(){
     currentLevel->Remove(this);
@@ -142,12 +141,18 @@ bool Game::init(){
     background->setPosition(0,0);
     background->setAnchorPoint(Vec2(0,0));
     background->setScale(visibleSize.width / background->getBoundingBox().size.width, visibleSize.height / background->getBoundingBox().size.height);
+    background->setGlobalZOrder(-2);
     this->addChild(background);
+    
+    
+    user = new User();
+    user->Add(this);
     
     timeLabel = Label::createWithBMFont("dimbo.fnt", "0.00", TextHAlignment::LEFT);
     timeLabel->setPosition(visibleSize.width / 2.0 - (80 * MainMenu::screenScale.x), visibleSize.height);
     timeLabel->setAnchorPoint(Point(0.0,1.0));
-    this->addChild(timeLabel);
+    timeLabel->setGlobalZOrder(3);
+    this->addChild(timeLabel,1);
     
     auto resetButton = MainMenu::CreateButton("reset.png", this, menu_selector(Game::resetButtonCallback), Vec2(0.02, 1.0-0.02), Vec2(1,1));
     menuItems.pushBack(resetButton);
@@ -193,7 +198,7 @@ void Game::UpdateTimer(float dt){
     timeLabel->setString(out.str());
 }
 void Game::resetButtonCallback(Ref* ref){
-    currentLevel->user->Reset();
+    user->Reset();
 }
 void Game::homeButtonCallback(Ref* ref){
     if(LevelSelect::myScene == NULL){
@@ -207,9 +212,9 @@ void Game::homeButtonCallback(Ref* ref){
     }
 }
 bool Game::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
-    currentLevel->user->Snag();
+    user->Snag();
     return true;
 }
 void Game::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
-    currentLevel->user->Release();
+    user->Release();
 }

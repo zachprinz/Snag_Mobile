@@ -14,6 +14,7 @@
 #include "cocos2d.h"
 #include "CocosGUI.h"
 #include "LevelMenuItem.h"
+#include "PopUp.h"
 
 #define LEVELS_CUSTOM 0
 #define LEVELS_SOCIAL 1
@@ -42,11 +43,13 @@ public:
     void socialCallback(Ref*);
     void favoritedCallback(Ref*);
     void newLevelCallback(Ref*);
-    void infoCallback(Ref*);
+    void deleteCallback(Ref*);
     void favoriteCallback(Ref*);
     void selectCallback(Ref*);
     void uploadCallback(Ref*);
-    
+    void deleteAcceptCallback(Ref*);
+    void deleteDeclineCallback(Ref*);
+
     float tabHeightSelected;
     float tabHeight;
     
@@ -66,6 +69,7 @@ public:
     void SetLevelSet(int);
     Level* selectedLevel;
     int page;
+    PopUp* deletePopUp;
 private:
     void showLoading();
     void goToLevelEditor();
@@ -90,6 +94,7 @@ private:
     void fetchCustomCallback(Node* sender, Value data);
     void doneFetching(Node* sender, Value data);
     void favCallback(Node* sender, Value data);
+    void levelDeletedCallback(Node* sender, Value data);
 };
 
 #endif /* defined(__Snag__LevelSelect__) */

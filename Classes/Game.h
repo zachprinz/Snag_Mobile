@@ -46,6 +46,7 @@ public:
     float time;
     Entity* GetClosestHook(Vec2 pos);
     Level* currentLevel;
+    User* user;
 private:
     PhysicsWorld* world;
     Size visibleSize;
