@@ -16,6 +16,7 @@
 #define HOOK 2
 #define SPAWNER 3
 #define GOAL 4
+#define USER 5
 
 #include <iostream>
 #include "cocos2d.h"
@@ -30,6 +31,7 @@ public:
     static Entity* createGoal(Vec2, Vec2);
     static Entity* createHook(Vec2);
     static Entity* createSpawner(Vec2, Vec2);
+    static int count;
     
     Entity(Vec2 pos, Vec2 size, Vec2 vel, int type);
     
@@ -45,6 +47,7 @@ public:
     Vec2 GetLaunchVelocity();
     Sprite* GetPhysicsSprite();
     int GetType();
+    int ID;
 protected:
     virtual void CalculateScale(Vec2 userPosition, float boardScale);
     Vec2 size;

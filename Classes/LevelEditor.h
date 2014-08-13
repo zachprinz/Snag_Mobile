@@ -14,15 +14,19 @@
 #include "cocos2d.h"
 #include "MapObject.h"
 #include "cocos-ext.h"
+#include "PopUp.h"
+#include "Preview.h"
 
 #define WALL 0
 #define SPIKE_WALL 1
 #define HOOK 2
 #define SPAWNER 3
-#define ERASE 4
-#define NO_TOOL 5
-#define MOVE 6
-#define GOAL 7
+#define GOAL 4
+#define USER 5
+#define ERASE 6
+#define NO_TOOL 7
+#define MOVE 8
+#define GOAL 9
 #define TILE_SIZE 40
 
 using namespace cocos2d::extension;
@@ -86,14 +90,9 @@ public:
     
     static Scene* myScene;
     bool isTouched;
-    Vec2 originTile;
     Vec2 touchStart;
     Vec2 touchCurrent;
     int currentTool;
-    Vec2 PixelToTile(Point);
-    std::vector<MapObject*> mapObjects;
-    void AddMapObject(MapObject*);
-    MapObject* currentMapObject;
     std::string name;
     bool noticeUp;
     void DisableSpawner();
@@ -108,8 +107,12 @@ public:
     void ResetSaveDialog();
     void Export();
     void Clear();
-private:
     
+    PopUp* savePopUp;
+private:
+    std::map<int,Entity*> entities;
+    Preview* preview;
+    Scale9Sprite* currentSprite;
 };
 
 #endif /* defined(__Snag__LevelEditor__) */

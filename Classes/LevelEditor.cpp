@@ -33,9 +33,17 @@ bool LevelEditor::init(){
     Instance = this;
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    originTile = Vec2(0,0);
     noticeUp = false;
 
+    preview = new Preview(Rect(0,0,visibleSize.width,visibleSize.height), this, 1.0);
+    currentSprite = new Scale9Sprite();
+    currentSprite->initWithFile("Sliced.png", Rect(0, 0, 60, 60));
+    currentSprite->setContentSize(Size(100, 100));
+    currentSprite->setPosition(0,0);
+    currentSprite->setGlobalZOrder(0);
+    currentSprite->setVisible(false);
+    currentSprite->setAnchorPoint(Vec2(0,0));
+    
     auto listener = EventListenerTouchOneByOne::create();
     listener->setSwallowTouches(true);
     listener->onTouchBegan = CC_CALLBACK_2(LevelEditor::onTouchBegan, this);
@@ -87,7 +95,7 @@ bool LevelEditor::init(){
     moveSelectButton = MainMenu::CreateButton("LevelEditorMove.png", this, menu_selector(LevelEditor::moveButtonCallback), Vec2(0.9,1.0-buttonGap-(4*jump)), Vec2(1,0));
     menuItems.pushBack(moveSelectButton);
     selectedLabel = MainMenu::CreateLabel("Pan Tool", Vec2(0,1.0-0.015), Vec2(0,1));
-    selectedLabel->setGlobalZOrder(2);
+    selectedLabel->setGlobalZOrder(0);
     selectedLabel->setPosition(0.5 * visibleSize.width, selectedLabel->getPosition().y);
     selectedLabel->setAnchorPoint(Vec2(0.5,1.0));
     
@@ -95,61 +103,30 @@ bool LevelEditor::init(){
     notice->setScale(0.45);
     notice->setVisible(false);
     this->addChild(notice);
-    
-    cocos2d::Vector<MenuItem*> saveMenuItems;
-    shade = MainMenu::CreateButton("shade.png", Vec2(0,0), Vec2(0,0));
-    shade->setScale(1,1);
-    shade->setScale(visibleSize.width / shade->getBoundingBox().size.width, visibleSize.height / shade->getBoundingBox().size.height);
-    saveMenuItems.pushBack(shade);
-    saveAcceptButton = MainMenu::CreateButton("check.png", this, menu_selector(LevelEditor::saveAcceptCallback), Vec2(0.25,1.0-0.3), Vec2(1,0));
-    saveMenuItems.pushBack(saveAcceptButton);
-    saveDeclineButton = MainMenu::CreateButton("x.png", this, menu_selector(LevelEditor::saveDeclineCallback), Vec2(0.75,1.0-0.3), Vec2(1,0));
-    saveMenuItems.pushBack(saveDeclineButton);
-    saveButtonsOnY = saveAcceptButton->getPosition().y;
-    saveButtonsOffY = -500;
-    saveAcceptButton->setPosition(saveAcceptButton->getPosition().x, saveButtonsOffY);
-    saveDeclineButton->setPosition(saveDeclineButton->getPosition().x, saveButtonsOffY);
-    
-    Size editBoxSize = Size(750*MainMenu::screenScale.x, 100 * MainMenu::screenScale.y);
-    Scale9Sprite* nameBoxBG = Scale9Sprite::create("line.png");
-    nameBoxBG->setContentSize(editBoxSize);
-    nameBox = EditBox::create(Size(350,50), nameBoxBG);
-    nameBox->setPosition(Point(visibleSize.width / 2.0, visibleSize.height / 2.0 + 100 + 1000));
-    nameBox->setFontSize(30);
-    nameBox->setMaxLength(18);
-    nameBox->setPlaceHolder("level name");
-    nameBox->setFontColor(Color3B::WHITE);
-    this->addChild(nameBox);
-    
+        
     menu = Menu::createWithArray(menuItems);
-    saveMenu = Menu::createWithArray(saveMenuItems);
-    saveMenu->setAnchorPoint(Point(0.0,0.0));
-    saveMenu->setPosition(0,0);
-    saveMenu->setGlobalZOrder(5);
     menu->setAnchorPoint(Point(0.0,0.0));
     menu->setPosition(0,0);
     this->addChild(menu, 1);
-    this->addChild(saveMenu,1);
-    this->addChild(selectedLabel);
+    this->addChild(selectedLabel,1);
+    
+    savePopUp = new PopUp("Save", "Please name your level.", this, menu_selector(LevelEditor::saveAcceptCallback), menu_selector(LevelEditor::saveDeclineCallback),true);
+    savePopUp->Add(this);
+    this->addChild(currentSprite);
     
     currentSelection = NULL;
     
     return true;
 }
-
 void LevelEditor::editBoxEditingDidBegin(EditBox *editBox) {
 }
-
 void LevelEditor::editBoxEditingDidEnd(EditBox *editBox) {
 }
-
 void LevelEditor::editBoxTextChanged(EditBox *editBox, std::string &text) {
     
 }
-
 void LevelEditor::editBoxReturn(EditBox *editBox) {
 }
-
 void LevelEditor::SpikeWallSelectCallback(Ref*){
     if(currentSelection != spikeWallSelectButton){
         ResetToolPos();
@@ -239,12 +216,12 @@ void LevelEditor::homeButtonCallback(Ref* ref){
 }
 void LevelEditor::saveButtonCallback(Ref* ref){
     bool hasSpawner = false;
-    for(int x = 0; x < mapObjects.size(); x++){
-        if(mapObjects[x]->GetType() == SPAWNER){
-            hasSpawner = true;
-            break;
-        }
-    }
+    //for(int x = 0; x < mapObjects.size(); x++){
+        //if(mapObjects[x]->GetType() == SPAWNER){
+        //   hasSpawner = true;
+         //   break;
+        //}
+    //}
     if(!hasSpawner){
         if(!noticeUp){
             notice->setVisible(true);
@@ -253,84 +230,17 @@ void LevelEditor::saveButtonCallback(Ref* ref){
         }
     }
     else{
-    shade->setAnchorPoint(Point(0,0));
-    saveDeclineButton->setPosition(saveDeclineButton->getPosition().x, saveButtonsOnY);
-    saveAcceptButton->setPosition(saveAcceptButton->getPosition().x, saveButtonsOnY);
-        
-    
-    moveSelectButton->setEnabled(false);
-    eraseSelectButton->setEnabled(false);
-    hookSelectButton->setEnabled(false);
-    wallSelectButton->setEnabled(false);
-    spikeWallSelectButton->setEnabled(false);
-    spawnerSelectButton->setEnabled(false);
-    goalSelectButton->setEnabled(false);
-    homeSelectButton->setEnabled(false);
-    trashSelectButton->setEnabled(false);
-    saveSelectButton->setEnabled(false);
-    saveAcceptButton->setEnabled(true);
-    saveDeclineButton->setEnabled(true);
-    
-    moveSelectButton->setVisible(false);
-    eraseSelectButton->setVisible(false);
-    hookSelectButton->setVisible(false);
-    wallSelectButton->setVisible(false);
-    spikeWallSelectButton->setVisible(false);
-    spawnerSelectButton->setVisible(false);
-    goalSelectButton->setVisible(false);
-    homeSelectButton->setVisible(false);
-    trashSelectButton->setVisible(false);
-    saveSelectButton->setVisible(false);
-    selectedSprite->setVisible(false);
-    selectedLabel->setVisible(false);
-    
-    saveDialog = true;
-    
-    nameBox->setPosition(Point(nameBox->getPosition().x, nameBox->getPosition().y - 1000));
+        savePopUp->Show();
+        saveDialog = true;
     }
 }
 void LevelEditor::saveAcceptCallback(Ref* ref){
-    name = nameBox->getText();
+    name = savePopUp->GetText();
     Export();
-    ResetSaveDialog();
+    savePopUp->Close();
 }
 void LevelEditor::saveDeclineCallback(Ref* ref){
-    ResetSaveDialog();
-}
-void LevelEditor::ResetSaveDialog(){
-    shade->setAnchorPoint(Point(0,1.0));
-    saveDeclineButton->setPosition(saveDeclineButton->getPosition().x, saveButtonsOffY);
-    saveAcceptButton->setPosition(saveAcceptButton->getPosition().x, saveButtonsOffY);
-    
-    moveSelectButton->setEnabled(true);
-    eraseSelectButton->setEnabled(true);
-    hookSelectButton->setEnabled(true);
-    wallSelectButton->setEnabled(true);
-    spikeWallSelectButton->setEnabled(true);
-    spawnerSelectButton->setEnabled(true);
-    goalSelectButton->setEnabled(true);
-    homeSelectButton->setEnabled(true);
-    trashSelectButton->setEnabled(true);
-    saveSelectButton->setEnabled(true);
-    saveAcceptButton->setEnabled(false);
-    saveDeclineButton->setEnabled(false);
-    
-    moveSelectButton->setVisible(true);
-    eraseSelectButton->setVisible(true);
-    hookSelectButton->setVisible(true);
-    wallSelectButton->setVisible(true);
-    spikeWallSelectButton->setVisible(true);
-    spawnerSelectButton->setVisible(true);
-    goalSelectButton->setVisible(true);
-    homeSelectButton->setVisible(true);
-    trashSelectButton->setVisible(true);
-    saveSelectButton->setVisible(true);
-    selectedSprite->setVisible(true);
-    selectedLabel->setVisible(true);
-    
-    saveDialog = false;
-    
-    nameBox->setPosition(Point(nameBox->getPosition().x, nameBox->getPosition().y + 1000));
+    savePopUp->Close();
 }
 void LevelEditor::moveButtonCallback(Ref* ref){
     if(currentSelection != moveSelectButton){
@@ -372,13 +282,13 @@ void LevelEditor::trashButtonCallback(Ref* ref){
     Clear();
 }
 void LevelEditor::Clear(){
-    for(int x = 0; x < mapObjects.size(); x++){
+    /*for(int x = 0; x < mapObjects.size(); x++){
         this->removeChild(mapObjects[x]->GetSprite());
     }
     mapObjects.clear();
     originTile = Vec2(0,0);
     MapObject::origin = originTile;
-    EnableSpawner();
+    EnableSpawner();*/
 }
 bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
     if(noticeUp){
@@ -387,72 +297,44 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
         noticeUp = false;
     }
     else{
-    if(!saveDialog){
-    touchStart = PixelToTile(touch->getLocation());
-    switch(currentTool){
-        case WALL:{
-            MapObject* mapObject = new MapObject(touchStart, currentTool);
-            currentMapObject = mapObject;
-            AddMapObject(mapObject);
-            break;
+        if(!saveDialog){
+            touchStart = touch->getLocation();
+            currentSprite->setPosition(touchStart);
+            currentSprite->setContentSize(Size(1,1));
+            currentSprite->setVisible(true);
+            return true;
         }
-        case SPIKE_WALL:{
-            MapObject* mapObject = new MapObject(touchStart, currentTool);
-            currentMapObject = mapObject;
-            AddMapObject(mapObject);
-            break;
-        }
-        case GOAL:{
-            MapObject* mapObject = new MapObject(touchStart, currentTool);
-            currentMapObject = mapObject;
-            AddMapObject(mapObject);
-            break;
-        }
-        case SPAWNER:{
-            MapObject* mapObject = new MapObject(touchStart, currentTool);
-            currentMapObject = mapObject;
-            AddMapObject(mapObject);
-            break;
-        }
-        case HOOK:{
-            MapObject* mapObject = new MapObject(touchStart, currentTool);
-            currentMapObject = mapObject;
-            AddMapObject(mapObject);
-            break;
-        }
-        case NO_TOOL:
-            break;
-        case ERASE:
-            Erase(touchStart);
-            break;
-    }
-    return true;
-    }
-    return false;
+        return false;
     }
     return false;
 }
 void LevelEditor::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
-    if(currentTool != ERASE && currentTool != NO_TOOL && currentTool != SPAWNER && currentTool != HOOK){
-        if(currentMapObject->GetSprite()->getBoundingBox().size.width < TILE_SIZE || currentMapObject->GetSprite()->getBoundingBox().size.height < TILE_SIZE){
-            for(int x = 0; x < mapObjects.size(); x++){
-                if(currentMapObject == mapObjects[x]){
-                    this->removeChild(mapObjects[x]->GetSprite());
-                    mapObjects.erase(mapObjects.begin() + x);
-                    break;
-                }
+    if(currentTool != ERASE && currentTool != NO_TOOL){
+        if(currentTool != SPAWNER && currentTool != HOOK){
+            if(currentSprite->getContentSize().width < (TILE_SIZE) || currentSprite->getContentSize().height < (TILE_SIZE)){
+                currentSprite->setVisible(false);
+            } else{
+                Entity* tempEnt = (preview->CreateEntity(touchStart, touchCurrent, currentTool));
+                entities[tempEnt->ID] = tempEnt;
+                preview->AddEntity(tempEnt);
+                currentSprite->setVisible(false);
             }
+
+        } else {
+            Entity* tempEnt = (preview->CreateEntity(touchStart, touchCurrent, currentTool));
+            entities[tempEnt->ID] = tempEnt;
+            preview->AddEntity(tempEnt);
+            currentSprite->setVisible(false);
         }
     }
 }
 void LevelEditor::onTouchMoved(Touch* touch, Event* event){
     if(currentTool != NO_TOOL && currentTool != ERASE){
-        touchCurrent = PixelToTile(touch->getLocation());
-        if(currentMapObject != NULL)
-            currentMapObject->UpdateEndCoord(touchCurrent);
-        printf("Tile: (%f,%f)\n",touchCurrent.x, touchCurrent.y);
+        touchCurrent = touch->getLocation();
+        if(currentSprite != NULL)
+            currentSprite->setContentSize(Size(touchCurrent.x - touchStart.x, touchCurrent.y - touchStart.y));
     }
-    if(currentTool == NO_TOOL){
+    /*if(currentTool == NO_TOOL){
         touchCurrent = PixelToTile(touch->getLocation());
         originTile = Vec2(originTile.x + (touchCurrent.x - touchStart.x), originTile.y + (touchCurrent.y - touchStart.y));
         touchCurrent = PixelToTile(touch->getLocation());
@@ -463,43 +345,30 @@ void LevelEditor::onTouchMoved(Touch* touch, Event* event){
         printf("StartTile: (%f,%f)\n",touchStart.x, touchStart.y);
         printf("EndTile: (%f,%f)\n",touchCurrent.x, touchCurrent.y);
         touchStart = touchCurrent;
-
-    }
+    }*/
 }
 void LevelEditor::SetLevel(Level* lvl){
-    currentLevel = lvl;
+    /*currentLevel = lvl;
     Clear();
     mapObjects = lvl->GetMapObjects();
     for(int x = 0; x < mapObjects.size(); x++){
         this->addChild(mapObjects[x]->GetSprite());
-    }
-    //currentLevel->AddToMap(this);
+    }*/
 }
-Vec2 LevelEditor::PixelToTile(Point pos){
-    Vec2 ret = Vec2(floor((float)pos.x / TILE_SIZE), floor((float)pos.y / TILE_SIZE));
-    ret.x += originTile.x;
-    ret.y += originTile.y;
-    return ret;
-}
+//void LevelEditor::AddMapObject(MapObject* mapObject){
 
-void LevelEditor::AddMapObject(MapObject* mapObject){
-    mapObjects.push_back(mapObject);
-    this->addChild(mapObject->GetSprite());
-}
-
+//}
 void LevelEditor::menuCloseCallback(Ref* pSender){
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
 	MessageBox("You pressed the close button. Windows Store Apps do not implement a close button.","Alert");
     return;
 #endif
-    
     Director::getInstance()->end();
     
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
     exit(0);
 #endif
 }
-
 void LevelEditor::DisableSpawner(){
     if(currentSelection == spawnerSelectButton){
         spawnerSelectButton->setEnabled(false);
@@ -510,20 +379,9 @@ ResetToolPos();        currentTool = NO_TOOL;
 void LevelEditor::EnableSpawner(){
     spawnerSelectButton->setEnabled(true);
 }
-
 void LevelEditor::Erase(Vec2 tile){
-    Vec2 pixelPos = Vec2((tile.x - originTile.x + 0.5) * TILE_SIZE, (tile.y - originTile.y + 0.5) * TILE_SIZE);
-    for(int x = 0; x < mapObjects.size(); x++){
-        if(mapObjects[x]->GetSprite()->getBoundingBox().containsPoint(pixelPos)){
-            if(mapObjects[x]->GetType() == SPAWNER)
-                EnableSpawner();
-            this->removeChild(mapObjects[x]->GetSprite());
-            mapObjects.erase(mapObjects.begin() + x);
-            break;
-        }
-    }
-}
 
+}
 void LevelEditor::SetToolPos(){
     if(currentSelection!= NULL){
     auto setAction = MoveTo::create(0.1, Point(currentSelection->getPosition().x + 20, currentSelection->getPosition().y));
@@ -587,9 +445,9 @@ void LevelEditor::ResetToolPos(){
     }
 }
 void LevelEditor::Export(){
-    currentLevel->SetName(name);
+    /*currentLevel->SetName(name);
     for(int x = 0; x < mapObjects.size(); x++){
         currentLevel->AddEntity(mapObjects[x]);
     }
-    currentLevel->Save();
+    currentLevel->Save();*/
 }
