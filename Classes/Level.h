@@ -22,9 +22,8 @@ public:
 
     Level();
     
-    void AddEntity(MapObject*);
+    void AddEntity(Entity*);
     void Add(Game* game);
-    void AddToMap(Layer* game);
     void Remove(Game* game);
 
     void SetName(std::string);
@@ -35,7 +34,6 @@ public:
     std::string GetPath();
     std::string GetAuthor();
     ValueMap getValueMap();
-    std::vector<MapObject*> GetMapObjects();
     std::vector<Entity*> ents;
     void Save();
     void makePublic();
@@ -45,11 +43,12 @@ public:
     bool GetIsFavorited();
     Vec2 GetLaunchVelocity();
     Vec2 GetLaunchPosition();
+    std::vector<Entity*> GetEntities();
 private:
     void CreateFromMapValues();
     bool hasMapObjects;
     void AddMapObject(MapObject*);
-    void AddMapValue(Entity*, Vec2,Vec2);
+    void AddMapValue(Entity*);
     void SetMap(ValueMap);
     ValueMap map;
     std::string path;

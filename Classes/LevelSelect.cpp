@@ -391,26 +391,28 @@ void LevelSelect::doneFetching(Node* sender, Value data){
     }
 };
 void LevelSelect::SetPreview(){
-    if(currentLevelSet == LEVELS_CUSTOM && selectedLevel->GetStatus().compare("Private") == 0){
-        uploadButton->setVisible(true);
-        uploadButton->setEnabled(true);
-        highscoresButton->setVisible(false);
-        highscoresButton->setEnabled(false);
+    if(selectedLevel != nullptr){
+        if(currentLevelSet == LEVELS_CUSTOM && selectedLevel->GetStatus().compare("Private") == 0){
+            uploadButton->setVisible(true);
+            uploadButton->setEnabled(true);
+            highscoresButton->setVisible(false);
+            highscoresButton->setEnabled(false);
+        }
+        if(currentLevelSet == LEVELS_CUSTOM && selectedLevel->GetStatus().compare("Public") == 0){
+            uploadButton->setVisible(false);
+            uploadButton->setEnabled(false);
+            highscoresButton->setVisible(true);
+            highscoresButton->setEnabled(true);
+        }
+        if(currentLevelSet != LEVELS_CUSTOM){
+            highscoresButton->setVisible(true);
+            highscoresButton->setEnabled(true);
+        }
+        previewTitle->setVisible(true);
+        previewAuthor->setVisible(true);
+        previewTitle->setString(selectedLevel->GetName());
+        previewAuthor->setString(selectedLevel->GetAuthor());
     }
-    if(currentLevelSet == LEVELS_CUSTOM && selectedLevel->GetStatus().compare("Public") == 0){
-        uploadButton->setVisible(false);
-        uploadButton->setEnabled(false);
-        highscoresButton->setVisible(true);
-        highscoresButton->setEnabled(true);
-    }
-    if(currentLevelSet != LEVELS_CUSTOM){
-        highscoresButton->setVisible(true);
-        highscoresButton->setEnabled(true);
-    }
-    previewTitle->setVisible(true);
-    previewAuthor->setVisible(true);
-    previewTitle->setString(selectedLevel->GetName());
-    previewAuthor->setString(selectedLevel->GetAuthor());
 }
 void LevelSelect::menuCloseCallback(Ref* pSender){
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)

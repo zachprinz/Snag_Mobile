@@ -11,6 +11,7 @@
 #include "Level.h"
 #include "Game.h"
 #include "LevelSelect.h"
+#include "Map.h"
 
 USING_NS_CC;
 
@@ -35,7 +36,7 @@ bool LevelEditor::init(){
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     noticeUp = false;
 
-    preview = new Preview(Rect(0,0,visibleSize.width,visibleSize.height), this, 1.0);
+    preview = new Preview(Rect(0,0,visibleSize.width,visibleSize.height), this, 0.33);
     currentSprite = new Scale9Sprite();
     currentSprite->initWithFile("Sliced.png", Rect(0, 0, 60, 60));
     currentSprite->setContentSize(Size(100, 100));
@@ -123,7 +124,6 @@ void LevelEditor::editBoxEditingDidBegin(EditBox *editBox) {
 void LevelEditor::editBoxEditingDidEnd(EditBox *editBox) {
 }
 void LevelEditor::editBoxTextChanged(EditBox *editBox, std::string &text) {
-    
 }
 void LevelEditor::editBoxReturn(EditBox *editBox) {
 }
@@ -216,12 +216,14 @@ void LevelEditor::homeButtonCallback(Ref* ref){
 }
 void LevelEditor::saveButtonCallback(Ref* ref){
     bool hasSpawner = false;
-    //for(int x = 0; x < mapObjects.size(); x++){
-        //if(mapObjects[x]->GetType() == SPAWNER){
-        //   hasSpawner = true;
-         //   break;
-        //}
-    //}
+    for (std::map<int,Entity*>::iterator it=entities.begin(); it!=entities.end(); ++it){
+        int entID = ((Entity*)it->second)->ID;
+        int type = ((Entity*)it->second)->GetType();
+        if(type == SPAWNER){
+            hasSpawner = true;
+            break;
+        }
+    }
     if(!hasSpawner){
         if(!noticeUp){
             notice->setVisible(true);
@@ -282,13 +284,15 @@ void LevelEditor::trashButtonCallback(Ref* ref){
     Clear();
 }
 void LevelEditor::Clear(){
-    /*for(int x = 0; x < mapObjects.size(); x++){
-        this->removeChild(mapObjects[x]->GetSprite());
+    if(entities.size() > 0){
+        for (std::map<int,Entity*>::iterator it=entities.begin(); it!=entities.end(); ++it){
+            int entID = it->first;
+            entities.erase(entID);
+            preview->RemoveEntity(entID);
+        }
     }
-    mapObjects.clear();
-    originTile = Vec2(0,0);
-    MapObject::origin = originTile;
-    EnableSpawner();*/
+    preview->Reset();
+    EnableSpawner();
 }
 bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
     if(noticeUp){
@@ -299,9 +303,15 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
     else{
         if(!saveDialog){
             touchStart = touch->getLocation();
-            currentSprite->setPosition(touchStart);
-            currentSprite->setContentSize(Size(1,1));
-            currentSprite->setVisible(true);
+            if(currentTool == HOOK || currentTool == SPAWNER){
+                Entity* tempEnt = (preview->CreateEntity(touchStart, touchStart, currentTool));
+                entities[tempEnt->ID] = tempEnt;
+                preview->AddEntity(tempEnt);
+            } else {
+                currentSprite->setPosition(touchStart);
+                currentSprite->setContentSize(Size(1,1));
+                currentSprite->setVisible(true);
+            }
             return true;
         }
         return false;
@@ -319,12 +329,6 @@ void LevelEditor::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
                 preview->AddEntity(tempEnt);
                 currentSprite->setVisible(false);
             }
-
-        } else {
-            Entity* tempEnt = (preview->CreateEntity(touchStart, touchCurrent, currentTool));
-            entities[tempEnt->ID] = tempEnt;
-            preview->AddEntity(tempEnt);
-            currentSprite->setVisible(false);
         }
     }
 }
@@ -348,16 +352,14 @@ void LevelEditor::onTouchMoved(Touch* touch, Event* event){
     }*/
 }
 void LevelEditor::SetLevel(Level* lvl){
-    /*currentLevel = lvl;
     Clear();
-    mapObjects = lvl->GetMapObjects();
-    for(int x = 0; x < mapObjects.size(); x++){
-        this->addChild(mapObjects[x]->GetSprite());
-    }*/
+    currentLevel = lvl;
+    std::vector<Entity*> tempEnts = lvl->GetEntities();
+    for(int x = 0; x < tempEnts.size(); x++){
+        entities[tempEnts[x]->ID] = tempEnts[x];
+        preview->AddEntity(tempEnts[x]);
+    }
 }
-//void LevelEditor::AddMapObject(MapObject* mapObject){
-
-//}
 void LevelEditor::menuCloseCallback(Ref* pSender){
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
 	MessageBox("You pressed the close button. Windows Store Apps do not implement a close button.","Alert");
@@ -372,7 +374,8 @@ void LevelEditor::menuCloseCallback(Ref* pSender){
 void LevelEditor::DisableSpawner(){
     if(currentSelection == spawnerSelectButton){
         spawnerSelectButton->setEnabled(false);
-ResetToolPos();        currentTool = NO_TOOL;
+        ResetToolPos();
+        currentTool = NO_TOOL;
         currentSelection = NULL;
     }
 }
@@ -445,9 +448,10 @@ void LevelEditor::ResetToolPos(){
     }
 }
 void LevelEditor::Export(){
-    /*currentLevel->SetName(name);
-    for(int x = 0; x < mapObjects.size(); x++){
-        currentLevel->AddEntity(mapObjects[x]);
+    currentLevel->SetName(name);
+    for (std::map<int,Entity*>::iterator it=entities.begin(); it!=entities.end(); ++it){
+        int entID = ((Entity*)it->second)->ID;
+        currentLevel->AddEntity(entities[entID]);
     }
-    currentLevel->Save();*/
+    currentLevel->Save();
 }

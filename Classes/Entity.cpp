@@ -20,15 +20,15 @@ USING_NS_CC;
 #define USER 5
 
 Entity* Entity::createWall(Vec2 pos, Vec2 size){
-    Entity* ent = new Entity(Vec2(pos.x + (size.x/2.0), pos.y - (size.y/2.0)), size, Vec2(0,0), WALL);
+    Entity* ent = new Entity(pos,size,Vec2(0,0),WALL);//Vec2(pos.x + (size.x/2.0), pos.y - (size.y/2.0)), size, Vec2(0,0), WALL);
     return ent;
 }
 Entity* Entity::createSpikeWall(Vec2 pos, Vec2 size){
-    Entity* ent = new Entity(Vec2(pos.x + size.x/2.0, pos.y - size.y/2.0), size, Vec2(0,0), SPIKE_WALL);
+    Entity* ent = new Entity(pos,size,Vec2(0,0),SPIKE_WALL);//Vec2(pos.x + size.x/2.0, pos.y - size.y/2.0), size, Vec2(0,0), SPIKE_WALL);
     return ent;
 }
 Entity* Entity::createGoal(Vec2 pos, Vec2 size){
-    Entity* ent = new Entity(Vec2(pos.x + size.x/2.0, pos.y - size.y/2.0), size, Vec2(0,0), GOAL);
+    Entity* ent = new Entity(pos,size,Vec2(0,0),GOAL);//Vec2(pos.x + size.x/2.0, pos.y - size.y/2.0), size, Vec2(0,0), GOAL);
     return ent;
 }
 Entity* Entity::createHook(Vec2 pos){
@@ -48,13 +48,15 @@ Entity::Entity(Vec2 pos, Vec2 size, Vec2 vel, int type){
     this->baseScale = Vec2(baseScales[type],baseScales[type]);
     this->type = type;
     this->size = size;
-    this->position = pos;
+    this->position = Vec2(pos.x, pos.y);
     sprite = Sprite::create(textures[type]);
+    sprite->setAnchorPoint(Vec2(0.5,0.5));
     sprite->retain();
     if(size.x != 0 && size.y != 0){
         baseScale.x = size.x / sprite->getBoundingBox().size.width;
         baseScale.y = size.y / sprite->getBoundingBox().size.height;
     }
+    this->launchVelocity = Vec2(600,600);
     sprite->setScale(baseScale.x, baseScale.y);
     if(type != USER)
         this->SetUpPhysicsSprite(textures[type], baseScale);

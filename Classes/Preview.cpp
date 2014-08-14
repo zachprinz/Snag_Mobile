@@ -15,6 +15,7 @@ Preview::Preview(Rect viewport, Layer* layer, float scale){
     screenViewSize = viewport.size;
     mapViewOrigin = Vec2(0,0);
     mapViewScale = scale;
+    originalMapViewScale = scale;
     mapViewSize = Vec2(screenViewSize.x/mapViewScale, screenViewSize.y/mapViewScale);
 };
 void Preview::Update(){
@@ -26,7 +27,7 @@ void Preview::AddEntity(Entity* ent){
     entities[ent->ID] = ent;
     sprites[ent->ID] = Sprite::create(textures[ent->GetType()]);
     sprites[ent->ID]->setPosition(MapToScreen(ent->GetPosition()));
-    sprites[ent->ID]->setAnchorPoint(Vec2(0,0));
+    sprites[ent->ID]->setAnchorPoint(Vec2(0.5,0.5));
     if(ent->GetType() != SPAWNER && ent->GetType() != HOOK)
         sprites[ent->ID]->setScale((ent->GetSize().x * mapViewScale)/sprites[ent->ID]->getBoundingBox().size.width, (ent->GetSize().y * mapViewScale) / sprites[ent->ID]->getBoundingBox().size.height);
     else
@@ -65,7 +66,11 @@ void Preview::SetZoom(float newScale){
 void Preview::SetDrag(float){
 
 };
-Entity* Preview::CreateEntity(Vec2 startTouch, Vec2 endTouch, int type){
+Entity* Preview::CreateEntity(Vec2 startTouch2, Vec2 endTouch2, int type){
+    Vec2 startTouch = ScreenToMap(startTouch2);
+    printf("\nScreen Start: (%f, %f)    Map Start: (%f, %f)", startTouch2.x,startTouch2.y,startTouch.x,startTouch.y);
+    Vec2 endTouch = ScreenToMap(endTouch2);
+    printf("\nScreen End:   (%f, %f)    Map End:   (%f, %f)", endTouch2.x, endTouch2.y, endTouch.x,endTouch.y);
     Vec2 minCoord;
     Vec2 maxCoord;
     if(startTouch.x > endTouch.x){
@@ -84,6 +89,7 @@ Entity* Preview::CreateEntity(Vec2 startTouch, Vec2 endTouch, int type){
     }
     Vec2 size(maxCoord.x - minCoord.x, maxCoord.y - minCoord.y);
     Vec2 pos = minCoord;
+    pos = Vec2(pos.x + (size.x / 2.0), pos.y + (size.y / 2.0));
     Entity* ent;
     switch(type){
         case WALL:
@@ -103,10 +109,9 @@ Entity* Preview::GetTarget(Vec2 touch){
 
 };
 Vec2 Preview::ScreenToMap(Vec2 pos){
-    Vec2 posPastScreenOrigin(pos.x - screenViewOrigin.x, pos.y - screenViewOrigin.y);
-    Vec2 viewPercent(posPastScreenOrigin.x / screenViewSize.x, posPastScreenOrigin.y / screenViewSize.y);
-    Vec2 mapPosWithoutOrigin(viewPercent.x/mapViewScale, viewPercent.y/mapViewScale);
-    Vec2 mapPos(mapPosWithoutOrigin.x + mapViewOrigin.x, mapPosWithoutOrigin.y + mapViewOrigin.y);
+    Vec2 posOnViewport(pos.x - screenViewOrigin.x, pos.y - screenViewOrigin.y);
+    Vec2 posMapWithoutOrigin(posOnViewport.x / mapViewScale, posOnViewport.y / mapViewScale);
+    Vec2 mapPos(posMapWithoutOrigin.x + mapViewOrigin.x, posMapWithoutOrigin.y + mapViewOrigin.y);
     return mapPos;
 }
 Vec2 Preview::MapToScreen(Vec2 pos){
@@ -114,4 +119,8 @@ Vec2 Preview::MapToScreen(Vec2 pos){
     Vec2 viewPercent(mapPosWithoutOrigin.x*mapViewScale, mapPosWithoutOrigin.y*mapViewScale);
     Vec2 screenPos(viewPercent.x + screenViewOrigin.x, viewPercent.y + screenViewOrigin.y);
     return screenPos;
+}
+void Preview::Reset(){
+    mapViewOrigin = Vec2(0,0);
+    mapViewScale = originalMapViewScale;
 }

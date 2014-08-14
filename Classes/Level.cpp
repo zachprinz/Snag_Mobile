@@ -22,36 +22,13 @@ Level* Level::createWithValueMap(ValueMap map){
 Level::Level(){
     entCount = 0;
 }
-void Level::AddEntity(MapObject* e){
-    mapObjects.push_back(e);
-    Entity* ent;
-    Vec2 pos = e->GetStart();
-    Vec2 size(0,0);
-    Vec2 vel(0,0);
-    if(e->GetType() == WALL || e->GetType() == SPIKE_WALL || e->GetType() == GOAL)
-        size = e->GetSize();
-    if(e->GetType() == SPAWNER){
-        vel.set(100,600);
-        launchVelocity = Vec2(100,600);
-        launchPosition = pos;
-    }
-    switch(e->GetType()){
-        case WALL:
-            ent = Entity::createWall(pos,size);
-            break;
-        case SPIKE_WALL:
-            ent = Entity::createSpikeWall(pos,size);
-            break;
-        case GOAL:
-            ent = Entity::createGoal(pos,size);
-        default:
-            ent = new Entity(pos, size, vel, e->GetType());
-    }
-    
-    ents.push_back(ent);
-    AddMapValue(ent, pos, size);
+void Level::AddEntity(Entity* e){
+    ents.push_back(e);
+    AddMapValue(e);
 }
-void Level::AddMapValue(Entity* ent, Vec2 pos, Vec2 size){
+void Level::AddMapValue(Entity* ent){
+    Vec2 pos = ent->GetPosition();
+    Vec2 size = ent->GetSize();
     std::string pre = "entity" + std::to_string(ents.size());
     map[pre + "type"] = std::to_string(ent->GetType());
     map[pre + "x"] = std::to_string(pos.x);
@@ -88,17 +65,20 @@ void Level::CreateFromMapValues(){
         size.y = std::atof(entities.at(z+4).asString().c_str());
         velocity.x = std::atof(entities.at(z+5).asString().c_str());
         velocity.y = std::atof(entities.at(z+6).asString().c_str());
-        printf("\nType: %i\nPos: (%f, %f)\nSize: (%f, %f)\nVelocity: (%f, %f)\n", type, pos.x, pos.y, size.x, size.y, velocity.x, velocity.y);
-        AddEntity(MapObject::CreateWithPosAndSize(pos,size,type));
+        if(type == SPAWNER){
+            launchPosition = pos;
+            launchVelocity = velocity;
+        }
+        //printf("\nType: %i\nPos: (%f, %f)\nSize: (%f, %f)\nVelocity: (%f, %f)\n", type, pos.x, pos.y, size.x, size.y, velocity.x, velocity.y);
+        AddEntity(new Entity(pos,size,Vec2(0,0),type));
     }
     hasMapObjects = true;
 }
- 
-std::vector<MapObject*> Level::GetMapObjects(){
+std::vector<Entity*> Level::GetEntities(){
     if(hasMapObjects)
-        return mapObjects;
+        return ents;
     CreateFromMapValues();
-    return mapObjects;
+    return ents;
 }
 void Level::Save(){
     map["name"] = name;
@@ -106,20 +86,15 @@ void Level::Save(){
     sendMessageWithParams("saveLevel", parameters);
 }
 void Level::Add(Game* game){
-    GetMapObjects();
+    GetEntities();
     for(int x = 0; x < ents.size(); x++){
         ents[x]->Add(game);
     }
 }
 void Level::Remove(Game* game){
-    GetMapObjects();
+    GetEntities();
     for(int x = 0; x < ents.size(); x++){
         ents[x]->Remove(game);
-    }
-}
-void Level::AddToMap(Layer* game){
-    for(int x = 0; x < ents.size(); x++){
-        mapObjects[x]->Add(game);
     }
 }
 void Level::makePublic(){

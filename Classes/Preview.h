@@ -35,6 +35,7 @@ public:
     Vec2 ScreenToMap(Vec2);
     Vec2 MapToScreen(Vec2);
     void Update();
+    void Reset();
 private:
     std::map<int,Entity*> entities;
     std::map<int,Sprite*> sprites;
@@ -45,6 +46,7 @@ private:
     Vec2 mapViewSize;
     float mapViewScale;
     Layer* layer;
+    float originalMapViewScale;
 };
 
 #endif /* defined(__Snag__Preview__) */
