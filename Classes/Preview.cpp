@@ -15,11 +15,22 @@ Preview::Preview(Rect viewport, Layer* layer, float scale){
     screenViewSize = viewport.size;
     mapViewOrigin = Vec2(0,0);
     mapViewScale = scale;
+    mapViewScaleOriginal = scale;
     originalMapViewScale = scale;
-    mapViewSize = Vec2(screenViewSize.x/mapViewScale, screenViewSize.y/mapViewScale);
 };
 void Preview::Update(){
-    
+    for (std::map<int,Entity*>::iterator it=entities.begin(); it!=entities.end(); ++it){
+        int entID = ((Entity*)it->second)->ID;
+        UpdateSprite(entID);
+    }
+}
+void Preview::UpdateSprite(int ID){
+    float baseScales[6] = {1,1,1.5,1,1,0.5};
+    sprites[ID]->setPosition(MapToScreen(entities[ID]->GetPosition()));
+    if(entities[ID]->GetType() != SPAWNER && entities[ID]->GetType() != HOOK)
+        sprites[ID]->setScale((entities[ID]->GetSize().x * mapViewScale)/entities[ID]->GetOriginalSize().x, (entities[ID]->GetSize().y * mapViewScale) / entities[ID]->GetOriginalSize().y);
+    else
+        sprites[ID]->setScale(baseScales[entities[ID]->GetType()] * mapViewScale,baseScales[entities[ID]->GetType()] * mapViewScale);
 }
 void Preview::AddEntity(Entity* ent){
     std::string textures[6] = {"wall.png", "spikewall.png", "hook.png", "spawner.png", "goal.png", "user.png"};
@@ -59,12 +70,38 @@ Entity* Preview::PopEntity(int entID){
     return returnEnt;
 };
 void Preview::SetZoom(float newScale){
-    mapViewScale = newScale;
-    mapViewSize = Vec2(screenViewSize.x/mapViewScale, screenViewSize.y/mapViewScale);
+    if(newScale < 0.5)
+        newScale = 0.5;
+    if(newScale > 2.0)
+        newScale = 2.0;
+    mapViewScale = mapViewScaleOriginal * newScale;
+    printf("\nUpdating for Zoom");
     Update();
 };
-void Preview::SetDrag(float){
-
+void Preview::onTouchesBegan(std::vector<Touch*> touches){
+    Vec2 touchOne = touches[0]->getLocation();
+    Vec2 touchTwo = touches[1]->getLocation();
+    originalMultitouchDistance = touchOne.getDistance(touchTwo);
+};
+void Preview::onTouchesMoved(std::vector<Touch*> touches){
+    if(originalMultitouchDistance == 0){
+        onTouchesBegan(touches);
+    } else {
+        Vec2 touchOne = touches[0]->getLocation();
+        Vec2 touchTwo = touches[1]->getLocation();
+        currentMultitouchDistance = touchOne.getDistance(touchTwo);
+        float ratio = currentMultitouchDistance / originalMultitouchDistance;
+        SetZoom(ratio);
+    }
+};
+void Preview::onTouchesEnded(std::vector<Touch*> touches){
+   mapViewScaleOriginal = mapViewScale;
+    originalMultitouchDistance = 0;
+}
+void Preview::Drag(Vec2 difference){
+    mapViewOrigin += Vec2(difference.x/mapViewScale, difference.y/mapViewScale);
+    printf("\nUpdating for Drag");
+    Update();
 };
 Entity* Preview::CreateEntity(Vec2 startTouch2, Vec2 endTouch2, int type){
     Vec2 startTouch = ScreenToMap(startTouch2);
@@ -119,6 +156,9 @@ Vec2 Preview::MapToScreen(Vec2 pos){
     Vec2 viewPercent(mapPosWithoutOrigin.x*mapViewScale, mapPosWithoutOrigin.y*mapViewScale);
     Vec2 screenPos(viewPercent.x + screenViewOrigin.x, viewPercent.y + screenViewOrigin.y);
     return screenPos;
+}
+float Preview::GetScale(){
+    return mapViewScale;
 }
 void Preview::Reset(){
     mapViewOrigin = Vec2(0,0);

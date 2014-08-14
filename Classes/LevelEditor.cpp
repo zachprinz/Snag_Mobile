@@ -45,11 +45,12 @@ bool LevelEditor::init(){
     currentSprite->setVisible(false);
     currentSprite->setAnchorPoint(Vec2(0,0));
     
-    auto listener = EventListenerTouchOneByOne::create();
-    listener->setSwallowTouches(true);
-    listener->onTouchBegan = CC_CALLBACK_2(LevelEditor::onTouchBegan, this);
-    listener->onTouchEnded = CC_CALLBACK_2(LevelEditor::onTouchEnded, this);
-    listener->onTouchMoved = CC_CALLBACK_2(LevelEditor::onTouchMoved, this);
+    auto listener = EventListenerTouchAllAtOnce::create();
+    //listener->setSwallowTouches(true);
+    listener->onTouchesBegan = CC_CALLBACK_2(LevelEditor::onTouchesBegan, this);
+    listener->onTouchesMoved = CC_CALLBACK_2(LevelEditor::onTouchesMoved, this);
+    listener->onTouchesEnded = CC_CALLBACK_2(LevelEditor::onTouchesEnded, this);
+    
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener,this);
     
     cocos2d::Vector<MenuItem*> menuItems;
@@ -99,11 +100,6 @@ bool LevelEditor::init(){
     selectedLabel->setGlobalZOrder(0);
     selectedLabel->setPosition(0.5 * visibleSize.width, selectedLabel->getPosition().y);
     selectedLabel->setAnchorPoint(Vec2(0.5,1.0));
-    
-    notice = Label::createWithBMFont("dimbo.fnt", "Please add at least one spawner to your level!", TextHAlignment::CENTER);
-    notice->setScale(0.45);
-    notice->setVisible(false);
-    this->addChild(notice);
         
     menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0.0,0.0));
@@ -113,9 +109,17 @@ bool LevelEditor::init(){
     
     savePopUp = new PopUp("Save", "Please name your level.", this, menu_selector(LevelEditor::saveAcceptCallback), menu_selector(LevelEditor::saveDeclineCallback),true);
     savePopUp->Add(this);
+    
+    spawnerPopUp = new PopUp("Error", "Please add at least one\nspawner to your map.", this, menu_selector(LevelEditor::closePopUpCallback));
+    spawnerPopUp->Add(this);
+    
+    hookPopUp = new PopUp("Error", "Please add at least one\nhook to your map.", this, menu_selector(LevelEditor::closePopUpCallback));
+    hookPopUp->Add(this);
+    
     this->addChild(currentSprite);
     
     currentSelection = NULL;
+    currentTool = NO_TOOL;
     
     return true;
 }
@@ -126,6 +130,10 @@ void LevelEditor::editBoxEditingDidEnd(EditBox *editBox) {
 void LevelEditor::editBoxTextChanged(EditBox *editBox, std::string &text) {
 }
 void LevelEditor::editBoxReturn(EditBox *editBox) {
+}
+void LevelEditor::closePopUpCallback(Ref*){
+    spawnerPopUp->Close();
+    hookPopUp->Close();
 }
 void LevelEditor::SpikeWallSelectCallback(Ref*){
     if(currentSelection != spikeWallSelectButton){
@@ -216,22 +224,19 @@ void LevelEditor::homeButtonCallback(Ref* ref){
 }
 void LevelEditor::saveButtonCallback(Ref* ref){
     bool hasSpawner = false;
+    bool hasHook = false;
     for (std::map<int,Entity*>::iterator it=entities.begin(); it!=entities.end(); ++it){
-        int entID = ((Entity*)it->second)->ID;
         int type = ((Entity*)it->second)->GetType();
-        if(type == SPAWNER){
+        if(type == SPAWNER)
             hasSpawner = true;
-            break;
-        }
+        if(type == HOOK)
+            hasHook = true;
     }
-    if(!hasSpawner){
-        if(!noticeUp){
-            notice->setVisible(true);
-            notice->setPosition(Point(notice->getPosition().x, notice->getPosition().y + 1000));
-            noticeUp = true;
-        }
-    }
-    else{
+    if(!hasSpawner)
+        spawnerPopUp->Show();
+    if(!hasHook)
+        hookPopUp->Show();
+    if(hasHook && hasSpawner){
         savePopUp->Show();
         saveDialog = true;
     }
@@ -284,12 +289,17 @@ void LevelEditor::trashButtonCallback(Ref* ref){
     Clear();
 }
 void LevelEditor::Clear(){
+    std::vector<int> ids;
     if(entities.size() > 0){
         for (std::map<int,Entity*>::iterator it=entities.begin(); it!=entities.end(); ++it){
             int entID = it->first;
-            entities.erase(entID);
-            preview->RemoveEntity(entID);
+            ids.push_back(entID);
         }
+    }
+    for(int x = 0; x < ids.size(); x++){
+        int entID = ids[x];
+        entities.erase(entID);
+        preview->RemoveEntity(entID);
     }
     preview->Reset();
     EnableSpawner();
@@ -308,9 +318,13 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
                 entities[tempEnt->ID] = tempEnt;
                 preview->AddEntity(tempEnt);
             } else {
-                currentSprite->setPosition(touchStart);
-                currentSprite->setContentSize(Size(1,1));
-                currentSprite->setVisible(true);
+                if(currentTool == NO_TOOL){
+                    
+                } else {
+                    currentSprite->setPosition(touchStart);
+                    currentSprite->setContentSize(Size(1,1));
+                    currentSprite->setVisible(true);
+                }
             }
             return true;
         }
@@ -321,10 +335,21 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
 void LevelEditor::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
     if(currentTool != ERASE && currentTool != NO_TOOL){
         if(currentTool != SPAWNER && currentTool != HOOK){
-            if(currentSprite->getContentSize().width < (TILE_SIZE) || currentSprite->getContentSize().height < (TILE_SIZE)){
+            if(std::abs(currentSprite->getContentSize().width) < (0.5 * TILE_SIZE * (1.0/preview->GetScale())) || std::abs(currentSprite->getContentSize().height) < (0.5 * (TILE_SIZE*(1.0/preview->GetScale())))){
                 currentSprite->setVisible(false);
             } else{
-                Entity* tempEnt = (preview->CreateEntity(touchStart, touchCurrent, currentTool));
+                Rect bb = currentSprite->getBoundingBox();
+                Vec2 minPoint(bb.getMinX(), bb.getMinY());
+                Vec2 maxPoint(bb.getMaxX(), bb.getMaxY());
+                if(touchStart.x > touchCurrent.x){
+                    maxPoint = Vec2(maxPoint.x + 20, maxPoint.y);
+                    minPoint = Vec2(minPoint.x - 20, minPoint.y);
+                }
+                if(touchStart.y > touchCurrent.y){
+                    maxPoint = Vec2(maxPoint.x, maxPoint.y + 20);
+                    minPoint = Vec2(minPoint.x, minPoint.y - 20);
+                }
+                Entity* tempEnt = (preview->CreateEntity(minPoint , maxPoint, currentTool));
                 entities[tempEnt->ID] = tempEnt;
                 preview->AddEntity(tempEnt);
                 currentSprite->setVisible(false);
@@ -338,19 +363,62 @@ void LevelEditor::onTouchMoved(Touch* touch, Event* event){
         if(currentSprite != NULL)
             currentSprite->setContentSize(Size(touchCurrent.x - touchStart.x, touchCurrent.y - touchStart.y));
     }
-    /*if(currentTool == NO_TOOL){
-        touchCurrent = PixelToTile(touch->getLocation());
-        originTile = Vec2(originTile.x + (touchCurrent.x - touchStart.x), originTile.y + (touchCurrent.y - touchStart.y));
-        touchCurrent = PixelToTile(touch->getLocation());
-        for(int x = 0; x < mapObjects.size(); x++){
-            mapObjects[x]->SetOriginTile(originTile);
-        }
-        printf("OriginTile: (%f, %f)\n", originTile.x, originTile.y);
-        printf("StartTile: (%f,%f)\n",touchStart.x, touchStart.y);
-        printf("EndTile: (%f,%f)\n",touchCurrent.x, touchCurrent.y);
-        touchStart = touchCurrent;
-    }*/
+    if(currentTool == NO_TOOL){
+        Vec2 oldTouch = touchStart;
+        touchCurrent = touch->getLocation();
+        touchStart  = touchCurrent;
+        preview->Drag(touchCurrent - oldTouch);
+    }
 }
+void LevelEditor::onTouchesBegan(const std::vector<cocos2d::Touch*> &touches, cocos2d::Event* event){
+    for(int x = 0; x < touches.size(); x++){
+        currentTouches.push_back(touches[x]);
+    }
+    if(currentTouches.size() > 2){
+        std::vector<Touch*> tempTouches;
+        for(int x = 0; x < currentTouches.size() && x < 2; x++){
+            tempTouches.push_back(currentTouches[x]);
+        }
+        currentTouches.clear();
+        currentTouches = tempTouches;
+    }
+    if(currentTouches.size() == 1){
+        onTouchBegan(currentTouches[0], event);
+    }
+};
+void LevelEditor::onTouchesMoved(const std::vector<cocos2d::Touch*> &touches, cocos2d::Event* event){
+    for(int x = 0; x < currentTouches.size(); x++){
+        for(int y = 0; y < touches.size(); y++){
+            if(currentTouches[x]->getID() == touches[y]->getID()){
+                currentTouches[x] = touches[y];
+                break;
+            }
+        }
+    }
+    if(currentTouches.size() == 1)
+        onTouchMoved(currentTouches[0], event);
+    if(currentTouches.size() == 2 && currentTool == NO_TOOL)
+        preview->onTouchesMoved(currentTouches);
+};
+void LevelEditor::onTouchesEnded(const std::vector<cocos2d::Touch*> &touches, cocos2d::Event* event){
+    if(currentTouches.size() >= 2){
+        preview->onTouchesEnded(currentTouches);
+        if(touches.size() >= currentTouches.size()){
+            currentTouches.clear();
+        } else {
+            if(touches[0]->getID() == currentTouches[0]->getID())
+                currentTouches.erase(currentTouches.begin());
+            else
+                currentTouches.erase(currentTouches.end()-1);
+            std::vector<Touch*> tempTouches = currentTouches;
+            currentTouches.clear();
+            onTouchesBegan(tempTouches, event);
+        }
+    } else {
+        currentTouches.clear();
+        onTouchEnded(touches[0],event);
+    }
+};
 void LevelEditor::SetLevel(Level* lvl){
     Clear();
     currentLevel = lvl;

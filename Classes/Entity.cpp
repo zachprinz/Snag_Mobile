@@ -50,6 +50,7 @@ Entity::Entity(Vec2 pos, Vec2 size, Vec2 vel, int type){
     this->size = size;
     this->position = Vec2(pos.x, pos.y);
     sprite = Sprite::create(textures[type]);
+    this->originalSize = Vec2(sprite->getBoundingBox().size.width, sprite->getBoundingBox().size.height);
     sprite->setAnchorPoint(Vec2(0.5,0.5));
     sprite->retain();
     if(size.x != 0 && size.y != 0){
@@ -120,4 +121,7 @@ int Entity::GetType(){
 }
 Vec2 Entity::GetSize(){
     return size;
+}
+Vec2 Entity::GetOriginalSize(){
+    return originalSize;
 }

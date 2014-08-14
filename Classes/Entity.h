@@ -47,6 +47,7 @@ public:
     Vec2 GetLaunchVelocity();
     Sprite* GetPhysicsSprite();
     int GetType();
+    Vec2 GetOriginalSize();
     int ID;
 protected:
     virtual void CalculateScale(Vec2 userPosition, float boardScale);
@@ -59,6 +60,7 @@ protected:
     DrawNode* boundsDebug;
     PhysicsBody* body;
     Sprite* physicsSprite;
+    Vec2 originalSize;
     int type;
 };
 

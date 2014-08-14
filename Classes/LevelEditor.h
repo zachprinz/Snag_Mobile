@@ -41,6 +41,9 @@ public:
     
     bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
     void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
+    void onTouchesBegan(const std::vector<cocos2d::Touch*> &touches, cocos2d::Event* event);
+    void onTouchesMoved(const std::vector<cocos2d::Touch*> &touches, cocos2d::Event* event);
+    void onTouchesEnded(const std::vector<cocos2d::Touch*> &touches, cocos2d::Event* event);
     void onTouchMoved(Touch* touch, Event* event);
     
     void SpikeWallSelectCallback(Ref*);
@@ -57,6 +60,7 @@ public:
     void saveAcceptCallback(Ref*);
     void saveDeclineCallback(Ref*);
     void GoalSelectCallback(Ref*);
+    void closePopUpCallback(Ref*);
     
     MenuItemImage* homeSelectButton;
     MenuItemImage* hookSelectButton;
@@ -109,7 +113,11 @@ public:
     void Clear();
     
     PopUp* savePopUp;
+    PopUp* spawnerPopUp;
+    PopUp* hookPopUp;
 private:
+    int numberOfTouches;
+    std::vector<Touch*> currentTouches;
     std::map<int,Entity*> entities;
     Preview* preview;
     Scale9Sprite* currentSprite;
