@@ -44,6 +44,7 @@ public:
     Vec2 GetLaunchVelocity();
     Vec2 GetLaunchPosition();
     std::vector<Entity*> GetEntities();
+    void Clear();
 private:
     void CreateFromMapValues();
     bool hasMapObjects;

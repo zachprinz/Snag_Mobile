@@ -19,32 +19,36 @@ PopUp::PopUp(std::string title, std::string text, Ref* ref, SEL_MenuHandler call
     shade->setScale(MainMenu::screenSize.x / shade->getBoundingBox().size.width, MainMenu::screenSize.y / shade->getBoundingBox().size.height);
     shade->setPosition(0,0);
     shade->setAnchorPoint(Vec2(0,0));
-    shade->setGlobalZOrder(4);
+    shade->setGlobalZOrder(6);
     menuItems.pushBack(shade);
     
     background = MainMenu::CreateButton("PUBackground.png", Vec2(0,0), Vec2(0,0));
-    background->setGlobalZOrder(5);
     background->setPosition(Vec2(MainMenu::screenSize.x / 2.0, MainMenu::screenSize.y / 2.0));
     background->setAnchorPoint(Vec2(0.5,0.5));
+    background->setGlobalZOrder(7);
     menuItems.pushBack(background);
     
     acceptButton = MainMenu::CreateButton("PUAccept.png", ref, callback, Vec2(0,0), Vec2(0,0));
     acceptButton->setPosition(background->getBoundingBox().getMidX() + (MainMenu::screenSize.x * 0.03), background->getBoundingBox().getMinY() + (MainMenu::screenSize.y * 0.04));
     acceptButton->setAnchorPoint(Vec2(0,0));
+    acceptButton->setGlobalZOrder(8);
     menuItems.pushBack(acceptButton);
     
     declineButton = MainMenu::CreateButton("PUDecline.png", ref, callback2, Vec2(0,0), Vec2(0,0));
     declineButton->setPosition(background->getBoundingBox().getMidX() - (MainMenu::screenSize.x * 0.03), background->getBoundingBox().getMinY() + (MainMenu::screenSize.y * 0.04));
     declineButton->setAnchorPoint(Vec2(1,0));
+    declineButton->setGlobalZOrder(8);
     menuItems.pushBack(declineButton);
     
     name = MainMenu::CreateLabel(title, Vec2(0,0), Vec2(0,0));
     name->setPosition(background->getBoundingBox().getMidX(), background->getBoundingBox().getMaxY() - (MainMenu::screenSize.y * 0.01));
+    name->setGlobalZOrder(8);
     name->setAnchorPoint(Vec2(0.5,1));
     
     this->text = MainMenu::CreateLabel(text, Vec2(0,0), Vec2(0,0));
     this->text->setPosition(background->getBoundingBox().getMidX(), background->getBoundingBox().getMidY());
     this->text->setAnchorPoint(Vec2(0.5,0.5));
+    this->text->setGlobalZOrder(8);
     nameBox = nullptr;
     
     menu = Menu::createWithArray(menuItems);
@@ -123,15 +127,17 @@ PopUp::PopUp(std::string title, std::string text, Ref* ref, SEL_MenuHandler call
     background->setGlobalZOrder(5);
     background->setPosition(Vec2(MainMenu::screenSize.x / 2.0, MainMenu::screenSize.y / 2.0));
     background->setAnchorPoint(Vec2(0.5,0.5));
+    background->setGlobalZOrder(3);
     menuItems.pushBack(background);
     
     acceptButton = MainMenu::CreateButton("PUAccept.png", ref, callback, Vec2(0,0), Vec2(0,0));
     acceptButton->setPosition(background->getBoundingBox().getMidX(), background->getBoundingBox().getMinY() + (MainMenu::screenSize.y * 0.1));
     acceptButton->setAnchorPoint(Vec2(0.5,0));
+    acceptButton->setGlobalZOrder(3);
     menuItems.pushBack(acceptButton);
     
     this->text = MainMenu::CreateLabel(text, Vec2(0,0), Vec2(0,0));
-    this->text->setPosition(background->getBoundingBox().getMidX(), background->getBoundingBox().getMidY() - (0.05 * MainMenu::screenSize.y));
+    this->text->setPosition(background->getBoundingBox().getMidX(), background->getBoundingBox().getMidY() + (0.05 * MainMenu::screenSize.y));
     this->text->setAnchorPoint(Vec2(0.5,0.5));
     
     name = MainMenu::CreateLabel(title, Vec2(0,0), Vec2(0,0));
@@ -174,6 +180,14 @@ void PopUp::Add(Layer* layer){
     layer->addChild(text,1);
     if(nameBox != nullptr){
         layer->addChild(nameBox,1);
+    }
+}
+void PopUp::Remove(Layer* layer){
+    layer->removeChild(menu,1);
+    layer->removeChild(name,1);
+    layer->removeChild(text,1);
+    if(nameBox != nullptr){
+        layer->removeChild(nameBox);
     }
 }
 std::string PopUp::GetText(){

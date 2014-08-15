@@ -37,6 +37,7 @@ public:
     void Add(Layer*);
     std::string GetText();
     Menu* menu;
+    void Remove(Layer*);
 private:
 };
 

@@ -189,7 +189,7 @@
 {
     NSLog(@"\nNative Creating a new Level.\n");
     PFObject *level = [PFObject objectWithClassName:@"Level"];
-    level[@"name"] = @"new level";
+    level[@"name"] = @"qq36q81q";
     NSString* author = [PFUser currentUser].username;
     level[@"author"] = author;
     level[@"entcount"] = @"0";
@@ -198,13 +198,16 @@
     [level saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
         if (succeeded) {
             level[@"id"] = [level objectId];
-            [level saveInBackground];
-            NSLog(@"\nFinished Creating a new Level.\n");
+            [level saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                NSLog(@"\nFinished Creating a new Level.\n");
+                NSString *responce = @"responce";
+                NSDictionary *params = [[NSDictionary alloc] initWithObjectsAndKeys:responce, @"responce", nil];
+                [IOSNDKHelper sendMessage:@"newLevelResponce" withParameters:params];
+            }];
         } else {
             NSLog(@"%@", error);
         }
     }];
-
 }
 
 - (void)saveLevel:(NSObject *)parametersObject

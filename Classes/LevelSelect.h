@@ -71,6 +71,7 @@ public:
     int page;
     PopUp* deletePopUp;
 private:
+    bool goToEdit;
     void showLoading();
     void goToLevelEditor();
     void SetPreview();
@@ -95,6 +96,7 @@ private:
     void doneFetching(Node* sender, Value data);
     void favCallback(Node* sender, Value data);
     void levelDeletedCallback(Node* sender, Value data);
+    void newLevelResponce(Node* sender, Value data);
 };
 
 #endif /* defined(__Snag__LevelSelect__) */

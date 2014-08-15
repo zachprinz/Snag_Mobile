@@ -143,7 +143,11 @@ Entity* Preview::CreateEntity(Vec2 startTouch2, Vec2 endTouch2, int type){
     return ent;
 };
 Entity* Preview::GetTarget(Vec2 touch){
-
+    for (std::map<int,Sprite*>::iterator it=sprites.begin(); it!=sprites.end(); ++it){
+        if(it->second->getBoundingBox().containsPoint(touch)){
+            return entities[it->first];
+        }
+    }
 };
 Vec2 Preview::ScreenToMap(Vec2 pos){
     Vec2 posOnViewport(pos.x - screenViewOrigin.x, pos.y - screenViewOrigin.y);

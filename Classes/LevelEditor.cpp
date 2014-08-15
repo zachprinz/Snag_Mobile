@@ -356,6 +356,11 @@ void LevelEditor::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
             }
         }
     }
+    if(currentTool == ERASE){
+        Entity* entToRemove = preview->GetTarget(currentTouches[0]->getLocation());
+        preview->RemoveEntity(entToRemove);
+        entities.erase(entToRemove->ID);
+    }
 }
 void LevelEditor::onTouchMoved(Touch* touch, Event* event){
     if(currentTool != NO_TOOL && currentTool != ERASE){
@@ -517,6 +522,7 @@ void LevelEditor::ResetToolPos(){
 }
 void LevelEditor::Export(){
     currentLevel->SetName(name);
+    currentLevel->Clear();
     for (std::map<int,Entity*>::iterator it=entities.begin(); it!=entities.end(); ++it){
         int entID = ((Entity*)it->second)->ID;
         currentLevel->AddEntity(entities[entID]);

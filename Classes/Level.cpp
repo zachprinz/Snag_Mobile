@@ -102,6 +102,19 @@ void Level::makePublic(){
     Value parameters = Value(map);
     sendMessageWithParams("saveLevelInfo", parameters);
 }
+void Level::Clear(){
+    ents.clear();
+    for(int x = 0; x < entCount; x++){
+        std::string pre = "entity" + std::to_string(ents.size());
+        map.erase(pre + "type");
+        map.erase(pre + "x");
+        map.erase(pre + "y");
+        map.erase(pre + "width");
+        map.erase(pre + "height");
+        map.erase(pre + "velocityX");
+        map.erase(pre + "velocityY");
+    }
+}
 ValueMap Level::getValueMap(){
     return map;
 };

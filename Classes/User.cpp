@@ -41,6 +41,8 @@ void User::SetUpPhysicsSprite(std::string texture, Vec2 scale){
     body->setCategoryBitmask(true);
 }
 void User::Add(Layer* layer){
+    sprite->setGlobalZOrder(0);
+    line->setGlobalZOrder(-1);
     layer->addChild(line,1);
     layer->addChild(sprite,1);
     layer->addChild(physicsSprite,1);

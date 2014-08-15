@@ -26,7 +26,6 @@
 #define ERASE 6
 #define NO_TOOL 7
 #define MOVE 8
-#define GOAL 9
 #define TILE_SIZE 40
 
 using namespace cocos2d::extension;

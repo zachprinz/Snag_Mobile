@@ -6,6 +6,14 @@
 #include <iostream>
 #include <iomanip>
 #include "Entity.h"
+#include "PopUp.h"
+
+#define WALL 0
+#define SPIKE_WALL 1
+#define HOOK 2
+#define SPAWNER 3
+#define GOAL 4
+#define USER 5
 
 USING_NS_CC;
 
@@ -67,9 +75,11 @@ void Game::onContactPostSolve(PhysicsContact& contact){
         user->Bounce(contact.getContactData());
     if(type == SPIKE_WALL)
         user->Reset();
+    if(type == GOAL)
+        onWin();
 }
 bool Game::onContactBegin(PhysicsContact& contact){
-    if(contact.getShapeB()->getBody()->getTag() == -1){
+    if(contact.getShapeB()->getBody()->getTag() == GOAL){
         onWin();
         return false;
     }
@@ -77,7 +87,8 @@ bool Game::onContactBegin(PhysicsContact& contact){
     return true;
 }
 void Game::onWin(){
-
+    world->setSpeed(0.2);
+    winPopUp->Show();
 }
 Entity* Game::GetClosestHook(Point pos){
     float smallestDistance = 9999;
@@ -103,8 +114,16 @@ void Game::Clear(){
     currentLevel->Remove(this);
 }
 void Game::LoadLevel(Level* lvl){
+    //TODO currentLevel->Remove(this);
+    //if(winPopUpAdded)
+    //    winPopUp->Remove(this);
     currentLevel = lvl;
     currentLevel->Add(this);
+    if(winPopUpAdded == false){
+        winPopUp->Add(this);
+        winPopUpAdded = true;
+    }
+    //winPopUpAdded = true;
 }
 void Game::setPhyWorld(PhysicsWorld* world2){
     world = world2;
@@ -166,6 +185,8 @@ bool Game::init(){
     menu->setPosition(0,0);
     this->addChild(menu, 1);
     
+    winPopUp = new PopUp("You Win!", "Would you like to replay?", this, menu_selector(Game::winAcceptCallback), menu_selector(Game::winDeclineCallback));
+    winPopUpAdded = false;
     return true;
 }
 void Game::menuCloseCallback(Ref* pSender) {
@@ -210,6 +231,16 @@ void Game::homeButtonCallback(Ref* ref){
         Director::getInstance()->pushScene(LevelSelect::myScene);
         LevelSelect::Instance->Refresh();
     }
+}
+void Game::winAcceptCallback(Ref*){
+    winPopUp->Close();
+    world->setSpeed(3.0);
+    resetButtonCallback(nullptr);
+}
+void Game::winDeclineCallback(Ref*){
+    winPopUp->Close();
+    world->setSpeed(3.0);
+    homeButtonCallback(nullptr);
 }
 bool Game::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
     user->Snag();

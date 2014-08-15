@@ -53,6 +53,7 @@ Entity::Entity(Vec2 pos, Vec2 size, Vec2 vel, int type){
     this->originalSize = Vec2(sprite->getBoundingBox().size.width, sprite->getBoundingBox().size.height);
     sprite->setAnchorPoint(Vec2(0.5,0.5));
     sprite->retain();
+    sprite->setGlobalZOrder(0);
     if(size.x != 0 && size.y != 0){
         baseScale.x = size.x / sprite->getBoundingBox().size.width;
         baseScale.y = size.y / sprite->getBoundingBox().size.height;
@@ -73,7 +74,7 @@ void Entity::SetUpPhysicsSprite(std::string texture, Vec2 scale){
     physicsSprite->setVisible(false);
     physicsSprite->setTag(type);
     physicsSprite->retain();
-    if(type == SPAWNER || type == HOOK){
+    if(type == SPAWNER || type == HOOK){// || type == GOAL){
         body->setContactTestBitmask(false);
         body->setCategoryBitmask(false);
     } else {
@@ -96,9 +97,9 @@ void Entity::CalculateScale(Vec2 userPosition, float boardScale){
     }
 }
 void Entity::Add(Game* game){
-    sprite->setGlobalZOrder(2);
-    game->addChild(sprite);
-    game->addChild(physicsSprite);
+    sprite->setGlobalZOrder(0);
+    game->addChild(sprite,1);
+    game->addChild(physicsSprite,1);
 }
 void Entity::Remove(Game* game){
     game->removeChild(sprite);

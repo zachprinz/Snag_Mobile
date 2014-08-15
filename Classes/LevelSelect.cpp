@@ -162,11 +162,12 @@ bool LevelSelect::init()
     NDKHelper::addSelector("LevelSelect", "doneFetching", CC_CALLBACK_2(LevelSelect::doneFetching, this), this);
     NDKHelper::addSelector("LevelSelect", "favCallback", CC_CALLBACK_2(LevelSelect::favCallback, this), this);
     NDKHelper::addSelector("LevelSelect", "levelDeletedCallback", CC_CALLBACK_2(LevelSelect::levelDeletedCallback, this), this);
+    NDKHelper::addSelector("LevelSelect", "newLevelResponce", CC_CALLBACK_2(LevelSelect::newLevelResponce, this), this);
     //--------------------------//
     
     deletePopUp = new PopUp("Delete Level", "Are you sure you want to\ndelete this level?", this, menu_selector(LevelSelect::deleteAcceptCallback), menu_selector(LevelSelect::deleteDeclineCallback));
     deletePopUp->Add(this);
-    
+    goToEdit = false;
     return true;
 }
 void LevelSelect::editCallback(Ref*){
@@ -224,6 +225,13 @@ void LevelSelect::scrollLeftCallback(Ref*){
 void LevelSelect::newLevelCallback(Ref*){
     sendMessageWithParams("newLevel", Value());
     Refresh();
+}
+void LevelSelect::newLevelResponce(cocos2d::Node *sender, cocos2d::Value data){
+    goToEdit = true;
+    if(currentLevelSet != LEVELS_CUSTOM)
+        customCallback(nullptr);
+    else
+        Refresh();
 }
 void LevelSelect::deleteCallback(Ref*){
     deletePopUp->Show();
@@ -350,7 +358,7 @@ void LevelSelect::FetchFavoritedLevels(){
 };
 void LevelSelect::showLoading(){
     loading->setVisible(true);
-    loading->runAction(Repeat::create(RotateBy::create(1.5, 360),1));
+    loading->runAction(Repeat::create(RotateBy::create(1.5, 360),5));
 }
 void LevelSelect::fetchSocialCallback(Node* sender, Value data){
     if (!data.isNull() && data.getType() == Value::Type::MAP) {
@@ -388,6 +396,17 @@ void LevelSelect::doneFetching(Node* sender, Value data){
         }
         selectedLevel = levels[0]->level;
         SetPreview();
+    }
+    if(goToEdit){
+        goToEdit = false;
+        for(int x = 0; x < Game::levels[currentLevelSet].size(); x++){
+            if(Game::levels[currentLevelSet][x]->GetName().compare("qq36q81q") == 0){
+                selectedLevel = Game::levels[currentLevelSet][x];
+                SetPreview();
+                break;
+            }
+        }
+        editCallback(nullptr);
     }
 };
 void LevelSelect::SetPreview(){

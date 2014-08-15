@@ -11,6 +11,7 @@
 
 class Entity;
 class Level;
+class PopUp;
 class Game : public cocos2d::Layer
 {
 public:
@@ -36,6 +37,8 @@ public:
     void UpdateTimer(float);
     void resetButtonCallback(Ref*);
     void homeButtonCallback(Ref*);
+    void winAcceptCallback(Ref*);
+    void winDeclineCallback(Ref*);
     void AddJoint(PhysicsJointDistance*);
     void RemoveAllJoints();
     
@@ -48,6 +51,8 @@ public:
     Level* currentLevel;
     User* user;
 private:
+    bool winPopUpAdded;
+    PopUp* winPopUp;
     PhysicsWorld* world;
     Size visibleSize;
     Label* timeLabel;
