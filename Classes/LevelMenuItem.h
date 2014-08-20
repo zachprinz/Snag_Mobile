@@ -22,6 +22,7 @@ public:
     cocos2d::MenuItemImage* background;
     cocos2d::Label* name;
     cocos2d::Label* favorites;
+    cocos2d::Label* number;
     void SetOrder(int);
     void SetLevel(Level*, int page);
     std::string myName;

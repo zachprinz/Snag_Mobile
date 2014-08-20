@@ -41,6 +41,8 @@ public:
     void onTouchesEnded(std::vector<Touch*>);
     float GetScale();
 private:
+    ClippingNode* clipNode;
+    DrawNode* stencil;
     float originalMultitouchDistance;
     float currentMultitouchDistance;
     void UpdateSprite(int);

@@ -262,12 +262,31 @@
         NSString* levelID = (NSString *)[parameters objectForKey:@"id"];
         PFQuery *query = [PFQuery queryWithClassName:@"Level"];
         [query getObjectInBackgroundWithId:levelID block:^(PFObject *level, NSError *error) {
-            [level deleteInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-                if(succeeded){
+            if(level != nil){
+                [level deleteInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                    //if(succeeded){
+                        int refresh = [[parameters objectForKey:@"refresh"] intValue];
+                        int refreshTest = 1;
+                        if(refresh == refreshTest){
+                            NSDictionary *found = [[NSDictionary alloc] initWithObjectsAndKeys:@"false", @"responce", nil];
+                            [IOSNDKHelper sendMessage:@"levelDeletedCallback" withParameters:found];
+                        } else {
+                            NSDictionary *found = [[NSDictionary alloc] initWithObjectsAndKeys:@"false", @"responce", nil];
+                            [IOSNDKHelper sendMessage:@"finishQuit" withParameters:found];
+                        }
+                    //}
+                }];
+            } else {
+                int refresh = [[parameters objectForKey:@"refresh"] intValue];
+                int refreshTest = 1;
+                if(refresh == refreshTest){
                     NSDictionary *found = [[NSDictionary alloc] initWithObjectsAndKeys:@"false", @"responce", nil];
                     [IOSNDKHelper sendMessage:@"levelDeletedCallback" withParameters:found];
+                } else {
+                    NSDictionary *found = [[NSDictionary alloc] initWithObjectsAndKeys:@"false", @"responce", nil];
+                    [IOSNDKHelper sendMessage:@"finishQuit" withParameters:found];
                 }
-            }];
+            }
         }];
     }
 }
@@ -303,6 +322,7 @@
     NSLog(@"\nLoading Custom Levels.\n");
     PFQuery *customQuery = [PFQuery queryWithClassName:@"Level"];
     [customQuery whereKey:@"author" equalTo:[PFUser currentUser].username];
+    //[customQuery whereKey:@"name" notEqualTo:@"qq36q81q"];
     [customQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) {
             PFUser *user = [PFUser currentUser];

@@ -80,7 +80,8 @@
       buildConfiguration = "Debug">
    </AnalyzeAction>
    <ArchiveAction
-      buildConfiguration = "Release"
+      buildConfiguration = "Ad Hoc"
+      customArchiveName = "Snag"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>

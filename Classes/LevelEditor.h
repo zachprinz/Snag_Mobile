@@ -58,8 +58,11 @@ public:
     void selectedButtonCallback(Ref*);
     void saveAcceptCallback(Ref*);
     void saveDeclineCallback(Ref*);
+    void acceptQuitCallback(Ref*);
+    void declineQuitCallback(Ref*);
     void GoalSelectCallback(Ref*);
     void closePopUpCallback(Ref*);
+    void finishQuit(Node* sender, Value data);
     
     MenuItemImage* homeSelectButton;
     MenuItemImage* hookSelectButton;
@@ -114,7 +117,10 @@ public:
     PopUp* savePopUp;
     PopUp* spawnerPopUp;
     PopUp* hookPopUp;
+    PopUp* quitPopUp;
 private:
+    bool unsavedChanges;
+    void goToHome();
     int numberOfTouches;
     std::vector<Touch*> currentTouches;
     std::map<int,Entity*> entities;

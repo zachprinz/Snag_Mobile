@@ -20,15 +20,12 @@ Scene* LevelSelect::myScene;
 Vec2 LevelSelect::screenScale;
 LevelSelect* LevelSelect::Instance;
 
-Scene* LevelSelect::createScene()
-{
+Scene* LevelSelect::createScene() {
     auto scene = Scene::create();
-    
     auto layer = LevelSelect::create();
     myScene = scene;
-    
+    myScene->retain();
     scene->addChild(layer);
-    
     return scene;
 }
 
@@ -131,6 +128,7 @@ bool LevelSelect::init()
     this->addChild(menu, 1);
     this->addChild(previewTitle, 1);
     this->addChild(previewAuthor, 1);
+    
 
     currentLevelsTab = risingLevels;
     
@@ -140,6 +138,7 @@ bool LevelSelect::init()
         levels.push_back(lvl);
         this->addChild(lvl->menu,1);
         this->addChild(lvl->name,1);
+        this->addChild(lvl->number,1);
         this->addChild(lvl->favorites,1);
     }
     
@@ -165,6 +164,8 @@ bool LevelSelect::init()
     NDKHelper::addSelector("LevelSelect", "newLevelResponce", CC_CALLBACK_2(LevelSelect::newLevelResponce, this), this);
     //--------------------------//
     
+    preview = new Preview(Rect(previewBackground->getBoundingBox().getMinX(),previewBackground->getBoundingBox().getMinY(),previewBackground->getBoundingBox().size.width,previewBackground->getBoundingBox().size.height), this, 0.33);
+    
     deletePopUp = new PopUp("Delete Level", "Are you sure you want to\ndelete this level?", this, menu_selector(LevelSelect::deleteAcceptCallback), menu_selector(LevelSelect::deleteDeclineCallback));
     deletePopUp->Add(this);
     goToEdit = false;
@@ -178,11 +179,13 @@ void LevelSelect::goToLevelEditor(){
     if(LevelEditor::myScene == NULL){
         auto scene = LevelEditor::createScene();
         LevelEditor::Instance->SetLevel(selectedLevel);
-        Director::getInstance()->pushScene(scene);
+        auto transition = TransitionFade::create(MainMenu::transitionTime, scene);
+        Director::getInstance()->replaceScene(transition);
     }
     else{
         LevelEditor::Instance->SetLevel(selectedLevel);
-        Director::getInstance()->pushScene(LevelEditor::myScene);
+        auto transition = TransitionFade::create(MainMenu::transitionTime, LevelEditor::myScene);
+        Director::getInstance()->pushScene(transition);
     }
 }
 void LevelSelect::highscoresCallback(Ref*){
@@ -191,6 +194,7 @@ void LevelSelect::highscoresCallback(Ref*){
 void LevelSelect::deleteAcceptCallback(Ref*){
     ValueMap valueMap;
     valueMap["id"] = selectedLevel->GetID();
+    valueMap["refresh"] = 1;
     Value parameters = Value(valueMap);
     sendMessageWithParams("deleteLevel", parameters);
     deletePopUp->Close();
@@ -224,7 +228,6 @@ void LevelSelect::scrollLeftCallback(Ref*){
 }
 void LevelSelect::newLevelCallback(Ref*){
     sendMessageWithParams("newLevel", Value());
-    Refresh();
 }
 void LevelSelect::newLevelResponce(cocos2d::Node *sender, cocos2d::Value data){
     goToEdit = true;
@@ -262,11 +265,13 @@ void LevelSelect::playCallback(Ref* sender){
     if(selectedLevel != NULL){
         if(Game::myScene == NULL){
             auto scene = Game::createScene();
-            Director::getInstance()->pushScene(scene);
+            auto transition = TransitionFade::create(MainMenu::transitionTime, Game::myScene);
+            Director::getInstance()->pushScene(transition);
             Game::Instance->Reset(selectedLevel);
         }
         else{
-            Director::getInstance()->pushScene(Game::myScene);
+            auto transition = TransitionFade::create(MainMenu::transitionTime, Game::myScene);
+            Director::getInstance()->pushScene(transition);
             Game::Instance->Reset(selectedLevel);
         }
     }
@@ -430,7 +435,17 @@ void LevelSelect::SetPreview(){
         previewTitle->setVisible(true);
         previewAuthor->setVisible(true);
         previewTitle->setString(selectedLevel->GetName());
+        previewTitle->setScale(1.0);
+        while(previewTitle->getBoundingBox().size.width >= 320){
+            previewTitle->setScaleX(previewTitle->getScaleX() - 0.05);
+            previewTitle->setScaleY(previewTitle->getScaleY() - 0.05);
+        }
         previewAuthor->setString(selectedLevel->GetAuthor());
+        preview->Reset();
+        std::vector<Entity*> tempEnts = selectedLevel->GetEntities();
+        for(int x = 0; x < tempEnts.size(); x++){
+            preview->AddEntity(tempEnts[x]);
+        }
     }
 }
 void LevelSelect::menuCloseCallback(Ref* pSender){

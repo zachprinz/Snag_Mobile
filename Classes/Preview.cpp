@@ -7,6 +7,7 @@
 //
 
 #include "Preview.h"
+#include "MainMenu.h"
 #include "cocos2d.h"
 
 Preview::Preview(Rect viewport, Layer* layer, float scale){
@@ -17,6 +18,32 @@ Preview::Preview(Rect viewport, Layer* layer, float scale){
     mapViewScale = scale;
     mapViewScaleOriginal = scale;
     originalMapViewScale = scale;
+    
+    stencil = DrawNode::create();
+    Vec2 rectangle[4];
+    //rectangle[0] = Vec2(0,0);//screenViewOrigin;
+    //rectangle[1] = Vec2(0,screenViewSize.y);//Vec2(screenViewOrigin.x, screenViewOrigin.y + screenViewSize.y);
+    //rectangle[2] = screenViewSize;//Vec2(screenViewOrigin.x + screenViewOrigin.x, screenViewOrigin.y + screenViewSize.y);
+    //rectangle[3] = Vec2(screenViewSize.x, 0);//Vec2(screenViewOrigin.x, screenViewOrigin.y + screenViewSize.y);
+    
+    rectangle[0] = screenViewOrigin;
+    rectangle[1] = Vec2(screenViewOrigin.x, screenViewOrigin.y + screenViewSize.y);
+    rectangle[2] = Vec2(screenViewOrigin.x + screenViewOrigin.x, screenViewOrigin.y + screenViewSize.y);
+    rectangle[3] = Vec2(screenViewOrigin.x, screenViewOrigin.y + screenViewSize.y);
+    
+    Color4F white(1, 1, 1, 1);
+    stencil->drawPolygon(rectangle, 4, white, 1, white);
+    //stencil->setPosition(Vec2(0,0));
+    stencil->setAnchorPoint(Vec2(0,0));
+    //stencil->setContentSize(Size(MainMenu::screenSize.x, MainMenu::screenSize.y));//screenViewSize.x, screenViewSize.y));
+    
+    clipNode = ClippingNode::create();
+    clipNode->setAlphaThreshold(0);
+    clipNode->setAnchorPoint(Vec2(0,0));
+    clipNode->setGlobalZOrder(1);
+    layer->addChild(clipNode,1);
+    layer->addChild(stencil);
+    clipNode->setStencil(stencil);
 };
 void Preview::Update(){
     for (std::map<int,Entity*>::iterator it=entities.begin(); it!=entities.end(); ++it){
@@ -43,27 +70,27 @@ void Preview::AddEntity(Entity* ent){
         sprites[ent->ID]->setScale((ent->GetSize().x * mapViewScale)/sprites[ent->ID]->getBoundingBox().size.width, (ent->GetSize().y * mapViewScale) / sprites[ent->ID]->getBoundingBox().size.height);
     else
             sprites[ent->ID]->setScale(baseScales[ent->GetType()] * mapViewScale,baseScales[ent->GetType()] * mapViewScale);
-    layer->addChild(sprites[ent->ID]);
+    clipNode->addChild(sprites[ent->ID]);
 };
 void Preview::RemoveEntity(Entity* ent){
-    layer->removeChild(sprites[ent->ID]);
+    clipNode->removeChild(sprites[ent->ID]);
     sprites.erase(ent->ID);
     entities.erase(ent->ID);
 };
 void Preview::RemoveEntity(int entID){
-    layer->removeChild(sprites[entID]);
+    clipNode->removeChild(sprites[entID]);
     sprites.erase(entID);
     entities.erase(entID);
 };
 Entity* Preview::PopEntity(Entity* ent){
-    layer->removeChild(sprites[ent->ID]);
+    clipNode->removeChild(sprites[ent->ID]);
     sprites.erase(ent->ID);
     Entity* returnEnt = entities[ent->ID];
     entities.erase(ent->ID);
     return returnEnt;
 };
 Entity* Preview::PopEntity(int entID){
-    layer->removeChild(sprites[entID]);
+    clipNode->removeChild(sprites[entID]);
     sprites.erase(entID);
     Entity* returnEnt = entities[entID];
     entities.erase(entID);

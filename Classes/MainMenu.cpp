@@ -24,6 +24,7 @@ Vec2 MainMenu::screenSize;
 float MainMenu::minScreenScale;
 Vec2 MainMenu::screenScale;
 MainMenu* MainMenu::Instance;
+float MainMenu::transitionTime = 0.5;
 
 Scene* MainMenu::createScene(){
     auto scene = Scene::create();
@@ -118,7 +119,8 @@ void MainMenu::userCheckCallback(Node* sender, Value data){
 void MainMenu::goToLevelSelect(){
     if(LevelSelect::myScene == NULL){
         auto scene = LevelSelect::createScene();
-        Director::getInstance()->pushScene(scene);
+        auto toLevelSelectTransition = TransitionFade::create(MainMenu::transitionTime, LevelSelect::myScene);
+        Director::getInstance()->pushScene(toLevelSelectTransition);
         LevelSelect::Instance->Refresh();
     }
     else{

@@ -65,6 +65,7 @@ Scene* Game::createScene() {
     auto layer = Game::create();
     layer->setPhyWorld(scene->getPhysicsWorld());
     myScene = scene;
+    myScene->retain();
     scene->addChild(layer);
     return scene;
 }
@@ -228,7 +229,8 @@ void Game::homeButtonCallback(Ref* ref){
         LevelSelect::Instance->Refresh();
     }
     else{
-        Director::getInstance()->pushScene(LevelSelect::myScene);
+        auto transition = TransitionFade::create(MainMenu::transitionTime, LevelSelect::myScene);
+        Director::getInstance()->pushScene(transition);
         LevelSelect::Instance->Refresh();
     }
 }

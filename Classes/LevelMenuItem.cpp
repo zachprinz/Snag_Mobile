@@ -37,8 +37,13 @@ LevelMenuItem::LevelMenuItem(std::string name){
     this->favorites->setAnchorPoint(Vec2(1,0.5));
     this->favorites->setGlobalZOrder(0);
     
+    this->number = MainMenu::CreateLabel("1) ", Vec2(x+0.00,1.0-(y+0.00)), Vec2(0,0));
+    this->number->setPosition(Vec2(background->getPositionX() + (24*MainMenu::screenScale.x), background->getBoundingBox().getMidY()));
+    this->number->setAnchorPoint(Vec2(0,0.5));
+    this->number->setGlobalZOrder(0);
+    
     this->name = MainMenu::CreateLabel("New Level", Vec2(x+0.00,1.0-(y+0.00)), Vec2(0,0));
-    this->name->setPosition(Vec2(background->getPositionX() + (24*MainMenu::screenScale.x), background->getBoundingBox().getMidY()));
+    this->name->setPosition(Vec2(number->getBoundingBox().getMaxX(), background->getBoundingBox().getMidY()));
     this->name->setAnchorPoint(Vec2(0,0.5));
     this->name->setGlobalZOrder(0);
     
@@ -50,6 +55,7 @@ void LevelMenuItem::SetEnabled(bool is){
     menu->setEnabled(is);
     menu->setVisible(is);
     name->setVisible(is);
+    number->setVisible(is);
     favorites->setVisible(is);
 }
 void LevelMenuItem::SetOrder(int){
@@ -72,7 +78,13 @@ void LevelMenuItem::SetLevel(Level* lvl, int page){
     myName = lvl->GetName();
     myPath = lvl->GetPath();
     name->setString(myName);
-    name->setString(std::to_string(favorited->getTag() + (page*4) +1) + ") " + myName);
+    number->setString(std::to_string(favorited->getTag() + (page*4) +1) + ") ");
+    name->setScale(1.0);
+    while(name->getBoundingBox().size.width >= 320){
+        name->setScaleX(name->getScaleX() - 0.05);
+        name->setScaleY(name->getScaleY() - 0.05);
+    }
+    this->name->setPosition(Vec2(number->getBoundingBox().getMaxX(), background->getBoundingBox().getMidY()));
     favorites->setString(std::to_string(lvl->GetFavorites()));
     SetFavorited(lvl->GetIsFavorited());
     printf("\nSet up a custom leve with %d favorites that %d favorited.", lvl->GetFavorites(), lvl->GetIsFavorited());

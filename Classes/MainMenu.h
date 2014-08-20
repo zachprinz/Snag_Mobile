@@ -46,7 +46,7 @@ public:
     void checkForUser();
     void goToLogIn();
     void goToLevelSelect();
-    
+    static float transitionTime;
     Label* notice;
     Menu* menu;
 private:

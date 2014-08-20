@@ -12,6 +12,7 @@
 #include "Game.h"
 #include "LevelSelect.h"
 #include "Map.h"
+#include "NDKHelper/NDKHelper.h"
 
 USING_NS_CC;
 
@@ -22,6 +23,7 @@ Scene* LevelEditor::createScene(){
     auto scene = Scene::create();
     auto layer = LevelEditor::create();
     myScene = scene;
+    myScene->retain();
     scene->addChild(layer);
     return scene;
     Instance = layer;
@@ -107,6 +109,8 @@ bool LevelEditor::init(){
     this->addChild(menu, 1);
     this->addChild(selectedLabel,1);
     
+    NDKHelper::addSelector("LevelEditor", "finishQuit", CC_CALLBACK_2(LevelEditor::finishQuit, this), this);
+    
     savePopUp = new PopUp("Save", "Please name your level.", this, menu_selector(LevelEditor::saveAcceptCallback), menu_selector(LevelEditor::saveDeclineCallback),true);
     savePopUp->Add(this);
     
@@ -116,12 +120,36 @@ bool LevelEditor::init(){
     hookPopUp = new PopUp("Error", "Please add at least one\nhook to your map.", this, menu_selector(LevelEditor::closePopUpCallback));
     hookPopUp->Add(this);
     
+    quitPopUp = new PopUp("Warning: Unsaved Changes", "Unsaved changes will be lost.\nDo you want to exit?", this, menu_selector(LevelEditor::acceptQuitCallback), menu_selector(LevelEditor::declineQuitCallback));
+    quitPopUp->Add(this);
+    
     this->addChild(currentSprite);
     
     currentSelection = NULL;
     currentTool = NO_TOOL;
     
     return true;
+}
+void LevelEditor::acceptQuitCallback(Ref*){
+    if(currentLevel->GetName().compare("qq36q81q") == 0){
+        ValueMap valueMap;
+        valueMap["id"] = currentLevel->GetID();
+        valueMap["refresh"] = 0;
+        Value parameters = Value(valueMap);
+        sendMessageWithParams("deleteLevel", parameters);
+    } else {
+        Clear();
+        quitPopUp->Close();
+        goToHome();
+    }
+}
+void LevelEditor::declineQuitCallback(Ref*){
+    quitPopUp->Close();
+}
+void LevelEditor::finishQuit(Node* sender, Value data){
+    Clear();
+    quitPopUp->Close();
+    goToHome();
 }
 void LevelEditor::editBoxEditingDidBegin(EditBox *editBox) {
 }
@@ -212,13 +240,22 @@ void LevelEditor::EraseSelectCallback(Ref*){
     }
 };
 void LevelEditor::homeButtonCallback(Ref* ref){
+    if(unsavedChanges || currentLevel->GetName().compare("qq36q81q") == 0){
+        quitPopUp->Show();
+    } else {
+        goToHome();
+    }
+}
+void LevelEditor::goToHome(){
     if(LevelSelect::myScene == NULL){
         auto scene = LevelSelect::createScene();
-        Director::getInstance()->pushScene(scene);
         LevelSelect::Instance->Refresh();
+        auto transition = TransitionFade::create(MainMenu::transitionTime, LevelSelect::myScene);
+        Director::getInstance()->pushScene(transition);
     }
     else{
-        Director::getInstance()->pushScene(LevelSelect::myScene);
+        auto transition = TransitionFade::create(MainMenu::transitionTime, LevelSelect::myScene);
+        Director::getInstance()->pushScene(transition);
         LevelSelect::Instance->Refresh();
     }
 }
@@ -244,9 +281,11 @@ void LevelEditor::saveButtonCallback(Ref* ref){
 void LevelEditor::saveAcceptCallback(Ref* ref){
     name = savePopUp->GetText();
     Export();
+    saveDialog = false;
     savePopUp->Close();
 }
 void LevelEditor::saveDeclineCallback(Ref* ref){
+    saveDialog = false;
     savePopUp->Close();
 }
 void LevelEditor::moveButtonCallback(Ref* ref){
@@ -301,10 +340,19 @@ void LevelEditor::Clear(){
         entities.erase(entID);
         preview->RemoveEntity(entID);
     }
+    touchCurrent = Vec2(0,0);
+    touchStart = Vec2(0,0);
+    currentTouches.clear();
+    ResetToolPos();
+    currentTool = NO_TOOL;
+    currentSelection = NULL;
+    selectedLabel->setString("Pan Tool");
+    SetToolPos();
     preview->Reset();
     EnableSpawner();
 }
 bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
+    unsavedChanges = true;
     if(noticeUp){
         notice->setVisible(false);
         notice->setPosition(Point(notice->getPosition().x, notice->getPosition().y - 1000));
@@ -528,4 +576,5 @@ void LevelEditor::Export(){
         currentLevel->AddEntity(entities[entID]);
     }
     currentLevel->Save();
+    unsavedChanges = false;
 }

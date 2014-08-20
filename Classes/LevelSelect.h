@@ -15,6 +15,7 @@
 #include "CocosGUI.h"
 #include "LevelMenuItem.h"
 #include "PopUp.h"
+#include "Preview.h"
 
 #define LEVELS_CUSTOM 0
 #define LEVELS_SOCIAL 1
@@ -71,6 +72,7 @@ public:
     int page;
     PopUp* deletePopUp;
 private:
+    Preview* preview;
     bool goToEdit;
     void showLoading();
     void goToLevelEditor();
