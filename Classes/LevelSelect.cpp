@@ -164,7 +164,7 @@ bool LevelSelect::init()
     NDKHelper::addSelector("LevelSelect", "newLevelResponce", CC_CALLBACK_2(LevelSelect::newLevelResponce, this), this);
     //--------------------------//
     
-    preview = new Preview(Rect(previewBackground->getBoundingBox().getMinX(),previewBackground->getBoundingBox().getMinY(),previewBackground->getBoundingBox().size.width,previewBackground->getBoundingBox().size.height), this, 0.33);
+    preview = new Preview(Rect(previewWindow->getBoundingBox().getMinX() + 10,previewWindow->getBoundingBox().getMinY() + 10,previewWindow->getBoundingBox().size.width - 20,previewWindow->getBoundingBox().size.height-20), this, 0.33);
     
     deletePopUp = new PopUp("Delete Level", "Are you sure you want to\ndelete this level?", this, menu_selector(LevelSelect::deleteAcceptCallback), menu_selector(LevelSelect::deleteDeclineCallback));
     deletePopUp->Add(this);

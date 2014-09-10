@@ -19,6 +19,7 @@
 #include <iostream>
 #include "cocos2d.h"
 #include "Entity.h"
+#include "CCClippingNode.h"
 
 class Preview{
 public:

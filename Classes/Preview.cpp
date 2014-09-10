@@ -21,29 +21,22 @@ Preview::Preview(Rect viewport, Layer* layer, float scale){
     
     stencil = DrawNode::create();
     Vec2 rectangle[4];
-    //rectangle[0] = Vec2(0,0);//screenViewOrigin;
-    //rectangle[1] = Vec2(0,screenViewSize.y);//Vec2(screenViewOrigin.x, screenViewOrigin.y + screenViewSize.y);
-    //rectangle[2] = screenViewSize;//Vec2(screenViewOrigin.x + screenViewOrigin.x, screenViewOrigin.y + screenViewSize.y);
-    //rectangle[3] = Vec2(screenViewSize.x, 0);//Vec2(screenViewOrigin.x, screenViewOrigin.y + screenViewSize.y);
-    
-    rectangle[0] = screenViewOrigin;
-    rectangle[1] = Vec2(screenViewOrigin.x, screenViewOrigin.y + screenViewSize.y);
-    rectangle[2] = Vec2(screenViewOrigin.x + screenViewOrigin.x, screenViewOrigin.y + screenViewSize.y);
-    rectangle[3] = Vec2(screenViewOrigin.x, screenViewOrigin.y + screenViewSize.y);
-    
+    rectangle[0] = Vec2(0,0);
+    rectangle[3] = Vec2(0,screenViewSize.y);
+    rectangle[2] = screenViewSize;
+    rectangle[1] = Vec2(screenViewSize.x, 0);
     Color4F white(1, 1, 1, 1);
     stencil->drawPolygon(rectangle, 4, white, 1, white);
-    //stencil->setPosition(Vec2(0,0));
     stencil->setAnchorPoint(Vec2(0,0));
-    //stencil->setContentSize(Size(MainMenu::screenSize.x, MainMenu::screenSize.y));//screenViewSize.x, screenViewSize.y));
+    stencil->setContentSize(Size(screenViewSize.x, screenViewSize.y));
+    layer->addChild(stencil);
     
     clipNode = ClippingNode::create();
-    clipNode->setAlphaThreshold(0);
     clipNode->setAnchorPoint(Vec2(0,0));
-    clipNode->setGlobalZOrder(1);
-    layer->addChild(clipNode,1);
-    layer->addChild(stencil);
+    clipNode->setContentSize(Size(screenViewSize.x, screenViewSize.y));
+    clipNode->setPosition(screenViewOrigin);
     clipNode->setStencil(stencil);
+    layer->addChild(clipNode,1);
 };
 void Preview::Update(){
     for (std::map<int,Entity*>::iterator it=entities.begin(); it!=entities.end(); ++it){
@@ -70,7 +63,7 @@ void Preview::AddEntity(Entity* ent){
         sprites[ent->ID]->setScale((ent->GetSize().x * mapViewScale)/sprites[ent->ID]->getBoundingBox().size.width, (ent->GetSize().y * mapViewScale) / sprites[ent->ID]->getBoundingBox().size.height);
     else
             sprites[ent->ID]->setScale(baseScales[ent->GetType()] * mapViewScale,baseScales[ent->GetType()] * mapViewScale);
-    clipNode->addChild(sprites[ent->ID]);
+    clipNode->addChild(sprites[ent->ID],1);
 };
 void Preview::RemoveEntity(Entity* ent){
     clipNode->removeChild(sprites[ent->ID]);
@@ -185,7 +178,7 @@ Vec2 Preview::ScreenToMap(Vec2 pos){
 Vec2 Preview::MapToScreen(Vec2 pos){
     Vec2 mapPosWithoutOrigin(pos.x - mapViewOrigin.x, pos.y - mapViewOrigin.y);
     Vec2 viewPercent(mapPosWithoutOrigin.x*mapViewScale, mapPosWithoutOrigin.y*mapViewScale);
-    Vec2 screenPos(viewPercent.x + screenViewOrigin.x, viewPercent.y + screenViewOrigin.y);
+    Vec2 screenPos = viewPercent;//(viewPercent.x + screenViewOrigin.x, viewPercent.y + screenViewOrigin.y);
     return screenPos;
 }
 float Preview::GetScale(){
