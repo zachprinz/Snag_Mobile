@@ -69,14 +69,53 @@ bool Highscores::init()
     slider2 = cocos2d::ui::Slider::create();
     slider2->loadBarTexture("HSSliderTrack.png");
     slider2->loadSlidBallTextures("HSScroller.png","HSScroller.png","");
-    //slider2->loadProgressBarTexture("line.png");
-    slider2->setCapInsets(Rect(20,0,0,-20));
-    //slider2->setContentSize(Size(visibleSize.width * 0.9,25));
+    slider2->setCapInsets(Rect(20,0,-20,0));
     slider2->setPosition(Vec2(visibleSize.width * 0.5, visibleSize.height * 0.247));
     slider2->setAnchorPoint(Point(0.5,1));
     slider2->setScale(visibleSize.width / 1704, visibleSize.height / 960);
-
     slider2->setPercent(50);
+    
+    scrollview = cocos2d::ui::ScrollView::create();
+    scrollview->setContentSize(Size(mainPanel->getBoundingBox().size.width*.9605, mainPanel->getBoundingBox().size.height * 0.9));
+    scrollview->setSize(Size(mainPanel->getBoundingBox().size.width*.9605, mainPanel->getBoundingBox().size.height * 0.9));
+    scrollview->setPosition(Vec2(mainPanel->getBoundingBox().getMidX(), mainPanel->getBoundingBox().getMidY() + visibleSize.height * 0.0725));
+    scrollview->setAnchorPoint(Point(0.49675,0.5));//475
+    scrollview->setDirection(cocos2d::ui::ScrollView::Direction::HORIZONTAL);
+    scrollview->setInertiaScrollEnabled(true);
+    float innerWidth = mainPanel->getBoundingBox().size.width * 3;
+    float innerHeight = mainPanel->getBoundingBox().size.height * 0.9;
+    scrollview->setInnerContainerSize(Size(innerWidth,innerHeight));
+    
+    for(int x = 0; x < 10; x++){
+        auto seperator1 = MainMenu::CreateButton("HSSeperator.png", Vec2(.009,0.17),Vec2(0,0));
+        seperator1->setPosition(Vec2(15 + (x * 550),0));
+        seperator1->setAnchorPoint(Vec2(0.0,0));
+        seperator1->setScale(visibleSize.height / 960);
+        scrollview->addChild(seperator1,1);
+        for(int y = 0; y < 4; y++){
+            float bottom = y * 88 - 14;
+            float left = x * 550 + 62;
+            auto userNameTemp = MainMenu::CreateLabel("PlayerName", Vec2(0,1.0-0.015), Vec2(0,0));
+            userNameTemp->setPosition(left, bottom);
+            userNameTemp->setAnchorPoint(Vec2(0.0,0));
+            userNameTemp->setScale(0.77);
+            auto userPlaceTemp = MainMenu::CreateLabel(std::to_string(x*4 + (4-y)), Vec2(0,1.0-0.015), Vec2(0,0));
+            userPlaceTemp->setPosition(left,bottom + 85 + 21);
+            userPlaceTemp->setAnchorPoint(Vec2(0,1));
+            userPlaceTemp->setColor(Color3B(255,225,107));
+            userPlaceTemp->setScale(0.49);
+            auto userTimeTemp = MainMenu::CreateLabel("0:00", Vec2(0,1.0-0.015), Vec2(0,0));
+            userTimeTemp->setPosition(left + 490, bottom + 50);
+            userTimeTemp->setAnchorPoint(Vec2(1,0.5));
+            userTimeTemp->setColor(Color3B(53,107,168));
+            if(y%2 == 0)
+                userTimeTemp->setColor(Color3B(170,201,228));
+            scrollview->addChild(userNameTemp,1);
+            scrollview->addChild(userPlaceTemp,1);
+            scrollview->addChild(userTimeTemp,1);
+        
+        }
+    }
     
     auto titleBackground = MainMenu::CreateButton("HSTitlePanel.png", Vec2(0,0), Vec2(0,0));
     titleBackground->setAnchorPoint(Vec2(0.5,1.0));
@@ -112,6 +151,7 @@ bool Highscores::init()
     this->addChild(userPlace,1);
     this->addChild(userTime,1);
     this->addChild(slider2,1);
+    this->addChild(scrollview,1);
     
     //-- Set Up Newtork Stuff --//
     //NDKHelper::addSelector("LogIn", "userCheckCallback", CC_CALLBACK_2(MainMenu::userCheckCallback, this), this);

@@ -59,6 +59,7 @@ bool LevelEditor::init(){
     saveDialog = false;
     
     selectedSprite = MainMenu::CreateButton("LevelEditorSelected.png", Vec2(0,1.0-0.015), Vec2(0,1));
+    selectedSprite->setScale(0.33);
     selectedSprite->setPosition(visibleSize.width / 2.0, selectedSprite->getPosition().y);
     selectedSprite->setAnchorPoint(Point(0.5,1.0));
     auto background = Sprite::create("GRID2.png");
@@ -98,10 +99,11 @@ bool LevelEditor::init(){
     menuItems.pushBack(eraseSelectButton);
     moveSelectButton = MainMenu::CreateButton("LevelEditorMove.png", this, menu_selector(LevelEditor::moveButtonCallback), Vec2(0.9,1.0-buttonGap-(4*jump)), Vec2(1,0));
     menuItems.pushBack(moveSelectButton);
-    selectedLabel = MainMenu::CreateLabel("Pan Tool", Vec2(0,1.0-0.015), Vec2(0,1));
+    selectedLabel = MainMenu::CreateLabel("Pan Tool", Vec2(0,1.0-0.015), Vec2(0,0));
     selectedLabel->setGlobalZOrder(0);
-    selectedLabel->setPosition(0.5 * visibleSize.width, selectedLabel->getPosition().y);
-    selectedLabel->setAnchorPoint(Vec2(0.5,1.0));
+    selectedLabel->setPosition(selectedSprite->getBoundingBox().getMidX(), selectedSprite->getBoundingBox().getMidY());
+    selectedLabel->setAnchorPoint(Vec2(0.5,0.5));
+    selectedLabel->setScale(0.8);
         
     menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0.0,0.0));

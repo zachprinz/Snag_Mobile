@@ -49,6 +49,8 @@ public:
     Label* userPlace;
     Label* userTime;
     
+    cocos2d::ui::ScrollView* scrollview;
+    
     void goToLevelSelect();
     void goToPlay();
     
