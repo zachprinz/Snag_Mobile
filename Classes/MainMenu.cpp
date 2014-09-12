@@ -164,8 +164,8 @@ Label* MainMenu::CreateLabel(std::string text, Vec2 pos, Vec2 anchors){
     Vec2 tempScale = GetAdjustedScale(pos, anchors);
     temp->setPosition(GetAdjustedPosition(pos, anchors, tempScale));
     temp->setAnchorPoint(Point(0.5,0.5));
+    temp->setColor(Color3B::BLACK);
     temp->retain();
-    temp->setColor(Color3B(0.0,0.0,0.0));
     //temp->setFontScale(tempScale);
     return temp;
 };

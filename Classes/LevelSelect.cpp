@@ -12,6 +12,7 @@
 #include "MainMenu.h"
 #include "LevelMenuItem.h"
 #include "LevelInfo.h"
+#include "Highscores.h"
 #include "NDKHelper/NDKHelper.h"
 
 USING_NS_CC;
@@ -189,7 +190,17 @@ void LevelSelect::goToLevelEditor(){
     }
 }
 void LevelSelect::highscoresCallback(Ref*){
-
+    if(Highscores::myScene == NULL){
+        auto scene = Highscores::createScene();
+        Highscores::Instance->SetLevel(selectedLevel);
+        auto transition = TransitionFade::create(MainMenu::transitionTime, scene);
+        Director::getInstance()->replaceScene(transition);
+    }
+    else{
+        Highscores::Instance->SetLevel(selectedLevel);
+        auto transition = TransitionFade::create(MainMenu::transitionTime, Highscores::myScene);
+        Director::getInstance()->pushScene(transition);
+    }
 }
 void LevelSelect::deleteAcceptCallback(Ref*){
     ValueMap valueMap;

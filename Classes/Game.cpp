@@ -170,6 +170,7 @@ bool Game::init(){
     
     timeLabel = Label::createWithBMFont("dimbo.fnt", "0.00", TextHAlignment::LEFT);
     timeLabel->setPosition(visibleSize.width / 2.0 - (80 * MainMenu::screenScale.x), visibleSize.height);
+    timeLabel->setColor(Color3B::BLACK);
     timeLabel->setAnchorPoint(Point(0.0,1.0));
     timeLabel->setGlobalZOrder(3);
     this->addChild(timeLabel,1);
