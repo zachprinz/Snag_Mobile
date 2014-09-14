@@ -9,6 +9,7 @@
 #include "Preview.h"
 #include "MainMenu.h"
 #include "cocos2d.h"
+#include "LevelEditor.h"
 
 Preview::Preview(Rect viewport, Layer* layer, float scale){
     this->layer = layer;
@@ -25,7 +26,7 @@ Preview::Preview(Rect viewport, Layer* layer, float scale){
     rectangle[3] = Vec2(0,screenViewSize.y);
     rectangle[2] = screenViewSize;
     rectangle[1] = Vec2(screenViewSize.x, 0);
-    Color4F white(1, 1, 1, 1);
+    Color4F white(170.0/255.0, 205.0/255.0, 238.0/255.0, 1);
     stencil->drawPolygon(rectangle, 4, white, 1, white);
     stencil->setAnchorPoint(Vec2(0,0));
     stencil->setContentSize(Size(screenViewSize.x, screenViewSize.y));
@@ -37,11 +38,16 @@ Preview::Preview(Rect viewport, Layer* layer, float scale){
     clipNode->setPosition(screenViewOrigin);
     clipNode->setStencil(stencil);
     layer->addChild(clipNode,1);
+    editor = false;
 };
 void Preview::Update(){
     for (std::map<int,Entity*>::iterator it=entities.begin(); it!=entities.end(); ++it){
         int entID = ((Entity*)it->second)->ID;
         UpdateSprite(entID);
+    }
+    if(editor){
+        LevelEditor::Instance->UpdateSelected();
+        LevelEditor::Instance->UpdateAxis();
     }
 }
 void Preview::UpdateSprite(int ID){
@@ -95,7 +101,8 @@ void Preview::SetZoom(float newScale){
     if(newScale > 2.0)
         newScale = 2.0;
     mapViewScale = mapViewScaleOriginal * newScale;
-    printf("\nUpdating for Zoom");
+    if(mapViewScale < 0.075)
+        mapViewScale = 0.075;
     Update();
 };
 void Preview::onTouchesBegan(std::vector<Touch*> touches){
@@ -120,6 +127,14 @@ void Preview::onTouchesEnded(std::vector<Touch*> touches){
 }
 void Preview::Drag(Vec2 difference){
     mapViewOrigin += Vec2(difference.x/mapViewScale, difference.y/mapViewScale);
+    if(mapViewOrigin.x < -2500)
+        mapViewOrigin.x = -2500;
+    if(mapViewOrigin.y < -2500)
+        mapViewOrigin.y = -2500;
+    if(mapViewOrigin.x > 5000)
+        mapViewOrigin.x = 5000;
+    if(mapViewOrigin.y > 5000)
+        mapViewOrigin.y = 5000;
     printf("\nUpdating for Drag");
     Update();
 };
@@ -165,9 +180,10 @@ Entity* Preview::CreateEntity(Vec2 startTouch2, Vec2 endTouch2, int type){
 Entity* Preview::GetTarget(Vec2 touch){
     for (std::map<int,Sprite*>::iterator it=sprites.begin(); it!=sprites.end(); ++it){
         if(it->second->getBoundingBox().containsPoint(touch)){
-            return entities[it->first];
+            return PopEntity(it->first);
         }
     }
+    return nullptr;
 };
 Vec2 Preview::ScreenToMap(Vec2 pos){
     Vec2 posOnViewport(pos.x - screenViewOrigin.x, pos.y - screenViewOrigin.y);

@@ -41,6 +41,7 @@ public:
     void onTouchesMoved(std::vector<Touch*>);
     void onTouchesEnded(std::vector<Touch*>);
     float GetScale();
+    bool editor;
 private:
     ClippingNode* clipNode;
     DrawNode* stencil;

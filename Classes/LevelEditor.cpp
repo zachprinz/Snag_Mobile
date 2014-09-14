@@ -38,7 +38,38 @@ bool LevelEditor::init(){
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     noticeUp = false;
 
+    verticalAxis = MainMenu::CreateButton("line.png", Vec2(0.5,0.5), Vec2(0,0));
+    verticalAxis->setAnchorPoint(Vec2(0.5,0.5));
+    verticalAxis->setScale(1,1);
+    verticalAxis->setScale(MainMenu::screenSize.y / verticalAxis->getBoundingBox().size.height,2);
+    verticalAxis->setRotation(90);
+    horizontalAxis = MainMenu::CreateButton("line.png", Vec2(0.5,0.5), Vec2(0,0));
+    horizontalAxis->setAnchorPoint(Vec2(0.5,0.5));
+    horizontalAxis->setScale(1,1);
+    horizontalAxis->setScale(MainMenu::screenSize.x / horizontalAxis->getBoundingBox().size.width, 2);
+    horizontalAxis->setGlobalZOrder(-4);
+    verticalAxis->setGlobalZOrder(-4);
+    for(int x = -50; x < 50; x++){
+        auto tempVertical = MainMenu::CreateButton("line.png", Vec2(0.5,0.5), Vec2(0,0));
+        tempVertical->setAnchorPoint(Vec2(0.5,0.5));
+        tempVertical->setScale(1,1);
+        tempVertical->setScale(MainMenu::screenSize.y / tempVertical->getBoundingBox().size.height,0.75);
+        tempVertical->setRotation(90);
+        verticalGuides.push_back(tempVertical);
+        this->addChild(tempVertical,1);
+        
+        auto tempHorizontal = MainMenu::CreateButton("line.png", Vec2(0.5,0.5), Vec2(0,0));
+        tempHorizontal->setAnchorPoint(Vec2(0.5,0.5));
+        tempHorizontal->setScale(1,1);
+        tempHorizontal->setScale(MainMenu::screenSize.x / tempHorizontal->getBoundingBox().size.width, 0.75);
+        horizontalGuides.push_back(tempHorizontal);
+        this->addChild(tempHorizontal,1);
+    }
+    this->addChild(verticalAxis,1);
+    this->addChild(horizontalAxis,1);
+    
     preview = new Preview(Rect(0,0,visibleSize.width,visibleSize.height), this, 0.33);
+    preview->editor = true;
     currentSprite = new Scale9Sprite();
     currentSprite->initWithFile("Sliced.png", Rect(0, 0, 60, 60));
     currentSprite->setContentSize(Size(100, 100));
@@ -46,6 +77,28 @@ bool LevelEditor::init(){
     currentSprite->setGlobalZOrder(0);
     currentSprite->setVisible(false);
     currentSprite->setAnchorPoint(Vec2(0,0));
+    
+    transform = MainMenu::CreateButton("Transform.png", this, menu_selector(LevelEditor::transformCallback), Vec2(0,0), Vec2(0,0));
+    //menuItems.pushBack(transform);
+    resize = MainMenu::CreateButton("Resize.png", this, menu_selector(LevelEditor::resizeCallback), Vec2(0,0), Vec2(0,0));
+    //menuItems.pushBack(resize);
+    remove = MainMenu::CreateButton("Remove.png", this, menu_selector(LevelEditor::removeCallback), Vec2(0,0), Vec2(0,0));
+    //menuItems.pushBack(remove);
+    rotate = MainMenu::CreateButton("Rotate.png", this, menu_selector(LevelEditor::rotateCallback), Vec2(0,0), Vec2(0,0));
+    //menuItems.pushBack(rotate);
+    transform->setVisible(false);
+    resize->setVisible(false);
+    remove->setVisible(false);
+    rotate->setVisible(false);
+    rotate->setAnchorPoint(Vec2(1,0));
+    resize->setAnchorPoint(Vec2(1,1));
+    transform->setAnchorPoint(Vec2(0,0));
+    remove->setAnchorPoint(Vec2(0,1));
+    this->addChild(transform,1);
+    this->addChild(resize,1);
+    this->addChild(remove,1);
+    this->addChild(rotate,1);
+    hasSelected = false;
     
     auto listener = EventListenerTouchAllAtOnce::create();
     //listener->setSwallowTouches(true);
@@ -92,13 +145,14 @@ bool LevelEditor::init(){
     homeSelectButton = MainMenu::CreateButton("home.png", this, menu_selector(LevelEditor::homeButtonCallback), Vec2(0.9,1.0-buttonGap), Vec2(1,0));
     menuItems.pushBack(homeSelectButton);
     trashSelectButton = MainMenu::CreateButton("trash.png", this, menu_selector(LevelEditor::trashButtonCallback), Vec2(0.9,1.0-buttonGap-(2*jump)), Vec2(1,0));
-    menuItems.pushBack(trashSelectButton);
-    saveSelectButton = MainMenu::CreateButton("save.png", this, menu_selector(LevelEditor::saveButtonCallback), Vec2(0.9,1.0-buttonGap-(jump)), Vec2(1,0));
+    //menuItems.pushBack(trashSelectButton);
+    saveSelectButton = MainMenu::CreateButton("save.png", this, menu_selector(LevelEditor::saveButtonCallback), Vec2(0.9,1.0-buttonGap-(4 * jump)), Vec2(1,0));
     menuItems.pushBack(saveSelectButton);
     eraseSelectButton = MainMenu::CreateButton("LevelEditorErase.png", this, menu_selector(LevelEditor::EraseSelectCallback), Vec2(0.9,1.0-buttonGap-(3*jump)), Vec2(1,0));
-    menuItems.pushBack(eraseSelectButton);
+    //menuItems.pushBack(eraseSelectButton);
     moveSelectButton = MainMenu::CreateButton("LevelEditorMove.png", this, menu_selector(LevelEditor::moveButtonCallback), Vec2(0.9,1.0-buttonGap-(4*jump)), Vec2(1,0));
-    menuItems.pushBack(moveSelectButton);
+    //menuItems.pushBack(moveSelectButton);
+    
     selectedLabel = MainMenu::CreateLabel("Pan Tool", Vec2(0,1.0-0.015), Vec2(0,0));
     selectedLabel->setGlobalZOrder(0);
     selectedLabel->setPosition(selectedSprite->getBoundingBox().getMidX(), selectedSprite->getBoundingBox().getMidY());
@@ -129,9 +183,21 @@ bool LevelEditor::init(){
     
     currentSelection = NULL;
     currentTool = NO_TOOL;
-    
+    UpdateAxis();
     return true;
 }
+void LevelEditor::transformCallback(Ref*){
+
+};
+void LevelEditor::resizeCallback(Ref*){
+
+};
+void LevelEditor::removeCallback(Ref*){
+    Deselect(false);
+};
+void LevelEditor::rotateCallback(Ref*){
+
+};
 void LevelEditor::acceptQuitCallback(Ref*){
     if(currentLevel->GetName().compare("qq36q81q") == 0){
         ValueMap valueMap;
@@ -363,24 +429,97 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
     else{
         if(!saveDialog){
             touchStart = touch->getLocation();
-            if(currentTool == HOOK || currentTool == SPAWNER){
-                Entity* tempEnt = (preview->CreateEntity(touchStart, touchStart, currentTool));
-                entities[tempEnt->ID] = tempEnt;
-                preview->AddEntity(tempEnt);
+            //Check if the user selected an entity//
+            Entity* target = preview->GetTarget(touchStart);
+            if(target != nullptr){
+                Select(target);
             } else {
-                if(currentTool == NO_TOOL){
-                    
+            //End Check//
+                if(currentTool == HOOK || currentTool == SPAWNER){
+                    Entity* tempEnt = (preview->CreateEntity(touchStart, touchStart, currentTool));
+                    entities[tempEnt->ID] = tempEnt;
+                    preview->AddEntity(tempEnt);
                 } else {
-                    currentSprite->setPosition(touchStart);
-                    currentSprite->setContentSize(Size(1,1));
-                    currentSprite->setVisible(true);
+                    if(currentTool == NO_TOOL){
+                        
+                    } else {
+                        currentSprite->setPosition(touchStart);
+                        currentSprite->setContentSize(Size(1,1));
+                        currentSprite->setVisible(true);
+                    }
                 }
-            }
+            } // This may be innapropriately placed.
             return true;
         }
         return false;
     }
     return false;
+}
+void LevelEditor::Select(Entity* entity){
+    if(hasSelected)
+        Deselect();
+    hasSelected = true;
+    currentSprite->setVisible(true);
+    selectedEntity = entity;
+    Vec2 startPosition = preview->MapToScreen(selectedEntity->GetPosition());
+    Size selectedEntitySize = Size(preview->GetScale() * entity->GetSize().x, preview->GetScale() * selectedEntity->GetSize().y);
+    startPosition.x -= selectedEntitySize.width / 2.0;
+    startPosition.y -= selectedEntitySize.height / 2.0;
+    currentSprite->setPosition(startPosition);
+    currentSprite->setContentSize(selectedEntitySize);
+    rotate->setVisible(true);
+    resize->setVisible(true);
+    transform->setVisible(true);
+    remove->setVisible(true);
+    Rect box = currentSprite->getBoundingBox();
+    rotate->setPosition(Vec2(box.getMinX(), box.getMaxY()));
+    transform->setPosition(Vec2(box.getMaxX(), box.getMaxY()));
+    resize->setPosition(Vec2(box.getMinX(), box.getMinY()));
+    remove->setPosition(Vec2(box.getMaxX(), box.getMinY()));
+}
+void LevelEditor::Deselect(bool keep){
+    if(keep){
+        preview->AddEntity(selectedEntity);
+    }
+    hasSelected = false;
+    selectedEntity = nullptr;
+    transform->setVisible(false);
+    rotate->setVisible(false);
+    remove->setVisible(false);
+    resize->setVisible(false);
+    currentSprite->setVisible(false);
+}
+void LevelEditor::UpdateSelected(){
+    if(hasSelected){
+        Vec2 startPosition = preview->MapToScreen(selectedEntity->GetPosition());
+        Size selectedEntitySize = Size(preview->GetScale() * selectedEntity->GetSize().x, preview->GetScale() * selectedEntity->GetSize().y);
+        startPosition.x -= selectedEntitySize.width / 2.0;
+        startPosition.y -= selectedEntitySize.height / 2.0;
+        currentSprite->setPosition(startPosition);
+        currentSprite->setContentSize(selectedEntitySize);
+        Rect box = currentSprite->getBoundingBox();
+        rotate->setPosition(Vec2(box.getMinX(), box.getMaxY()));
+        transform->setPosition(Vec2(box.getMaxX(), box.getMaxY()));
+        resize->setPosition(Vec2(box.getMinX(), box.getMinY()));
+        remove->setPosition(Vec2(box.getMaxX(), box.getMinY()));
+    }
+}
+void LevelEditor::UpdateAxis(){
+    Vec2 originPos = preview->MapToScreen(Vec2(0,0));
+    verticalAxis->setPosition(originPos.x, verticalAxis->getPosition().y);
+    horizontalAxis->setPosition(horizontalAxis->getPosition().x, originPos.y);
+    for(int x = 0; x < 100; x++){
+        Vec2 tempPos = preview->MapToScreen(Vec2(250 * (-10 + x), 250 * (-10 + x)));
+        verticalGuides[x]->setPosition(tempPos.x, verticalGuides[x]->getPosition().y);
+        horizontalGuides[x]->setPosition(horizontalGuides[x]->getPosition().x, tempPos.y);
+        float tempScale = preview->GetScale() * 1;
+        if(tempScale > 1)
+            tempScale = 1;
+        if(tempScale < 0.5)
+            tempScale = 0.5;
+        horizontalGuides[x]->setScaleY(tempScale);
+        verticalGuides[x]->setScaleY(tempScale);
+    }
 }
 void LevelEditor::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
     if(currentTool != ERASE && currentTool != NO_TOOL){

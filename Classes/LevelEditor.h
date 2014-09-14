@@ -62,7 +62,16 @@ public:
     void declineQuitCallback(Ref*);
     void GoalSelectCallback(Ref*);
     void closePopUpCallback(Ref*);
+    void transformCallback(Ref*);
+    void resizeCallback(Ref*);
+    void removeCallback(Ref*);
+    void rotateCallback(Ref*);
     void finishQuit(Node* sender, Value data);
+    
+    MenuItemImage* transform;
+    MenuItemImage* resize;
+    MenuItemImage* remove;
+    MenuItemImage* rotate;
     
     MenuItemImage* homeSelectButton;
     MenuItemImage* hookSelectButton;
@@ -80,6 +89,10 @@ public:
     MenuItemImage* currentSelection;
     MenuItemImage* shade;
     MenuItemImage* selectedSprite;
+    MenuItemImage* verticalAxis;
+    MenuItemImage* horizontalAxis;
+    std::vector<MenuItemImage*> horizontalGuides;
+    std::vector<MenuItemImage*> verticalGuides;
     Label* selectedLabel;
     Label* notice;
     Menu* menu;
@@ -113,12 +126,18 @@ public:
     void ResetSaveDialog();
     void Export();
     void Clear();
+    void Select(Entity*);
+    void UpdateSelected();
+    void Deselect(bool keep = true);
+    bool hasSelected;
+    void UpdateAxis();
     
     PopUp* savePopUp;
     PopUp* spawnerPopUp;
     PopUp* hookPopUp;
     PopUp* quitPopUp;
 private:
+    Entity* selectedEntity;
     bool unsavedChanges;
     void goToHome();
     int numberOfTouches;
