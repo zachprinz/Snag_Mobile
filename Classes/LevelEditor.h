@@ -64,14 +64,16 @@ public:
     void closePopUpCallback(Ref*);
     void transformCallback();
     void resizeCallback();
+    void targetCallback();
     void removeCallback(Ref*);
-    void duplicateCallback();
+    void duplicateCallback(Ref*);
     void finishQuit(Node* sender, Value data);
     
     MenuItemImage* transform;
     MenuItemImage* resize;
     MenuItemImage* remove;
     MenuItemImage* duplicate;
+    MenuItemImage* target;
     
     MenuItemImage* homeSelectButton;
     MenuItemImage* hookSelectButton;
@@ -148,6 +150,7 @@ private:
     bool isTransforming;
     bool isScaling;
     bool isRotating;
+    bool isTargeting;
 };
 
 #endif /* defined(__Snag__LevelEditor__) */

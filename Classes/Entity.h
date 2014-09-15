@@ -46,6 +46,7 @@ public:
     Sprite* GetSprite();
     Point GetPosition();
     Vec2 GetLaunchVelocity();
+    void SetLaunchVelocity(Vec2);
     Sprite* GetPhysicsSprite();
     int GetType();
     Vec2 GetOriginalSize();

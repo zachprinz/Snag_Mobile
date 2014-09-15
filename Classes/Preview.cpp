@@ -38,6 +38,7 @@ Preview::Preview(Rect viewport, Layer* layer, float scale){
     clipNode->setPosition(screenViewOrigin);
     clipNode->setStencil(stencil);
     layer->addChild(clipNode,1);
+    originalMultitouchDistance = 0;
     editor = false;
 };
 void Preview::Update(){
@@ -63,6 +64,7 @@ void Preview::AddEntity(Entity* ent){
     float baseScales[6] = {1,1,1.5,1,1,0.5};
     entities[ent->ID] = ent;
     sprites[ent->ID] = Sprite::create(textures[ent->GetType()]);
+    sprites[ent->ID]->setTag(ent->GetType());
     sprites[ent->ID]->setPosition(MapToScreen(ent->GetPosition()));
     sprites[ent->ID]->setAnchorPoint(Vec2(0.5,0.5));
     if(ent->GetType() != SPAWNER && ent->GetType() != HOOK)
@@ -117,6 +119,8 @@ void Preview::onTouchesMoved(std::vector<Touch*> touches){
         Vec2 touchOne = touches[0]->getLocation();
         Vec2 touchTwo = touches[1]->getLocation();
         currentMultitouchDistance = touchOne.getDistance(touchTwo);
+        if(originalMultitouchDistance == 0)
+            originalMultitouchDistance = currentMultitouchDistance;
         float ratio = currentMultitouchDistance / originalMultitouchDistance;
         SetZoom(ratio);
     }
@@ -179,7 +183,12 @@ Entity* Preview::CreateEntity(Vec2 startTouch2, Vec2 endTouch2, int type){
 };
 Entity* Preview::GetTarget(Vec2 touch){
     for (std::map<int,Sprite*>::iterator it=sprites.begin(); it!=sprites.end(); ++it){
-        if(it->second->getBoundingBox().containsPoint(touch)){
+        Rect bb = it->second->getBoundingBox();
+        if(it->second->getTag() == HOOK || it->second->getTag() == SPAWNER){
+            printf("\nScale: %f",GetScale());
+            bb = Rect(bb.getMinX() - ((1.0/GetScale()) * bb.size.width), bb.getMinY() - ((1.0/GetScale()) * bb.size.height), bb.size.width * 2 * (1.0/GetScale()) + bb.size.width, bb.size.height * 2 * (1.0/GetScale()) + bb.size.height);
+        }
+        if(bb.containsPoint(touch)){
             return PopEntity(it->first);
         }
     }

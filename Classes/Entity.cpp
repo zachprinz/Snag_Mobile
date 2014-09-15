@@ -120,6 +120,9 @@ void Entity::SetPosition(Vec2 pos){
 Vec2 Entity::GetLaunchVelocity(){
     return launchVelocity;
 }
+void Entity::SetLaunchVelocity(Vec2 vl){
+    launchVelocity = vl;
+}
 int Entity::GetType(){
     return type;
 }
