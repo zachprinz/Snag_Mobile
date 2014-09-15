@@ -45,6 +45,13 @@ bool LevelSelect::init()
     
     cocos2d::Vector<MenuItem*> menuItems;
     
+    auto listener = EventListenerTouchOneByOne::create();
+    //listener->setSwallowTouches(true);
+    listener->onTouchBegan = CC_CALLBACK_2(LevelSelect::onTouchBegan, this);
+    listener->onTouchMoved = CC_CALLBACK_2(LevelSelect::onTouchMoved, this);
+    listener->onTouchEnded = CC_CALLBACK_2(LevelSelect::onTouchEnded, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener,this);
+    
     risingLevels = MainMenu::CreateButton("LSRisingTab.png", this, menu_selector(LevelSelect::risingCallback), Vec2(0.015,1.0-0.105), Vec2(0,0));
     risingLevels->setGlobalZOrder(0);
     socialLevels = MainMenu::CreateButton("LSSocialTab.png", this, menu_selector(LevelSelect::socialCallback), Vec2(0.151,1.0-0.105), Vec2(0,0));
@@ -65,7 +72,7 @@ bool LevelSelect::init()
     levelTitle->setGlobalZOrder(0);
     auto levelAuthor = MainMenu::CreateButton("LSPreviewAuthor.png", Vec2(0.621,1.0-0.163), Vec2(0,0));
     levelAuthor->setGlobalZOrder(0);
-    auto previewWindow = MainMenu::CreateButton("LSPreviewPreview.png", Vec2(0.582,1.0-0.303), Vec2(0,0));
+    previewWindow = MainMenu::CreateButton("LSPreviewPreview.png", Vec2(0.582,1.0-0.303), Vec2(0,0));
     previewWindow->setGlobalZOrder(0);
     auto playButton = MainMenu::CreateButton("LSPlay.png", this, menu_selector(LevelSelect::playCallback), Vec2(0.587,1.0-0.808), Vec2(0,0));
     playButton->setGlobalZOrder(0);
@@ -165,13 +172,36 @@ bool LevelSelect::init()
     NDKHelper::addSelector("LevelSelect", "newLevelResponce", CC_CALLBACK_2(LevelSelect::newLevelResponce, this), this);
     //--------------------------//
     
-    preview = new Preview(Rect(previewWindow->getBoundingBox().getMinX() + 10,previewWindow->getBoundingBox().getMinY() + 10,previewWindow->getBoundingBox().size.width - 20,previewWindow->getBoundingBox().size.height-20), this, 0.33);
-    
+    preview = new Preview(Rect(previewWindow->getBoundingBox().getMinX() + 10,previewWindow->getBoundingBox().getMinY() + 10,previewWindow->getBoundingBox().size.width - 20,previewWindow->getBoundingBox().size.height-20), this, 0.2);
+    hand = MainMenu::CreateButton("Hand.png", Vec2(0,0), Vec2(0,0));
+    hand->setPosition(Vec2(previewWindow->getBoundingBox().getMidX(), previewWindow->getBoundingBox().getMidY()));
+    hand->setAnchorPoint(Vec2(0.5,0.5));
+    this->addChild(hand,1);
     deletePopUp = new PopUp("Delete Level", "Are you sure you want to\ndelete this level?", this, menu_selector(LevelSelect::deleteAcceptCallback), menu_selector(LevelSelect::deleteDeclineCallback));
     deletePopUp->Add(this);
     goToEdit = false;
     return true;
 }
+bool LevelSelect::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
+    touchStart = touch->getLocation();
+    touchCurrent = touch->getLocation();
+    if(previewWindow->getBoundingBox().containsPoint(touchStart)){
+        isDragging = true;
+        hand->setVisible(false);
+    }
+    return true;
+};
+void LevelSelect::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
+    
+};
+void LevelSelect::onTouchMoved(Touch* touch, Event* event){
+    if(isDragging){
+        Vec2 oldTouch = touchStart;
+        touchCurrent = touch->getLocation();
+        touchStart  = touchCurrent;
+        preview->Drag(touchCurrent - oldTouch);
+    }
+};
 void LevelSelect::editCallback(Ref*){
     if(selectedLevel != nullptr)
         goToLevelEditor();
@@ -427,6 +457,8 @@ void LevelSelect::doneFetching(Node* sender, Value data){
 };
 void LevelSelect::SetPreview(){
     if(selectedLevel != nullptr){
+        preview->Clear();
+        hand->setVisible(true);
         if(currentLevelSet == LEVELS_CUSTOM && selectedLevel->GetStatus().compare("Private") == 0){
             uploadButton->setVisible(true);
             uploadButton->setEnabled(true);

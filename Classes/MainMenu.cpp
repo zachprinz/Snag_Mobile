@@ -116,6 +116,12 @@ void MainMenu::userCheckCallback(Node* sender, Value data){
         }
     }
 }
+bool MainMenu::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
+    return true;
+};
+void MainMenu::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
+
+};
 void MainMenu::goToLevelSelect(){
     if(LevelSelect::myScene == NULL){
         auto scene = LevelSelect::createScene();
@@ -137,12 +143,6 @@ void MainMenu::goToLogIn(){
         Director::getInstance()->pushScene(LogInMenu::myScene);
     }
 }
-bool MainMenu::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
-    return true;
-}
-void MainMenu::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
-}
-
 MenuItemImage* MainMenu::CreateButton(std::string imagePath, Ref* ref, SEL_MenuHandler callback, Vec2 pos, Vec2 anchors){
     MenuItemImage* temp = MenuItemImage::create(imagePath, imagePath, ref, callback);
     Vec2 tempScale = GetAdjustedScale(pos, anchors);
@@ -158,7 +158,6 @@ MenuItemImage* MainMenu::CreateButton(std::string imagePath, Vec2 pos, Vec2 anch
     temp->setEnabled(false);
     return temp;
 };
-
 Label* MainMenu::CreateLabel(std::string text, Vec2 pos, Vec2 anchors){
     Label* temp = Label::createWithBMFont("dimbo.fnt", text, TextHAlignment::CENTER);
     Vec2 tempScale = GetAdjustedScale(pos, anchors);

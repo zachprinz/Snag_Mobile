@@ -37,8 +37,9 @@ public:
     void UpdateTimer(float);
     void resetButtonCallback(Ref*);
     void homeButtonCallback(Ref*);
-    void winAcceptCallback(Ref*);
-    void winDeclineCallback(Ref*);
+    void winLevelSelectCallback(Ref*);
+    void winHighscoresSelectCallback(Ref*);
+    void winReplaySelectCallback(Ref*);
     void AddJoint(PhysicsJointDistance*);
     void RemoveAllJoints();
     

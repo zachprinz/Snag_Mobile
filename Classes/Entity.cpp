@@ -98,7 +98,7 @@ void Entity::CalculateScale(Vec2 userPosition, float boardScale){
 }
 void Entity::Add(Game* game){
     sprite->setGlobalZOrder(0);
-    game->addChild(sprite,1);
+    game->addChild(sprite,-1);
     game->addChild(physicsSprite,1);
 }
 void Entity::Remove(Game* game){

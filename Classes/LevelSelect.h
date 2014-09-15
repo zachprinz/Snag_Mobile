@@ -71,6 +71,12 @@ public:
     Level* selectedLevel;
     int page;
     PopUp* deletePopUp;
+    bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
+    void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
+    void onTouchMoved(Touch* touch, Event* event);
+    Vec2 touchStart;
+    Vec2 touchCurrent;
+    bool isDragging;
 private:
     Preview* preview;
     bool goToEdit;
@@ -84,6 +90,8 @@ private:
     MenuItemImage* favoritedLevels;
     MenuItemImage* highscoresButton;
     MenuItemImage* uploadButton;
+    MenuItemImage* previewWindow;
+    MenuItemImage* hand;
     Sprite* loading;
     Label* previewTitle;
     Label* previewAuthor;

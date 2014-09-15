@@ -213,3 +213,10 @@ void Preview::Reset(){
     mapViewOrigin = Vec2(0,0);
     mapViewScale = originalMapViewScale;
 }
+void Preview::Clear(){
+    for (std::map<int,Sprite*>::iterator it=sprites.begin(); it!=sprites.end(); ++it){
+        clipNode->removeChild(it->second);
+    }
+    sprites.clear();
+    entities.clear();
+}

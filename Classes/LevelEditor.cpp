@@ -83,7 +83,6 @@ bool LevelEditor::init(){
     listener->onTouchesBegan = CC_CALLBACK_2(LevelEditor::onTouchesBegan, this);
     listener->onTouchesMoved = CC_CALLBACK_2(LevelEditor::onTouchesMoved, this);
     listener->onTouchesEnded = CC_CALLBACK_2(LevelEditor::onTouchesEnded, this);
-    
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener,this);
     
     cocos2d::Vector<MenuItem*> menuItems;

@@ -7,6 +7,7 @@
 #include <iomanip>
 #include "Entity.h"
 #include "PopUp.h"
+#include "Highscores.h"
 
 #define WALL 0
 #define SPIKE_WALL 1
@@ -115,16 +116,12 @@ void Game::Clear(){
     currentLevel->Remove(this);
 }
 void Game::LoadLevel(Level* lvl){
-    //TODO currentLevel->Remove(this);
-    //if(winPopUpAdded)
-    //    winPopUp->Remove(this);
     currentLevel = lvl;
     currentLevel->Add(this);
     if(winPopUpAdded == false){
         winPopUp->Add(this);
         winPopUpAdded = true;
     }
-    //winPopUpAdded = true;
 }
 void Game::setPhyWorld(PhysicsWorld* world2){
     world = world2;
@@ -187,7 +184,7 @@ bool Game::init(){
     menu->setPosition(0,0);
     this->addChild(menu, 1);
     
-    winPopUp = new PopUp("You Win!", "Would you like to replay?", this, menu_selector(Game::winAcceptCallback), menu_selector(Game::winDeclineCallback));
+    winPopUp = new PopUp("You Win!", "What Next?", this, menu_selector(Game::winLevelSelectCallback), menu_selector(Game::winHighscoresSelectCallback), menu_selector(Game::winReplaySelectCallback), 8);
     winPopUpAdded = false;
     return true;
 }
@@ -235,16 +232,29 @@ void Game::homeButtonCallback(Ref* ref){
         LevelSelect::Instance->Refresh();
     }
 }
-void Game::winAcceptCallback(Ref*){
-    winPopUp->Close();
-    world->setSpeed(3.0);
-    resetButtonCallback(nullptr);
-}
-void Game::winDeclineCallback(Ref*){
+void Game::winLevelSelectCallback(Ref*){
     winPopUp->Close();
     world->setSpeed(3.0);
     homeButtonCallback(nullptr);
 }
+void Game::winHighscoresSelectCallback(Ref*){
+    if(Highscores::myScene == NULL){
+        auto scene = Highscores::createScene();
+        Highscores::Instance->SetLevel(currentLevel);
+        auto transition = TransitionFade::create(MainMenu::transitionTime, scene);
+        Director::getInstance()->replaceScene(transition);
+    }
+    else{
+        Highscores::Instance->SetLevel(currentLevel);
+        auto transition = TransitionFade::create(MainMenu::transitionTime, Highscores::myScene);
+        Director::getInstance()->pushScene(transition);
+    }
+};
+void Game::winReplaySelectCallback(Ref*){
+    winPopUp->Close();
+    world->setSpeed(3.0);
+    resetButtonCallback(nullptr);
+};
 bool Game::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
     user->Snag();
     return true;
