@@ -42,12 +42,14 @@ public:
     void draw();
     
     Vec2 GetSize();
+    void SetSize(Vec2);
     Sprite* GetSprite();
     Point GetPosition();
     Vec2 GetLaunchVelocity();
     Sprite* GetPhysicsSprite();
     int GetType();
     Vec2 GetOriginalSize();
+    void SetPosition(Vec2);
     int ID;
 protected:
     virtual void CalculateScale(Vec2 userPosition, float boardScale);

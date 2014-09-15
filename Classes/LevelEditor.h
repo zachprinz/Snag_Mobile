@@ -62,10 +62,10 @@ public:
     void declineQuitCallback(Ref*);
     void GoalSelectCallback(Ref*);
     void closePopUpCallback(Ref*);
-    void transformCallback(Ref*);
-    void resizeCallback(Ref*);
+    void transformCallback();
+    void resizeCallback();
     void removeCallback(Ref*);
-    void rotateCallback(Ref*);
+    void rotateCallback();
     void finishQuit(Node* sender, Value data);
     
     MenuItemImage* transform;
@@ -145,6 +145,9 @@ private:
     std::map<int,Entity*> entities;
     Preview* preview;
     Scale9Sprite* currentSprite;
+    bool isTransforming;
+    bool isScaling;
+    bool isRotating;
 };
 
 #endif /* defined(__Snag__LevelEditor__) */

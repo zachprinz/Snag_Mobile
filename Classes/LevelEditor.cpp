@@ -78,28 +78,6 @@ bool LevelEditor::init(){
     currentSprite->setVisible(false);
     currentSprite->setAnchorPoint(Vec2(0,0));
     
-    transform = MainMenu::CreateButton("Transform.png", this, menu_selector(LevelEditor::transformCallback), Vec2(0,0), Vec2(0,0));
-    //menuItems.pushBack(transform);
-    resize = MainMenu::CreateButton("Resize.png", this, menu_selector(LevelEditor::resizeCallback), Vec2(0,0), Vec2(0,0));
-    //menuItems.pushBack(resize);
-    remove = MainMenu::CreateButton("Remove.png", this, menu_selector(LevelEditor::removeCallback), Vec2(0,0), Vec2(0,0));
-    //menuItems.pushBack(remove);
-    rotate = MainMenu::CreateButton("Rotate.png", this, menu_selector(LevelEditor::rotateCallback), Vec2(0,0), Vec2(0,0));
-    //menuItems.pushBack(rotate);
-    transform->setVisible(false);
-    resize->setVisible(false);
-    remove->setVisible(false);
-    rotate->setVisible(false);
-    rotate->setAnchorPoint(Vec2(1,0));
-    resize->setAnchorPoint(Vec2(1,1));
-    transform->setAnchorPoint(Vec2(0,0));
-    remove->setAnchorPoint(Vec2(0,1));
-    this->addChild(transform,1);
-    this->addChild(resize,1);
-    this->addChild(remove,1);
-    this->addChild(rotate,1);
-    hasSelected = false;
-    
     auto listener = EventListenerTouchAllAtOnce::create();
     //listener->setSwallowTouches(true);
     listener->onTouchesBegan = CC_CALLBACK_2(LevelEditor::onTouchesBegan, this);
@@ -123,6 +101,41 @@ bool LevelEditor::init(){
     this->addChild(background);
     menuItems.pushBack(selectedSprite);
     
+    transform = MainMenu::CreateButton("Transform.png", Vec2(0,0), Vec2(0,0));//this, menu_selector(LevelEditor::transformCallback), Vec2(0,0), Vec2(0,0));
+    menuItems.pushBack(transform);
+    resize = MainMenu::CreateButton("Resize.png", Vec2(0,0), Vec2(0,0));
+    menuItems.pushBack(resize);
+    remove = MainMenu::CreateButton("Remove.png", this, menu_selector(LevelEditor::removeCallback), Vec2(0,0), Vec2(0,0));
+    menuItems.pushBack(remove);
+    rotate = MainMenu::CreateButton("Rotate.png", Vec2(0,0), Vec2(0,0));
+    menuItems.pushBack(rotate);
+    //rotate->setDisabledImage(Sprite::create("RotateDisabled.png"));
+    //remove->setDisabledImage(Sprite::create("RemoveDisabled.png"));
+    //transform->setDisabledImage(Sprite::create("TransformDisabled.png"));
+    //resize->setDisabledImage(Sprite::create("ResizeDisabled.png"));
+    //transform->setRotation(180.f);
+    //resize->setRotation(180.f);
+    transform->setVisible(false);
+    resize->setVisible(false);
+    remove->setVisible(false);
+    rotate->setVisible(false);
+    rotate->setAnchorPoint(Vec2(1,0));
+    transform->setAnchorPoint(Vec2(1,1));
+    resize->setAnchorPoint(Vec2(0,0));
+    remove->setAnchorPoint(Vec2(0,1));
+    int od = -4;
+    remove->setGlobalZOrder(od);
+    transform->setGlobalZOrder(od);
+    resize->setGlobalZOrder(od);
+    rotate->setGlobalZOrder(od);
+    hasSelected = false;
+    isTransforming = false;
+    isRotating = false;
+    isScaling = false;
+    transform->getEventDispatcher()->setEnabled(false);
+    resize->getEventDispatcher()->setEnabled(false);
+    rotate->getEventDispatcher()->setEnabled(false);
+
     float buttonHeightPixels = 155;
     float tempScale = MainMenu::minScreenScale;
     if(tempScale > 1.5)
@@ -145,13 +158,10 @@ bool LevelEditor::init(){
     homeSelectButton = MainMenu::CreateButton("home.png", this, menu_selector(LevelEditor::homeButtonCallback), Vec2(0.9,1.0-buttonGap), Vec2(1,0));
     menuItems.pushBack(homeSelectButton);
     trashSelectButton = MainMenu::CreateButton("trash.png", this, menu_selector(LevelEditor::trashButtonCallback), Vec2(0.9,1.0-buttonGap-(2*jump)), Vec2(1,0));
-    //menuItems.pushBack(trashSelectButton);
     saveSelectButton = MainMenu::CreateButton("save.png", this, menu_selector(LevelEditor::saveButtonCallback), Vec2(0.9,1.0-buttonGap-(4 * jump)), Vec2(1,0));
     menuItems.pushBack(saveSelectButton);
     eraseSelectButton = MainMenu::CreateButton("LevelEditorErase.png", this, menu_selector(LevelEditor::EraseSelectCallback), Vec2(0.9,1.0-buttonGap-(3*jump)), Vec2(1,0));
-    //menuItems.pushBack(eraseSelectButton);
     moveSelectButton = MainMenu::CreateButton("LevelEditorMove.png", this, menu_selector(LevelEditor::moveButtonCallback), Vec2(0.9,1.0-buttonGap-(4*jump)), Vec2(1,0));
-    //menuItems.pushBack(moveSelectButton);
     
     selectedLabel = MainMenu::CreateLabel("Pan Tool", Vec2(0,1.0-0.015), Vec2(0,0));
     selectedLabel->setGlobalZOrder(0);
@@ -186,17 +196,17 @@ bool LevelEditor::init(){
     UpdateAxis();
     return true;
 }
-void LevelEditor::transformCallback(Ref*){
-
+void LevelEditor::transformCallback(){
+    isTransforming = true;
 };
-void LevelEditor::resizeCallback(Ref*){
-
+void LevelEditor::resizeCallback(){
+    isScaling = true;
 };
 void LevelEditor::removeCallback(Ref*){
     Deselect(false);
 };
-void LevelEditor::rotateCallback(Ref*){
-
+void LevelEditor::rotateCallback(){
+    isRotating = true;
 };
 void LevelEditor::acceptQuitCallback(Ref*){
     if(currentLevel->GetName().compare("qq36q81q") == 0){
@@ -429,26 +439,38 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
     else{
         if(!saveDialog){
             touchStart = touch->getLocation();
+            touchCurrent = touch->getLocation();
+            if(transform->getBoundingBox().containsPoint(touchStart))
+               transformCallback();
+            if(rotate->getBoundingBox().containsPoint(touchStart))
+                rotateCallback();
+            if(resize->getBoundingBox().containsPoint(touchStart))
+                resizeCallback();
             //Check if the user selected an entity//
             Entity* target = preview->GetTarget(touchStart);
             if(target != nullptr){
                 Select(target);
             } else {
             //End Check//
-                if(currentTool == HOOK || currentTool == SPAWNER){
-                    Entity* tempEnt = (preview->CreateEntity(touchStart, touchStart, currentTool));
-                    entities[tempEnt->ID] = tempEnt;
-                    preview->AddEntity(tempEnt);
+                if(isRotating || isTransforming || isScaling){
+                    
                 } else {
-                    if(currentTool == NO_TOOL){
-                        
+                    if(currentTool == HOOK || currentTool == SPAWNER){
+                        Entity* tempEnt = (preview->CreateEntity(touchStart, touchStart, currentTool));
+                        entities[tempEnt->ID] = tempEnt;
+                        preview->AddEntity(tempEnt);
                     } else {
-                        currentSprite->setPosition(touchStart);
-                        currentSprite->setContentSize(Size(1,1));
-                        currentSprite->setVisible(true);
+                        if(currentTool == NO_TOOL){
+                            if(hasSelected)
+                                Deselect();
+                        } else {
+                            currentSprite->setPosition(touchStart);
+                            currentSprite->setContentSize(Size(1,1));
+                            currentSprite->setVisible(true);
+                        }
                     }
-                }
-            } // This may be innapropriately placed.
+                } // This may be innapropriately placed.
+            }
             return true;
         }
         return false;
@@ -458,6 +480,10 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
 void LevelEditor::Select(Entity* entity){
     if(hasSelected)
         Deselect();
+    //if(entity->GetType() == HOOK || entity->GetType() == SPAWNER)
+        //resize->setEnabled(false);
+    //if(entity->GetType() == HOOK)
+        //rotate->setEnabled(false);
     hasSelected = true;
     currentSprite->setVisible(true);
     selectedEntity = entity;
@@ -473,8 +499,8 @@ void LevelEditor::Select(Entity* entity){
     remove->setVisible(true);
     Rect box = currentSprite->getBoundingBox();
     rotate->setPosition(Vec2(box.getMinX(), box.getMaxY()));
-    transform->setPosition(Vec2(box.getMaxX(), box.getMaxY()));
-    resize->setPosition(Vec2(box.getMinX(), box.getMinY()));
+    resize->setPosition(Vec2(box.getMaxX(), box.getMaxY()));
+    transform->setPosition(Vec2(box.getMinX(), box.getMinY()));
     remove->setPosition(Vec2(box.getMaxX(), box.getMinY()));
 }
 void LevelEditor::Deselect(bool keep){
@@ -488,6 +514,12 @@ void LevelEditor::Deselect(bool keep){
     remove->setVisible(false);
     resize->setVisible(false);
     currentSprite->setVisible(false);
+    //rotate->setEnabled(true);
+    //resize->setEnabled(true);
+    //transform->setEnabled(true);
+    //remove->setEnabled(true);
+    //resize->getEventDispatcher()->setEnabled(false);
+    //rotate->getEventDispatcher()->setEnabled(false);
 }
 void LevelEditor::UpdateSelected(){
     if(hasSelected){
@@ -499,8 +531,8 @@ void LevelEditor::UpdateSelected(){
         currentSprite->setContentSize(selectedEntitySize);
         Rect box = currentSprite->getBoundingBox();
         rotate->setPosition(Vec2(box.getMinX(), box.getMaxY()));
-        transform->setPosition(Vec2(box.getMaxX(), box.getMaxY()));
-        resize->setPosition(Vec2(box.getMinX(), box.getMinY()));
+        resize->setPosition(Vec2(box.getMaxX(), box.getMaxY()));
+        transform->setPosition(Vec2(box.getMinX(), box.getMinY()));
         remove->setPosition(Vec2(box.getMaxX(), box.getMinY()));
     }
 }
@@ -522,46 +554,74 @@ void LevelEditor::UpdateAxis(){
     }
 }
 void LevelEditor::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
-    if(currentTool != ERASE && currentTool != NO_TOOL){
-        if(currentTool != SPAWNER && currentTool != HOOK){
-            if(std::abs(currentSprite->getContentSize().width) < (0.5 * TILE_SIZE * (1.0/preview->GetScale())) || std::abs(currentSprite->getContentSize().height) < (0.5 * (TILE_SIZE*(1.0/preview->GetScale())))){
-                currentSprite->setVisible(false);
-            } else{
-                Rect bb = currentSprite->getBoundingBox();
-                Vec2 minPoint(bb.getMinX(), bb.getMinY());
-                Vec2 maxPoint(bb.getMaxX(), bb.getMaxY());
-                if(touchStart.x > touchCurrent.x){
-                    maxPoint = Vec2(maxPoint.x + 20, maxPoint.y);
-                    minPoint = Vec2(minPoint.x - 20, minPoint.y);
+    if(isScaling || isRotating || isTransforming){
+        isScaling = false;
+        isRotating = false;
+        isTransforming = false;
+    } else {
+        if(currentTool != ERASE && currentTool != NO_TOOL){
+            if(currentTool != SPAWNER && currentTool != HOOK){
+                if(std::abs(currentSprite->getContentSize().width) < (0.5 * TILE_SIZE * (1.0/preview->GetScale())) || std::abs(currentSprite->getContentSize().height) < (0.5 * (TILE_SIZE*(1.0/preview->GetScale())))){
+                    currentSprite->setVisible(false);
+                } else{
+                    Rect bb = currentSprite->getBoundingBox();
+                    Vec2 minPoint(bb.getMinX(), bb.getMinY());
+                    Vec2 maxPoint(bb.getMaxX(), bb.getMaxY());
+                    if(touchStart.x > touchCurrent.x){
+                        maxPoint = Vec2(maxPoint.x + 20, maxPoint.y);
+                        minPoint = Vec2(minPoint.x - 20, minPoint.y);
+                    }
+                    if(touchStart.y > touchCurrent.y){
+                        maxPoint = Vec2(maxPoint.x, maxPoint.y + 20);
+                        minPoint = Vec2(minPoint.x, minPoint.y - 20);
+                    }
+                    Entity* tempEnt = (preview->CreateEntity(minPoint , maxPoint, currentTool));
+                    entities[tempEnt->ID] = tempEnt;
+                    preview->AddEntity(tempEnt);
+                    currentSprite->setVisible(false);
                 }
-                if(touchStart.y > touchCurrent.y){
-                    maxPoint = Vec2(maxPoint.x, maxPoint.y + 20);
-                    minPoint = Vec2(minPoint.x, minPoint.y - 20);
-                }
-                Entity* tempEnt = (preview->CreateEntity(minPoint , maxPoint, currentTool));
-                entities[tempEnt->ID] = tempEnt;
-                preview->AddEntity(tempEnt);
-                currentSprite->setVisible(false);
             }
         }
-    }
-    if(currentTool == ERASE){
-        Entity* entToRemove = preview->GetTarget(currentTouches[0]->getLocation());
-        preview->RemoveEntity(entToRemove);
-        entities.erase(entToRemove->ID);
+        if(currentTool == ERASE){
+            Entity* entToRemove = preview->GetTarget(currentTouches[0]->getLocation());
+            preview->RemoveEntity(entToRemove);
+            entities.erase(entToRemove->ID);
+        }
     }
 }
 void LevelEditor::onTouchMoved(Touch* touch, Event* event){
-    if(currentTool != NO_TOOL && currentTool != ERASE){
+    if(isRotating || isScaling || isTransforming){
+        Vec2 oldTouch = touchCurrent;
         touchCurrent = touch->getLocation();
-        if(currentSprite != NULL)
-            currentSprite->setContentSize(Size(touchCurrent.x - touchStart.x, touchCurrent.y - touchStart.y));
-    }
-    if(currentTool == NO_TOOL){
-        Vec2 oldTouch = touchStart;
-        touchCurrent = touch->getLocation();
-        touchStart  = touchCurrent;
-        preview->Drag(touchCurrent - oldTouch);
+        if(isScaling){
+            if(currentSprite != NULL){
+                currentSprite->setContentSize(Size(currentSprite->getContentSize().width + (touchCurrent.x - oldTouch.x), currentSprite->getContentSize().height - (touchCurrent.y - oldTouch.y)));
+                selectedEntity->SetSize(Vec2(currentSprite->getContentSize().width / preview->GetScale(), currentSprite->getContentSize().height / preview->GetScale()));
+                this->UpdateSelected();
+            }
+        }
+        if(isTransforming){
+            if(currentSprite != NULL){
+                currentSprite->setPosition(Vec2(currentSprite->getPosition().x + (touchCurrent.x - oldTouch.x), currentSprite->getPosition().y + (touchCurrent.y - oldTouch.y)));
+                selectedEntity->SetPosition(preview->ScreenToMap(Vec2(currentSprite->getBoundingBox().getMidX(), currentSprite->getBoundingBox().getMidY())));
+                this->UpdateSelected();
+            }
+        }
+        if(isRotating){
+            
+        }
+    } else {
+        if(currentTool != NO_TOOL && currentTool != ERASE){
+            touchCurrent = touch->getLocation();
+            if(currentSprite != NULL)
+                currentSprite->setContentSize(Size(touchCurrent.x - touchStart.x, touchCurrent.y - touchStart.y));
+        }
+        if(currentTool == NO_TOOL){
+            Vec2 oldTouch = touchStart;
+            touchCurrent = touch->getLocation();
+            touchStart  = touchCurrent;
+            preview->Drag(touchCurrent - oldTouch);
+        }
     }
 }
 void LevelEditor::onTouchesBegan(const std::vector<cocos2d::Touch*> &touches, cocos2d::Event* event){

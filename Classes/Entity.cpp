@@ -114,6 +114,9 @@ Sprite* Entity::GetPhysicsSprite(){
 Point Entity::GetPosition(){
     return position;
 }
+void Entity::SetPosition(Vec2 pos){
+    position = pos;
+}
 Vec2 Entity::GetLaunchVelocity(){
     return launchVelocity;
 }
@@ -122,6 +125,9 @@ int Entity::GetType(){
 }
 Vec2 Entity::GetSize(){
     return size;
+}
+void Entity::SetSize(Vec2 size){
+    this->size = size;
 }
 Vec2 Entity::GetOriginalSize(){
     return originalSize;

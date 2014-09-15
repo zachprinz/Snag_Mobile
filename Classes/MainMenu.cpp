@@ -150,7 +150,7 @@ MenuItemImage* MainMenu::CreateButton(std::string imagePath, Ref* ref, SEL_MenuH
     temp->setScale(tempScale.x, tempScale.y);
     temp->setAnchorPoint(Point(0,1));
     temp->retain();
-    printf("Created a button at position (%f, %f)", temp->getPosition().x, temp->getPosition().y);
+    printf("\nCreated a button at position (%f, %f)", temp->getPosition().x, temp->getPosition().y);
     return temp;
 };
 MenuItemImage* MainMenu::CreateButton(std::string imagePath, Vec2 pos, Vec2 anchors){
