@@ -20,15 +20,15 @@ USING_NS_CC;
 #define USER 5
 
 Entity* Entity::createWall(Vec2 pos, Vec2 size){
-    Entity* ent = new Entity(pos,size,Vec2(0,0),WALL);//Vec2(pos.x + (size.x/2.0), pos.y - (size.y/2.0)), size, Vec2(0,0), WALL);
+    Entity* ent = new Entity(pos,size,Vec2(0,0),WALL);
     return ent;
 }
 Entity* Entity::createSpikeWall(Vec2 pos, Vec2 size){
-    Entity* ent = new Entity(pos,size,Vec2(0,0),SPIKE_WALL);//Vec2(pos.x + size.x/2.0, pos.y - size.y/2.0), size, Vec2(0,0), SPIKE_WALL);
+    Entity* ent = new Entity(pos,size,Vec2(0,0),SPIKE_WALL);
     return ent;
 }
 Entity* Entity::createGoal(Vec2 pos, Vec2 size){
-    Entity* ent = new Entity(pos,size,Vec2(0,0),GOAL);//Vec2(pos.x + size.x/2.0, pos.y - size.y/2.0), size, Vec2(0,0), GOAL);
+    Entity* ent = new Entity(pos,size,Vec2(0,0),GOAL);
     return ent;
 }
 Entity* Entity::createHook(Vec2 pos){

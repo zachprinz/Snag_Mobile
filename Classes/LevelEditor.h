@@ -65,13 +65,13 @@ public:
     void transformCallback();
     void resizeCallback();
     void removeCallback(Ref*);
-    void rotateCallback();
+    void duplicateCallback();
     void finishQuit(Node* sender, Value data);
     
     MenuItemImage* transform;
     MenuItemImage* resize;
     MenuItemImage* remove;
-    MenuItemImage* rotate;
+    MenuItemImage* duplicate;
     
     MenuItemImage* homeSelectButton;
     MenuItemImage* hookSelectButton;

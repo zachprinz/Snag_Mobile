@@ -107,8 +107,8 @@ bool LevelEditor::init(){
     menuItems.pushBack(resize);
     remove = MainMenu::CreateButton("Remove.png", this, menu_selector(LevelEditor::removeCallback), Vec2(0,0), Vec2(0,0));
     menuItems.pushBack(remove);
-    rotate = MainMenu::CreateButton("Rotate.png", Vec2(0,0), Vec2(0,0));
-    menuItems.pushBack(rotate);
+    duplicate = MainMenu::CreateButton("Duplicate.png", Vec2(0,0), Vec2(0,0));
+    menuItems.pushBack(duplicate);
     //rotate->setDisabledImage(Sprite::create("RotateDisabled.png"));
     //remove->setDisabledImage(Sprite::create("RemoveDisabled.png"));
     //transform->setDisabledImage(Sprite::create("TransformDisabled.png"));
@@ -118,8 +118,8 @@ bool LevelEditor::init(){
     transform->setVisible(false);
     resize->setVisible(false);
     remove->setVisible(false);
-    rotate->setVisible(false);
-    rotate->setAnchorPoint(Vec2(1,0));
+    duplicate->setVisible(false);
+    duplicate->setAnchorPoint(Vec2(1,0));
     transform->setAnchorPoint(Vec2(1,1));
     resize->setAnchorPoint(Vec2(0,0));
     remove->setAnchorPoint(Vec2(0,1));
@@ -127,14 +127,13 @@ bool LevelEditor::init(){
     remove->setGlobalZOrder(od);
     transform->setGlobalZOrder(od);
     resize->setGlobalZOrder(od);
-    rotate->setGlobalZOrder(od);
+    duplicate->setGlobalZOrder(od);
     hasSelected = false;
     isTransforming = false;
     isRotating = false;
     isScaling = false;
     transform->getEventDispatcher()->setEnabled(false);
     resize->getEventDispatcher()->setEnabled(false);
-    rotate->getEventDispatcher()->setEnabled(false);
 
     float buttonHeightPixels = 155;
     float tempScale = MainMenu::minScreenScale;
@@ -205,7 +204,7 @@ void LevelEditor::resizeCallback(){
 void LevelEditor::removeCallback(Ref*){
     Deselect(false);
 };
-void LevelEditor::rotateCallback(){
+void LevelEditor::duplicateCallback(){
     isRotating = true;
 };
 void LevelEditor::acceptQuitCallback(Ref*){
@@ -440,16 +439,24 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
         if(!saveDialog){
             touchStart = touch->getLocation();
             touchCurrent = touch->getLocation();
-            if(transform->getBoundingBox().containsPoint(touchStart))
+            bool hitTab = false;
+            if(transform->getBoundingBox().containsPoint(touchStart)){
                transformCallback();
-            if(rotate->getBoundingBox().containsPoint(touchStart))
-                rotateCallback();
-            if(resize->getBoundingBox().containsPoint(touchStart))
+                hitTab = true;
+            }
+            if(resize->getBoundingBox().containsPoint(touchStart)){
                 resizeCallback();
+                hitTab = true;
+            }
             //Check if the user selected an entity//
-            Entity* target = preview->GetTarget(touchStart);
-            if(target != nullptr){
-                Select(target);
+            if(hitTab == false){
+                if(hasSelected){
+                    Deselect();
+                } else {
+                    Entity* target = preview->GetTarget(touchStart);
+                    if(target != nullptr)
+                        Select(target);
+                }
             } else {
             //End Check//
                 if(isRotating || isTransforming || isScaling){
@@ -493,12 +500,12 @@ void LevelEditor::Select(Entity* entity){
     startPosition.y -= selectedEntitySize.height / 2.0;
     currentSprite->setPosition(startPosition);
     currentSprite->setContentSize(selectedEntitySize);
-    rotate->setVisible(true);
+    duplicate->setVisible(true);
     resize->setVisible(true);
     transform->setVisible(true);
     remove->setVisible(true);
     Rect box = currentSprite->getBoundingBox();
-    rotate->setPosition(Vec2(box.getMinX(), box.getMaxY()));
+    duplicate->setPosition(Vec2(box.getMinX(), box.getMaxY()));
     resize->setPosition(Vec2(box.getMaxX(), box.getMaxY()));
     transform->setPosition(Vec2(box.getMinX(), box.getMinY()));
     remove->setPosition(Vec2(box.getMaxX(), box.getMinY()));
@@ -510,7 +517,7 @@ void LevelEditor::Deselect(bool keep){
     hasSelected = false;
     selectedEntity = nullptr;
     transform->setVisible(false);
-    rotate->setVisible(false);
+    duplicate->setVisible(false);
     remove->setVisible(false);
     resize->setVisible(false);
     currentSprite->setVisible(false);
@@ -520,6 +527,9 @@ void LevelEditor::Deselect(bool keep){
     //remove->setEnabled(true);
     //resize->getEventDispatcher()->setEnabled(false);
     //rotate->getEventDispatcher()->setEnabled(false);
+    isRotating = false;
+    isTransforming = false;
+    isScaling = false;
 }
 void LevelEditor::UpdateSelected(){
     if(hasSelected){
@@ -530,7 +540,7 @@ void LevelEditor::UpdateSelected(){
         currentSprite->setPosition(startPosition);
         currentSprite->setContentSize(selectedEntitySize);
         Rect box = currentSprite->getBoundingBox();
-        rotate->setPosition(Vec2(box.getMinX(), box.getMaxY()));
+        duplicate->setPosition(Vec2(box.getMinX(), box.getMaxY()));
         resize->setPosition(Vec2(box.getMaxX(), box.getMaxY()));
         transform->setPosition(Vec2(box.getMinX(), box.getMinY()));
         remove->setPosition(Vec2(box.getMaxX(), box.getMinY()));
@@ -595,7 +605,7 @@ void LevelEditor::onTouchMoved(Touch* touch, Event* event){
         touchCurrent = touch->getLocation();
         if(isScaling){
             if(currentSprite != NULL){
-                currentSprite->setContentSize(Size(currentSprite->getContentSize().width + (touchCurrent.x - oldTouch.x), currentSprite->getContentSize().height - (touchCurrent.y - oldTouch.y)));
+                currentSprite->setContentSize(Size(currentSprite->getContentSize().width + (touchCurrent.x - oldTouch.x), currentSprite->getContentSize().height + (touchCurrent.y - oldTouch.y)));
                 selectedEntity->SetSize(Vec2(currentSprite->getContentSize().width / preview->GetScale(), currentSprite->getContentSize().height / preview->GetScale()));
                 this->UpdateSelected();
             }
