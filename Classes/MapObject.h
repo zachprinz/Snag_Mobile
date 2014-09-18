@@ -16,7 +16,6 @@
 #define ERASE 4
 #define NO_TOOL 5
 #define MOVE 6
-#define GOAL 7
 #define TILE_SIZE 40
 
 #include <iostream>

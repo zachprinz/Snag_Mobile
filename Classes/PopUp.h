@@ -12,7 +12,11 @@
 #include <iostream>
 #include "cocos2d.h"
 #include "MainMenu.h"
-#include "cocos-ext.h"
+#if(CC_PLATFORM_ANDROID == CC_TARGET_PLATFORM)
+	#include "extensions/cocos-ext.h"
+#elif(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+	#include "cocos-ext.h"
+#endif
 
 using namespace cocos2d;
 using namespace cocos2d::extension;

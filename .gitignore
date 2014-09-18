@@ -1,4 +1,5 @@
 proj.wp8-xaml/*
-proj.android/*
 proj.win32/*
+proj.android/obj/*
+proj.android/assets/*
 cocos2d/*

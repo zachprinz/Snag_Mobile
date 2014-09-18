@@ -13,8 +13,11 @@
 #include "Game.h"
 #include "cocos2d.h"
 #include "MapObject.h"
-#include "cocos-ext.h"
-#include "PopUp.h"
+#if(CC_PLATFORM_ANDROID == CC_TARGET_PLATFORM)
+	#include "extensions/cocos-ext.h"
+#elif(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+	#include "cocos-ext.h"
+#endif#include "PopUp.h"
 #include "Preview.h"
 
 #define WALL 0

@@ -172,7 +172,7 @@ void NDKHelper::handleMessage(json_t *methodName, json_t *methodParams)
 }
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-#include "../../cocos2d/cocos/2d/platform/android/jni/JniHelper.h"
+#include "../../cocos2d/cocos/platform/android/jni/JniHelper.h"
 #include <android/log.h>
 #include <jni.h>
 

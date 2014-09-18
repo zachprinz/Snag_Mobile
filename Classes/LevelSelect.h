@@ -12,7 +12,7 @@
 #include <iostream>
 #include "Game.h"
 #include "cocos2d.h"
-#include "CocosGUI.h"
+//#include "CocosGUI.h"
 #include "LevelMenuItem.h"
 #include "PopUp.h"
 #include "Preview.h"

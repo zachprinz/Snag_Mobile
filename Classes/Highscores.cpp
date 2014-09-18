@@ -66,21 +66,21 @@ bool Highscores::init()
     slider = MainMenu::CreateButton("HSScroller.png", this, menu_selector(Highscores::sliderCallback), Vec2(0.023, 0.247), Vec2(0,0));
     //menuItems.pushBack(slider);
     
-    slider2 = cocos2d::ui::Slider::create();
-    slider2->loadBarTexture("HSSliderTrack.png");
-    slider2->loadSlidBallTextures("HSScroller.png","HSScroller.png","");
-    slider2->setCapInsets(Rect(20,0,-20,0));
-    slider2->setPosition(Vec2(visibleSize.width * 0.5, visibleSize.height * 0.247));
-    slider2->setAnchorPoint(Point(0.5,1));
-    slider2->setScale(visibleSize.width / 1704, visibleSize.height / 960);
-    slider2->setPercent(50);
+    //slider2 = cocos2d::ui::Slider::create();
+    //slider2->loadBarTexture("HSSliderTrack.png");
+    //slider2->loadSlidBallTextures("HSScroller.png","HSScroller.png","");
+    //slider2->setCapInsets(Rect(20,0,-20,0));
+    //slider2->setPosition(Vec2(visibleSize.width * 0.5, visibleSize.height * 0.247));
+    //slider2->setAnchorPoint(Point(0.5,1));
+    //slider2->setScale(visibleSize.width / 1704, visibleSize.height / 960);
+    //slider2->setPercent(50);
     
-    scrollview = cocos2d::ui::ScrollView::create();
+    scrollview = ui::ScrollView::create();
     scrollview->setContentSize(Size(mainPanel->getBoundingBox().size.width*.9605, mainPanel->getBoundingBox().size.height * 0.9));
     scrollview->setSize(Size(mainPanel->getBoundingBox().size.width*.9605, mainPanel->getBoundingBox().size.height * 0.9));
     scrollview->setPosition(Vec2(mainPanel->getBoundingBox().getMidX(), mainPanel->getBoundingBox().getMidY() + visibleSize.height * 0.0725));
     scrollview->setAnchorPoint(Point(0.49675,0.5));//475
-    scrollview->setDirection(cocos2d::ui::ScrollView::Direction::HORIZONTAL);
+    scrollview->setDirection(ui::ScrollView::Direction::HORIZONTAL);
     scrollview->setInertiaScrollEnabled(true);
     float innerWidth = mainPanel->getBoundingBox().size.width * 3;
     float innerHeight = mainPanel->getBoundingBox().size.height * 0.9;
@@ -150,7 +150,7 @@ bool Highscores::init()
     this->addChild(userName,1);
     this->addChild(userPlace,1);
     this->addChild(userTime,1);
-    this->addChild(slider2,1);
+    //this->addChild(slider2,1);
     this->addChild(scrollview,1);
     
     //-- Set Up Newtork Stuff --//

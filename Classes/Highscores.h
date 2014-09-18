@@ -11,12 +11,20 @@
 
 #include <iostream>
 #include "cocos2d.h"
-#include "cocos-ext.h"
 #include "cocos2d.h"
 #include "Level.h"
 #include "Game.h"
 #include "MainMenu.h"
 #include "LevelSelect.h"
+#include "../cocos2d/cocos/ui/UIScrollView.h"
+#include "ui/CocosGUI.h"
+//#if(CC_PLATFORM_ANDROID == CC_TARGET_PLATFORM)
+	//#include "extensions/cocos-ext.h"
+//#elif(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+//	#include "cocos-ext.h"
+//#endif
+
+USING_NS_CC;
 
 using namespace cocos2d::extension;
 
@@ -43,13 +51,12 @@ public:
     void sliderCallback(Ref*);
     
     MenuItemImage* slider;
-    cocos2d::ui::Slider* slider2;
     Label* levelName;
     Label* userName;
     Label* userPlace;
     Label* userTime;
     
-    cocos2d::ui::ScrollView* scrollview;
+    ui::ScrollView* scrollview;
     
     void goToLevelSelect();
     void goToPlay();

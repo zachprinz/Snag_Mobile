@@ -11,7 +11,11 @@
 #define __EasyNDK_for_cocos2dx__NDKHelper__
 
 #include "cocos2d.h"
+#if(CC_PLATFORM_ANDROID == CC_TARGET_PLATFORM)
+#include "jansson/jansson.h"
+#elif(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
 #include "jansson.h"
+#endif
 #include "NDKCallbackNode.h"
 
 class NDKHelper

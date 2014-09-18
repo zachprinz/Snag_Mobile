@@ -9,7 +9,6 @@
 #include "User.h"
 #include "Game.h"
 #include "MainMenu.h"
-#include "Spawner.h"
 #include "Level.h"
 
 #define FALL_SPEED 2500
