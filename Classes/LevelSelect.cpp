@@ -432,11 +432,12 @@ void LevelSelect::fetchCustomCallback(Node* sender, Value data){
     }
 };
 void LevelSelect::doneFetching(Node* sender, Value data){
-    printf("\nDone Fetching\n");
+	log("\nDone Fetching");
     loading->setVisible(false);
     loading->stopAllActions();
     if(Game::levels.size() > 0){
         for(int x = page * 4; x < Game::levels[currentLevelSet].size() && x < ((page*4)+4); x++){
+        	log("\tIterating through levels");
             levels[x%4]->SetEnabled(true);
             levels[x%4]->SetLevel(Game::levels[currentLevelSet][x], page);
         }
@@ -456,9 +457,12 @@ void LevelSelect::doneFetching(Node* sender, Value data){
     }
 };
 void LevelSelect::SetPreview(){
+	log("Setting Preview");
     if(selectedLevel != nullptr){
+    	log("\tFound selected level");
         preview->Clear();
         hand->setVisible(true);
+        log("\tCleared level set");
         if(currentLevelSet == LEVELS_CUSTOM && selectedLevel->GetStatus().compare("Private") == 0){
             uploadButton->setVisible(true);
             uploadButton->setEnabled(true);
@@ -484,11 +488,15 @@ void LevelSelect::SetPreview(){
             previewTitle->setScaleY(previewTitle->getScaleY() - 0.05);
         }
         previewAuthor->setString(selectedLevel->GetAuthor());
+        log("\tFinished changing Buttons");
         preview->Reset();
         std::vector<Entity*> tempEnts = selectedLevel->GetEntities();
+        log("\tEntering Loop");
         for(int x = 0; x < tempEnts.size(); x++){
+        	log("\t\tAdding Entity");
             preview->AddEntity(tempEnts[x]);
         }
+        log("\t\tOut of Loop");
     }
 }
 void LevelSelect::menuCloseCallback(Ref* pSender){

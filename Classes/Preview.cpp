@@ -210,6 +210,7 @@ float Preview::GetScale(){
     return mapViewScale;
 }
 void Preview::Reset(){
+    log("\tReseting Preview");
     mapViewOrigin = Vec2(0,0);
     mapViewScale = originalMapViewScale;
 }

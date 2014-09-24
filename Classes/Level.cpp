@@ -48,10 +48,14 @@ void Level::AddMapValue(Entity* ent){
     map["entcount"] = std::to_string(ents.size());
 }
 void Level::CreateFromMapValues(){
+	log("CreateFromMapValues()");
     ents.clear();
     mapObjects.clear();
+    log("\tFinished Clearing");
     ValueVector entities = map["entities"].asValueVector();
+    log("\tCreated ValueVector");
     int count = std::atoi(map["entcount"].asString().c_str());
+    log("\tEntering Loop");
     for (int i = 0; i < count; i++) {
         int z = i*7;
         Vec2 pos;
@@ -70,13 +74,17 @@ void Level::CreateFromMapValues(){
             launchVelocity = velocity;
         }
         //printf("\nType: %i\nPos: (%f, %f)\nSize: (%f, %f)\nVelocity: (%f, %f)\n", type, pos.x, pos.y, size.x, size.y, velocity.x, velocity.y);
+        log("\tAdding Entity");
         AddEntity(new Entity(pos,size,Vec2(0,0),type));
     }
     hasMapObjects = true;
 }
 std::vector<Entity*> Level::GetEntities(){
-    if(hasMapObjects)
+	log("Getting Entities");
+    if(hasMapObjects){
+    	log("\thasMapObjects");
         return ents;
+    }
     CreateFromMapValues();
     return ents;
 }

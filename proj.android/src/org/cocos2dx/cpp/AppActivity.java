@@ -273,10 +273,7 @@ public class AppActivity extends Cocos2dxActivity {
 									c.printStackTrace();
 								}
 							}
-							if(count > 0)
-								level.add("entities", ents);
-							else
-								level.add("entities", null);
+							level.add("entities", ents);
 							level.saveInBackground();
 				         } else {
 				        	 
@@ -436,8 +433,12 @@ public class AppActivity extends Cocos2dxActivity {
 		    						Set<String> ents = level.keySet();
 		    						for(String s : ents){
 		    							try {
-		    								dict.put(s, level.getString(s));
-		    							} catch (JSONException e1) {
+		    								if(s.equals("entities")){
+		    									dict.put(s, level.getJSONArray(s));
+		    								} else {
+		    									dict.put(s, level.get(s));
+		    								}
+		    								} catch (JSONException e1) {
 		    								// TODO Auto-generated catch block
 		    								e1.printStackTrace();
 		    							}
@@ -485,21 +486,30 @@ public class AppActivity extends Cocos2dxActivity {
 		ParseQuery<ParseObject> query = ParseQuery.getQuery("Level");
 		query.addDescendingOrder("favorites");
 		query.setLimit(12);
+		System.out.println("Fetching Rising Levels");
 		query.findInBackground(new FindCallback<ParseObject>() {
 		    public void done(final List<ParseObject> levels, ParseException e) {
 		        if (e == null) {
 		        	ParseUser user = ParseUser.getCurrentUser();
 		        	ParseRelation<ParseObject> relation = user.getRelation("favorites");
+		    		System.out.println("\tAbout to search for favorited Levels");
 		        	relation.getQuery().findInBackground( new FindCallback<ParseObject>() {
 		        		public void done(List<ParseObject> favs, ParseException f){
 		        			if(f == null){
+		    		    		System.out.println("\tIterating through levels");
 		    		        	for(int x = 0; x < levels.size(); x++){
+		    		        		System.out.println("\t\tFound Level");
 		    		        		ParseObject level = levels.get(x);
 		    		        		JSONObject dict = new JSONObject();
-		    						Set<String> ents = level.keySet();
-		    						for(String s : ents){
+		    						Set<String> keys = level.keySet();
+		    						for(String s : keys){
+			    						System.out.println("\t\t\tAdding: " + s);
 		    							try {
-		    								dict.put(s, level.getString(s));
+		    								if(s.equals("entities")){
+		    									dict.put(s, level.getJSONArray(s));
+		    								} else {
+		    									dict.put(s, level.get(s));
+		    								}
 		    							} catch (JSONException e1) {
 		    								// TODO Auto-generated catch block
 		    								e1.printStackTrace();
@@ -524,6 +534,7 @@ public class AppActivity extends Cocos2dxActivity {
 		    								break;
 		    							}
 		    						}
+		    			    		System.out.println("\t\t\tAbout to send level");
 		    			    		AndroidNDKHelper.SendMessageWithParameters("fetchRisingCallback", dict);
 		    		        	}
 					    		JSONObject message = new JSONObject();
@@ -532,6 +543,7 @@ public class AppActivity extends Cocos2dxActivity {
 								} catch (JSONException e1) {
 									e1.printStackTrace();
 								}
+					    		System.out.println("\tAbout to send done fetching");
 					    		AndroidNDKHelper.SendMessageWithParameters("doneFetching", message);
 		        			} else {
 		        				
@@ -559,7 +571,11 @@ public class AppActivity extends Cocos2dxActivity {
 		    						Set<String> ents = level.keySet();
 		    						for(String s : ents){
 		    							try {
-		    								dict.put(s, level.getString(s));
+		    								if(s.equals("entities")){
+		    									dict.put(s, level.getJSONArray(s));
+		    								} else {
+		    									dict.put(s, level.get(s));
+		    								}
 		    							} catch (JSONException e1) {
 		    								// TODO Auto-generated catch block
 		    								e1.printStackTrace();
