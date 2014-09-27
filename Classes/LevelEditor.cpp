@@ -11,7 +11,7 @@
 #include "Level.h"
 #include "Game.h"
 #include "LevelSelect.h"
-#include "Map.h"
+#include <map>
 #include "NDKHelper/NDKHelper.h"
 
 USING_NS_CC;

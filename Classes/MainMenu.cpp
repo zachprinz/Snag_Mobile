@@ -13,12 +13,17 @@
 #include "LogInMenu.h"
 #include "NDKHelper/NDKHelper.h"
 #include "String.h"
+#include "external/tinyxml2/tinyxml2.h"
 
 USING_NS_CC;
 #define MAX_SCALE 1.5;
 #define NATIVE_WIDTH 1704;
 #define NATIVE_HEIGHT 960;
 
+std::map<std::string, Vec2> MainMenu::elementMap;
+float MainMenu::ar_scale;
+std::string MainMenu::ar_extension;
+int MainMenu::aspectRatio;
 Scene* MainMenu::myScene;
 Vec2 MainMenu::screenSize;
 float MainMenu::minScreenScale;
@@ -50,8 +55,34 @@ bool MainMenu::init()
     Vec2 adjustedScale = Vec2(visibleSize.width / maxSize.x, visibleSize.height / maxSize.y);
     screenScale = adjustedScale;
     minScreenScale = adjustedScale.x;
+    
+    float ar_3x2 = 1.5;
+    float ar_4x3 = 1.33;
+    float ar_16x9 = 1.77;
+    float my_ar = visibleSize.width / visibleSize.height;
+    float diff_3x2 = fabs(ar_3x2 - my_ar);
+    float diff_4x3 = fabs(ar_4x3 - my_ar);
+    float diff_16x9 = fabs(ar_16x9 - my_ar);
+    float min_diff = 0.0;
+    aspectRatio = 0;
+    ar_extension = "3x2";
+    ar_scale = visibleSize.width / 960.f;
+    min_diff = diff_3x2;
+    if(diff_4x3 < diff_3x2){
+        aspectRatio = 1;
+        ar_extension = "4x3";
+        ar_scale = visibleSize.width / 2048.f;
+        min_diff = diff_4x3;
+    }
+    if(diff_16x9 < min_diff){
+        aspectRatio = 2;
+        ar_scale = visibleSize.width / 1920.f;
+        ar_extension = "16x9";
+    }
+    
     if(adjustedScale.y < adjustedScale.x)
         minScreenScale = adjustedScale.y;
+    LoadElementMap("mainmenu");
     auto background = MainMenu::CreateButton("MMBackground.png", Vec2(0,1), Vec2(0,0));
     if(visibleSize.width <= ((Sprite*)background->getNormalImage())->getTextureRect().size.width && visibleSize.height <= ((Sprite*)background->getNormalImage())->getTextureRect().size.height){
         background->setNormalImage(Sprite::create("MMBackground.png", Rect(0,0,visibleSize.width, visibleSize.height)));
@@ -150,7 +181,6 @@ MenuItemImage* MainMenu::CreateButton(std::string imagePath, Ref* ref, SEL_MenuH
     temp->setScale(tempScale.x, tempScale.y);
     temp->setAnchorPoint(Point(0,1));
     temp->retain();
-    printf("\nCreated a button at position (%f, %f)", temp->getPosition().x, temp->getPosition().y);
     return temp;
 };
 MenuItemImage* MainMenu::CreateButton(std::string imagePath, Vec2 pos, Vec2 anchors){
@@ -165,7 +195,6 @@ Label* MainMenu::CreateLabel(std::string text, Vec2 pos, Vec2 anchors){
     temp->setAnchorPoint(Point(0.5,0.5));
     temp->setColor(Color3B::BLACK);
     temp->retain();
-    //temp->setFontScale(tempScale);
     return temp;
 };
 Vec2 MainMenu::GetAdjustedScale(Vec2 pos, Vec2 anchors){
@@ -218,6 +247,32 @@ Vec2 MainMenu::GetAdjustedPosition(Vec2 pos, Vec2 anchors, Vec2 scale){
     ///////////////////
     return Vec2(baseX, baseY);
 };
+
+void MainMenu::LoadElementMap(std::string xmldoc){
+    tinyxml2::XMLDocument doc;
+    std::string path = "Images/";
+    path.append(ar_extension);
+    path.append("/");
+    path.append(xmldoc);
+    path.append("/");
+    path.append(xmldoc);
+    path.append(".xml");
+    doc.LoadFile(FileUtils::getInstance()->fullPathForFilename(path).c_str());
+    tinyxml2::XMLElement* element = doc.RootElement()->FirstChildElement();
+    while(element != NULL){
+        std::string image = element->Attribute("name");
+        std::string posString = element->Attribute("position");
+        //std::string sizeString = element->Attribute("size");
+        int commaPosition = posString.find(',');
+        int spacePosition = posString.find(' ');
+        Vec2 position(std::stoi(posString.substr(0,commaPosition)), std::stoi(posString.substr(spacePosition,posString.length())));
+        position.y = MainMenu::Instance->screenSize.y - (position.y * ar_scale);
+        position.x *= ar_scale;
+        elementMap[image] = position;
+        printf("Element: %s\n\tPos: (%f, %f)\n", image.c_str(), position.x, position.y);
+        element = element->NextSiblingElement();
+    }
+}
 
 void MainMenu::menuCloseCallback(Ref* pSender)
 {

@@ -9,9 +9,15 @@
 #ifndef __Snag__MainMenu__
 #define __Snag__MainMenu__
 
+#define AR_3X2
+#define AR_4X3
+#define AR_16X9
+
 #include <iostream>
 #include "Game.h"
 #include "cocos2d.h"
+#include <map>
+#include "string.h"
 
 class MainMenu : public cocos2d::Layer
 {
@@ -42,6 +48,13 @@ public:
     static Label* CreateLabel(std::string text, Vec2 pos, Vec2 anchors);
     static Vec2 GetAdjustedScale(Vec2, Vec2);
     static Vec2 GetAdjustedPosition(Vec2, Vec2, Vec2);
+    
+    static int aspectRatio;
+    static std::map<std::string, Vec2> elementMap;
+    static std::string ar_extension;
+    static float ar_scale;
+    static void LoadElementMap(std::string);
+    
     void userCheckCallback(Node* sender, Value data);
     void checkForUser();
     void goToLogIn();

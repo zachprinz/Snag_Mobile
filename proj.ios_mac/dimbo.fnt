@@ -1,6 +1,6 @@
 info face="Dimbo" size=100 bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=1 aa=1 padding=0,0,0,0 spacing=1,1 outline=0
 common lineHeight=100 base=83 scaleW=1024 scaleH=1024 pages=1 packed=0 alphaChnl=1 redChnl=0 greenChnl=0 blueChnl=0
-page id=0 file="dimbo_0.png"
+page id=0 file="dimbo_white.png"
 chars count=178
 char id=32   x=1003  y=75    width=3     height=1     xoffset=-1    yoffset=99    xadvance=15    page=0  chnl=15
 char id=33   x=158   y=280   width=14    height=58    xoffset=0     yoffset=23    xadvance=14    page=0  chnl=15
