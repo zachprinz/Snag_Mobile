@@ -14,8 +14,8 @@
 int LevelMenuItem::count;
 
 LevelMenuItem::LevelMenuItem(std::string name){
-    float yPositions[] = {0.22,0.37,0.37 + (.37-.22),0.37 + (2*(0.37-.22))};
-    float xPosition = 0.02;
+    float yPositions[] = {0.24,0.39,0.39 + (.37-.22),0.39 + (2*(0.37-.22))};
+    float xPosition = 0.0125;
     float x = xPosition;
     float y = yPositions[count];
     count++;
@@ -23,6 +23,7 @@ LevelMenuItem::LevelMenuItem(std::string name){
     
     background = MainMenu::CreateButton("LSSingleLevelBackground.png", LevelSelect::Instance, menu_selector(LevelSelect::selectCallback), Vec2(x,1.0-y), Vec2(0,0));
     background->setGlobalZOrder(0);
+    background->setScaleX(background->getScaleX() * 0.98);
     menuItems.pushBack(background);
     
     favorited = MainMenu::CreateButton("FavoriteOff.png", LevelSelect::Instance, menu_selector(LevelSelect::favoriteCallback), Vec2(x+0.00, 1.0-(y+0.00)), Vec2(1,0));

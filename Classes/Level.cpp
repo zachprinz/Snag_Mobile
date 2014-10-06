@@ -7,7 +7,6 @@
 //
 
 #include "Level.h"
-#include "MapObject.h"
 #include "NDKHelper/NDKHelper.h"
 #include "User.h"
 
@@ -50,7 +49,6 @@ void Level::AddMapValue(Entity* ent){
 void Level::CreateFromMapValues(){
 	log("CreateFromMapValues()");
     ents.clear();
-    mapObjects.clear();
     log("\tFinished Clearing");
     ValueVector entities = map["entities"].asValueVector();
     log("\tCreated ValueVector");

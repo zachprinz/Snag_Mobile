@@ -20,7 +20,6 @@ USING_NS_CC;
 #define NATIVE_WIDTH 1704;
 #define NATIVE_HEIGHT 960;
 
-std::map<std::string, Vec2> MainMenu::elementMap;
 float MainMenu::ar_scale;
 std::string MainMenu::ar_extension;
 int MainMenu::aspectRatio;
@@ -48,7 +47,6 @@ bool MainMenu::init()
     Instance = this;
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    cocos2d::Vector<MenuItem*> menuItems;
     screenSize.x = visibleSize.width;
     screenSize.y = visibleSize.height;
     Vec2 maxSize(1704, 960); //TODO Replace with defined Native Sizes
@@ -82,8 +80,21 @@ bool MainMenu::init()
     
     if(adjustedScale.y < adjustedScale.x)
         minScreenScale = adjustedScale.y;
-    LoadElementMap("mainmenu");
-    auto background = MainMenu::CreateButton("MMBackground.png", Vec2(0,1), Vec2(0,0));
+    
+    /////////////////////////////////////
+    //Create the actual MainMenu Screen//
+    /////////////////////////////////////
+    
+    std::map<std::string, SEL_MenuHandler> callbacks;
+    callbacks["Play"] = menu_selector(MainMenu::playButtonCallback);
+    cocos2d::Vector<MenuItem*> menuItems;
+    elements = LoadElementMap("mainmenu", this, callbacks, &menuItems, this);
+    menu = Menu::createWithArray(menuItems);
+    menu->setAnchorPoint(Point(0.0,0.0));
+    menu->setPosition(0,0);
+    this->addChild(menu, 1);
+    
+    /*auto background = MainMenu::CreateButton("MMBackground.png", Vec2(0,1), Vec2(0,0));
     if(visibleSize.width <= ((Sprite*)background->getNormalImage())->getTextureRect().size.width && visibleSize.height <= ((Sprite*)background->getNormalImage())->getTextureRect().size.height){
         background->setNormalImage(Sprite::create("MMBackground.png", Rect(0,0,visibleSize.width, visibleSize.height)));
     }
@@ -104,12 +115,7 @@ bool MainMenu::init()
     auto title = MainMenu::CreateButton("MMSnag.png", Vec2(0,0), Vec2(0,1));
     title->setAnchorPoint(Vec2(0.5,title->getAnchorPoint().y));
     title->setPosition(Vec2(background->getBoundingBox().getMidX(), (1.0-0.05)*screenSize.y));
-    menuItems.pushBack(title);
-    
-    menu = Menu::createWithArray(menuItems);
-    menu->setAnchorPoint(Point(0.0,0.0));
-    menu->setPosition(0,0);
-    this->addChild(menu, 1);
+    menuItems.pushBack(title);*/
     
     notice = Label::createWithBMFont("dimbo.fnt", "Searching for an account", TextHAlignment::CENTER);
     notice->setScale(1);
@@ -248,13 +254,16 @@ Vec2 MainMenu::GetAdjustedPosition(Vec2 pos, Vec2 anchors, Vec2 scale){
     return Vec2(baseX, baseY);
 };
 
-void MainMenu::LoadElementMap(std::string xmldoc){
+std::map<std::string, MenuItemImage*> MainMenu::LoadElementMap(std::string xmldoc, Ref* ref, std::map<std::string, SEL_MenuHandler> callbacks, cocos2d::Vector<MenuItem*>* menuItems, cocos2d::Layer* layer){
+    std::map<std::string, MenuItemImage*> elementMap;
     tinyxml2::XMLDocument doc;
     std::string path = "Images/";
     path.append(ar_extension);
     path.append("/");
     path.append(xmldoc);
     path.append("/");
+    std::string rootPath;
+    rootPath.assign(path);
     path.append(xmldoc);
     path.append(".xml");
     doc.LoadFile(FileUtils::getInstance()->fullPathForFilename(path).c_str());
@@ -262,16 +271,36 @@ void MainMenu::LoadElementMap(std::string xmldoc){
     while(element != NULL){
         std::string image = element->Attribute("name");
         std::string posString = element->Attribute("position");
-        //std::string sizeString = element->Attribute("size");
-        int commaPosition = posString.find(',');
-        int spacePosition = posString.find(' ');
+        int commaPosition = (int)posString.find(',');
+        int spacePosition = (int)posString.find(' ');
         Vec2 position(std::stoi(posString.substr(0,commaPosition)), std::stoi(posString.substr(spacePosition,posString.length())));
-        position.y = MainMenu::Instance->screenSize.y - (position.y * ar_scale);
+        float originalY = position.y;
+        float originalX = position.x;
+        position.y = MainMenu::Instance->screenSize.y - position.y * ar_scale;//MainMenu::Instance->screenSize.y - (position.y * ar_scale);
         position.x *= ar_scale;
-        elementMap[image] = position;
-        printf("Element: %s\n\tPos: (%f, %f)\n", image.c_str(), position.x, position.y);
+        std::string fullPath;
+        fullPath.assign(rootPath);
+        fullPath.append(image);
+        fullPath.append(".png");
+        std::string imagePath = FileUtils::getInstance()->fullPathForFilename(fullPath);
+        MenuItemImage* temp;
+        //If there is no included callback for this button//
+        printf("Element: %s\n\tPos: (%f, %f)\n\tOriginal Pos: (%f, %f)\n", image.c_str(), position.x, position.y, originalX, originalY);
+        if(callbacks.find(image) == callbacks.end()){
+            temp = MenuItemImage::create(imagePath, imagePath, MainMenu::Instance, menu_selector(MainMenu::emptyCallback));
+            printf("\tCouldn't find a callback\n");
+        } else {//If there is a callback for this button//
+            temp = MenuItemImage::create(imagePath, imagePath, ref, callbacks[image]);
+        }
+        temp->setPosition(position);
+        temp->setScale(ar_scale, ar_scale);
+        temp->setAnchorPoint(Point(0,1));
+        temp->retain();
+        menuItems->pushBack(temp);
+        elementMap[image] = temp;
         element = element->NextSiblingElement();
     }
+    return elementMap;
 }
 
 void MainMenu::menuCloseCallback(Ref* pSender)

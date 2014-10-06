@@ -36,6 +36,7 @@ public:
     
     void playButtonCallback(Ref*);
     void emptyCallback(Ref*){};
+    std::map<std::string, MenuItemImage*> elements;
     
     static Scene* myScene;
     static MainMenu* Instance;
@@ -50,10 +51,9 @@ public:
     static Vec2 GetAdjustedPosition(Vec2, Vec2, Vec2);
     
     static int aspectRatio;
-    static std::map<std::string, Vec2> elementMap;
     static std::string ar_extension;
     static float ar_scale;
-    static void LoadElementMap(std::string);
+    static std::map<std::string, MenuItemImage*> LoadElementMap(std::string xmlPath, Ref* ref, std::map<std::string, SEL_MenuHandler> callbacks, cocos2d::Vector<MenuItem*>* menuItems, cocos2d::Layer*);
     
     void userCheckCallback(Node* sender, Value data);
     void checkForUser();

@@ -43,8 +43,6 @@ bool LevelSelect::init()
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     
-    cocos2d::Vector<MenuItem*> menuItems;
-    
     auto listener = EventListenerTouchOneByOne::create();
     //listener->setSwallowTouches(true);
     listener->onTouchBegan = CC_CALLBACK_2(LevelSelect::onTouchBegan, this);
@@ -52,93 +50,48 @@ bool LevelSelect::init()
     listener->onTouchEnded = CC_CALLBACK_2(LevelSelect::onTouchEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener,this);
     
-    risingLevels = MainMenu::CreateButton("LSRisingTab.png", this, menu_selector(LevelSelect::risingCallback), Vec2(0.015,1.0-0.105), Vec2(0,0));
-    risingLevels->setGlobalZOrder(0);
-    socialLevels = MainMenu::CreateButton("LSSocialTab.png", this, menu_selector(LevelSelect::socialCallback), Vec2(0.151,1.0-0.105), Vec2(0,0));
-    socialLevels->setGlobalZOrder(0);
-    favoritedLevels = MainMenu::CreateButton("LSFavoritedTab.png", this, menu_selector(LevelSelect::favoritedCallback), Vec2(0.29,1.0-0.105), Vec2(0,0));
-    favoritedLevels->setGlobalZOrder(0);
-    customLevels = MainMenu::CreateButton("LSCustomTab.png", this, menu_selector(LevelSelect::customCallback), Vec2(0.423,1.0-0.105), Vec2(0,0));
-    customLevels->setGlobalZOrder(0);
-    auto seperator = MainMenu::CreateButton("LSSeperator.png", Vec2(0.113,1.0-0.822), Vec2(0,0));
-    seperator->setGlobalZOrder(0);
-    auto leftButton = MainMenu::CreateButton("LSLeft.png", this, menu_selector(LevelSelect::scrollLeftCallback), Vec2(0.016,1.0-0.819), Vec2(0,0));
-    leftButton->setGlobalZOrder(0);
-    auto rightButton = MainMenu::CreateButton("LSRight.png", this, menu_selector(LevelSelect::scrollRightCallback), Vec2(0.47,1.0-0.819), Vec2(0,0));
-    rightButton->setGlobalZOrder(0);
-    auto newLevelButton = MainMenu::CreateButton("LSNewLevel.png", this, menu_selector(LevelSelect::newLevelCallback), Vec2(0.114,1.0-0.855), Vec2(0,0));
-    newLevelButton->setGlobalZOrder(0);
-    auto levelTitle = MainMenu::CreateButton("LSPreviewTitle.png", Vec2(0.585,1.0-0.028), Vec2(0,0));
-    levelTitle->setGlobalZOrder(0);
-    auto levelAuthor = MainMenu::CreateButton("LSPreviewAuthor.png", Vec2(0.621,1.0-0.163), Vec2(0,0));
-    levelAuthor->setGlobalZOrder(0);
-    previewWindow = MainMenu::CreateButton("LSPreviewPreview.png", Vec2(0.582,1.0-0.303), Vec2(0,0));
-    previewWindow->setGlobalZOrder(0);
-    auto playButton = MainMenu::CreateButton("LSPlay.png", this, menu_selector(LevelSelect::playCallback), Vec2(0.587,1.0-0.808), Vec2(0,0));
-    playButton->setGlobalZOrder(0);
-    highscoresButton = MainMenu::CreateButton("LSHighscores.png", this, menu_selector(LevelSelect::highscoresCallback), Vec2(0.69,1.0-0.808), Vec2(0,0));
-    highscoresButton->setGlobalZOrder(0);
-    uploadButton = MainMenu::CreateButton("DownloadOn.png", this, menu_selector(LevelSelect::uploadCallback), Vec2(0.69,1.0-0.808), Vec2(0,0));
-    uploadButton->setVisible(false);
-    uploadButton->setGlobalZOrder(0);
-    auto deleteButton = MainMenu::CreateButton("Delete.png", this, menu_selector(LevelSelect::deleteCallback), Vec2(0.887,1.0-0.808), Vec2(0,0));
-    deleteButton->setGlobalZOrder(0);
-    auto editButton = MainMenu::CreateButton("LSEdit.png", this, menu_selector(LevelSelect::editCallback), Vec2(0.789,1.0-0.808), Vec2(0,0));
-    editButton->setGlobalZOrder(0);
-    auto selectBackground = MainMenu::CreateButton("LSSelectBackground.png",  Vec2(0.01,1.0-0.206), Vec2(0,0));
-    selectBackground->setGlobalZOrder(0);
-    auto previewBackground = MainMenu::CreateButton("LSPreviewBackground.png", Vec2(0.574,1.0-0.013), Vec2(0,0));
-    previewBackground->setGlobalZOrder(0);
-    auto title = MainMenu::CreateButton("LSTitle.png", Vec2(0.144,1.0-0.0), Vec2(0,0));
-    title->setGlobalZOrder(0);
-    auto background = MainMenu::CreateButton("MMBackground.png", Vec2(0,1.0-0.0), Vec2(0,0));
-    if(visibleSize.width <= ((Sprite*)background->getNormalImage())->getTextureRect().size.width && visibleSize.height <= ((Sprite*)background->getNormalImage())->getTextureRect().size.height){
-        background->setNormalImage(Sprite::create("MMBackground.png", Rect(0,0,visibleSize.width, visibleSize.height)));
-    }
-    if(background->getScaleX() < 1.0)
-        background->setScaleX(1.0);
-    if(background->getScaleY() < 1.0)
-        background->setScaleY(1.0);
-    background->setGlobalZOrder(0);
-    previewTitle = MainMenu::CreateLabel("Select A", Vec2(0,0), Vec2(0,0));
-    previewTitle->setGlobalZOrder(0);
-    previewTitle->setPosition(Vec2(levelTitle->getBoundingBox().getMidX(), levelTitle->getBoundingBox().getMidY()));
-    previewTitle->setVisible(false);
-    previewAuthor = MainMenu::CreateLabel("Level", Vec2(0,0), Vec2(0,0));
-    previewAuthor->setPosition(Vec2(levelAuthor->getBoundingBox().getMidX(), levelAuthor->getBoundingBox().getMidY()));
-    previewAuthor->setGlobalZOrder(0);
-    previewAuthor->setVisible(false);
-    
-    menuItems.pushBack(background);
-    menuItems.pushBack(previewBackground);
-    menuItems.pushBack(risingLevels);
-    menuItems.pushBack(customLevels);
-    menuItems.pushBack(socialLevels);
-    menuItems.pushBack(favoritedLevels);
-    menuItems.pushBack(selectBackground);
-    menuItems.pushBack(leftButton);
-    menuItems.pushBack(rightButton);
-    menuItems.pushBack(seperator);
-    menuItems.pushBack(newLevelButton);
-    menuItems.pushBack(previewWindow);
-    menuItems.pushBack(levelTitle);
-    menuItems.pushBack(levelAuthor);
-    menuItems.pushBack(deleteButton);
-    menuItems.pushBack(editButton);
-    menuItems.pushBack(playButton);
-    menuItems.pushBack(highscoresButton);
-    menuItems.pushBack(uploadButton);
-    menuItems.pushBack(title);
-    
+    std::map<std::string, SEL_MenuHandler> callbacks;
+    callbacks["CustomImage"] = menu_selector(LevelSelect::customCallback);
+    callbacks["RisingImage"] = menu_selector(LevelSelect::risingCallback);
+    callbacks["SocialImage"] = menu_selector(LevelSelect::socialCallback);
+    callbacks["StarImage"] = menu_selector(LevelSelect::favoritedCallback);
+    callbacks["Delete"] = menu_selector(LevelSelect::deleteCallback);
+    callbacks["Edit"] = menu_selector(LevelSelect::editCallback);
+    callbacks["HighScores"] = menu_selector(LevelSelect::highscoresCallback);
+    callbacks["Left"] = menu_selector(LevelSelect::scrollLeftCallback);
+    callbacks["Right"] = menu_selector(LevelSelect::scrollRightCallback);
+    callbacks["Play"] = menu_selector(LevelSelect::playCallback);
+    callbacks["Upload"] = menu_selector(LevelSelect::uploadCallback);
+    callbacks["NewLevel"] = menu_selector(LevelSelect::newLevelCallback);
+    cocos2d::Vector<MenuItem*> menuItems;
+    elements = MainMenu::LoadElementMap("levelselect", this, callbacks, &menuItems, this);
     Menu* menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0.0,0.0));
     menu->setPosition(0,0);
     this->addChild(menu, 1);
-    this->addChild(previewTitle, 1);
-    this->addChild(previewAuthor, 1);
-    
 
-    currentLevelsTab = risingLevels;
+    previewTitle = MainMenu::CreateLabel("Select A", Vec2(0,0), Vec2(0,0));
+    previewTitle->setGlobalZOrder(0);
+    previewTitle->setPosition(Vec2(elements["TitleBackground"]->getBoundingBox().getMidX(), elements["TitleBackground"]->getBoundingBox().getMidY()));
+    previewTitle->setVisible(false);
+    this->addChild(previewTitle, 1);
+    previewAuthor = MainMenu::CreateLabel("Level", Vec2(0,0), Vec2(0,0));
+    previewAuthor->setPosition(Vec2(elements["AuthorBackground"]->getBoundingBox().getMidX(), elements["AuthorBackground"]->getBoundingBox().getMidY()));
+    previewAuthor->setGlobalZOrder(0);
+    previewAuthor->setVisible(false);
+    this->addChild(previewAuthor, 1);
+    auto newLevelLabel = MainMenu::CreateLabel("New Level", Vec2(0,0), Vec2(0,0));
+    newLevelLabel->setPosition(Vec2(elements["NewLevel"]->getBoundingBox().getMidX(), elements["NewLevel"]->getBoundingBox().getMidY()));
+    newLevelLabel->setGlobalZOrder(0);
+    newLevelLabel->setVisible(true);
+    this->addChild(newLevelLabel, 1);
+    auto titleLabel = MainMenu::CreateLabel("Level Select", Vec2(0,0), Vec2(0,0));
+    titleLabel->setPosition(Vec2(elements["TitlePanel"]->getBoundingBox().getMidX(), elements["TitlePanel"]->getBoundingBox().getMidY()));
+    titleLabel->setGlobalZOrder(0);
+    titleLabel->setVisible(true);
+    this->addChild(titleLabel, 1);
+    
+    currentLevelsTab = elements["RisingTab"];
     
     for(int x = 0; x < 4; x++){
         LevelMenuItem* lvl = new LevelMenuItem(std::to_string(x) + ") New Map");
@@ -157,7 +110,7 @@ bool LevelSelect::init()
     loading->setVisible(false);
     this->addChild(loading,1);
     
-    tabHeight = socialLevels->getPosition().y;
+    tabHeight = elements["SocialTab"]->getPosition().y;
     tabHeightSelected = tabHeight - 20;
     currentLevelsTab->setPositionY(tabHeightSelected);
     
@@ -172,9 +125,9 @@ bool LevelSelect::init()
     NDKHelper::addSelector("LevelSelect", "newLevelResponce", CC_CALLBACK_2(LevelSelect::newLevelResponce, this), this);
     //--------------------------//
     
-    preview = new Preview(Rect(previewWindow->getBoundingBox().getMinX() + 10,previewWindow->getBoundingBox().getMinY() + 10,previewWindow->getBoundingBox().size.width - 20,previewWindow->getBoundingBox().size.height-20), this, 0.2);
+    preview = new Preview(Rect(elements["LevelPreviewBackground"]->getBoundingBox().getMinX() + 10,elements["LevelPreviewBackground"]->getBoundingBox().getMinY() + 10,elements["LevelPreviewBackground"]->getBoundingBox().size.width - 20,elements["LevelPreviewBackground"]->getBoundingBox().size.height-20), this, 0.2);
     hand = MainMenu::CreateButton("Hand.png", Vec2(0,0), Vec2(0,0));
-    hand->setPosition(Vec2(previewWindow->getBoundingBox().getMidX(), previewWindow->getBoundingBox().getMidY()));
+    hand->setPosition(Vec2(elements["LevelPreviewBackground"]->getBoundingBox().getMidX(), elements["LevelPreviewBackground"]->getBoundingBox().getMidY()));
     hand->setAnchorPoint(Vec2(0.5,0.5));
     this->addChild(hand,1);
     deletePopUp = new PopUp("Delete Level", "Are you sure you want to\ndelete this level?", this, menu_selector(LevelSelect::deleteAcceptCallback), menu_selector(LevelSelect::deleteDeclineCallback));
@@ -185,7 +138,7 @@ bool LevelSelect::init()
 bool LevelSelect::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
     touchStart = touch->getLocation();
     touchCurrent = touch->getLocation();
-    if(previewWindow->getBoundingBox().containsPoint(touchStart)){
+    if(elements["LevelPreviewBackground"]->getBoundingBox().containsPoint(touchStart)){
         isDragging = true;
         hand->setVisible(false);
     }
@@ -249,10 +202,10 @@ void LevelSelect::levelDeletedCallback(Node* sender, Value data){
 void LevelSelect::uploadCallback(Ref*){
     selectedLevel->makePublic();
     if(currentLevelSet == LEVELS_CUSTOM && selectedLevel->GetStatus().compare("Public") == 0){
-        uploadButton->setVisible(false);
-        uploadButton->setEnabled(false);
-        highscoresButton->setVisible(true);
-        highscoresButton->setEnabled(true);
+        elements["Upload"]->setVisible(false);
+        elements["Upload"]->setEnabled(false);
+        elements["HighScores"]->setVisible(true);
+        elements["HighScores"]->setEnabled(true);
     }
 }
 void LevelSelect::scrollRightCallback(Ref*){
@@ -342,16 +295,16 @@ void LevelSelect::SetLevelSetButtons(){
     currentLevelsTab->runAction(MoveTo::create(0.1, Point(currentLevelsTab->getPosition().x, tabHeight)));
     switch(currentLevelSet){
         case LEVELS_RISING:
-            currentLevelsTab = risingLevels;
+            currentLevelsTab = elements["RisingTab"];
             break;
         case LEVELS_FAVORITED:
-            currentLevelsTab = favoritedLevels;
+            currentLevelsTab = elements["StarredTab"];
             break;
         case LEVELS_SOCIAL:
-            currentLevelsTab = socialLevels;
+            currentLevelsTab = elements["SocialTab"];
             break;
         case LEVELS_CUSTOM:
-            currentLevelsTab = customLevels;
+            currentLevelsTab = elements["CustomTab"];
             break;
     }
     currentLevelsTab->runAction(MoveTo::create(0.1, Point(currentLevelsTab->getPosition().x, tabHeightSelected)));
@@ -464,20 +417,20 @@ void LevelSelect::SetPreview(){
         hand->setVisible(true);
         log("\tCleared level set");
         if(currentLevelSet == LEVELS_CUSTOM && selectedLevel->GetStatus().compare("Private") == 0){
-            uploadButton->setVisible(true);
-            uploadButton->setEnabled(true);
-            highscoresButton->setVisible(false);
-            highscoresButton->setEnabled(false);
+            elements["Upload"]->setVisible(true);
+            elements["Upload"]->setEnabled(true);
+            elements["HighScores"]->setVisible(false);
+            elements["HighScores"]->setEnabled(false);
         }
         if(currentLevelSet == LEVELS_CUSTOM && selectedLevel->GetStatus().compare("Public") == 0){
-            uploadButton->setVisible(false);
-            uploadButton->setEnabled(false);
-            highscoresButton->setVisible(true);
-            highscoresButton->setEnabled(true);
+            elements["Upload"]->setVisible(false);
+            elements["Upload"]->setEnabled(false);
+            elements["HighScores"]->setVisible(true);
+            elements["HighScores"]->setEnabled(true);
         }
         if(currentLevelSet != LEVELS_CUSTOM){
-            highscoresButton->setVisible(true);
-            highscoresButton->setEnabled(true);
+            elements["HighScores"]->setVisible(true);
+            elements["HighScores"]->setEnabled(true);
         }
         previewTitle->setVisible(true);
         previewAuthor->setVisible(true);

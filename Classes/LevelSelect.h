@@ -15,6 +15,7 @@
 //#include "CocosGUI.h"
 #include "LevelMenuItem.h"
 #include "PopUp.h"
+#include <map>
 #include "Preview.h"
 
 #define LEVELS_CUSTOM 0
@@ -53,7 +54,8 @@ public:
 
     float tabHeightSelected;
     float tabHeight;
-    
+    std::map<std::string, MenuItemImage*> elements;
+
     std::vector<LevelMenuItem*> levels;
     void LoadLevels();
     
@@ -62,6 +64,8 @@ public:
     
     MenuItemImage* levelsBackground;
     int currentLevelSet;
+    
+    
     
     void Refresh();
     
@@ -84,13 +88,6 @@ private:
     void goToLevelEditor();
     void SetPreview();
     MenuItemImage* currentLevelsTab;
-    MenuItemImage* customLevels;
-    MenuItemImage* socialLevels;
-    MenuItemImage* risingLevels;
-    MenuItemImage* favoritedLevels;
-    MenuItemImage* highscoresButton;
-    MenuItemImage* uploadButton;
-    MenuItemImage* previewWindow;
     MenuItemImage* hand;
     Sprite* loading;
     Label* previewTitle;

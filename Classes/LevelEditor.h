@@ -12,7 +12,6 @@
 #include <iostream>
 #include "Game.h"
 #include "cocos2d.h"
-#include "MapObject.h"
 #if(CC_PLATFORM_ANDROID == CC_TARGET_PLATFORM)
 	#include "extensions/cocos-ext.h"
 #elif(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)

@@ -10,7 +10,6 @@
 #define __Snag__Level__
 
 #include <iostream>
-#include "MapObject.h"
 #include "Game.h"
 #include "cocos2d.h"
 
@@ -48,7 +47,6 @@ public:
 private:
     void CreateFromMapValues();
     bool hasMapObjects;
-    void AddMapObject(MapObject*);
     void AddMapValue(Entity*);
     void SetMap(ValueMap);
     ValueMap map;
@@ -57,7 +55,6 @@ private:
     std::string author;
     std::string objectID;
     std::string highscoresID;
-    std::vector<MapObject*> mapObjects;
     Vec2 launchVelocity;
     Vec2 launchPosition;
     int entCount;
