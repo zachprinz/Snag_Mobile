@@ -29,6 +29,7 @@ float MainMenu::minScreenScale;
 Vec2 MainMenu::screenScale;
 MainMenu* MainMenu::Instance;
 float MainMenu::transitionTime = 0.5;
+float MainMenu::ar_offset;
 
 Scene* MainMenu::createScene(){
     auto scene = Scene::create();
@@ -64,11 +65,13 @@ bool MainMenu::init()
     float min_diff = 0.0;
     aspectRatio = 0;
     ar_extension = "3x2";
+    ar_offset = 4;
     ar_scale = visibleSize.width / 960.f;
     min_diff = diff_3x2;
     if(diff_4x3 < diff_3x2){
         aspectRatio = 1;
         ar_extension = "4x3";
+        ar_offset = 3;
         ar_scale = visibleSize.width / 2048.f;
         min_diff = diff_4x3;
     }
@@ -76,6 +79,7 @@ bool MainMenu::init()
         aspectRatio = 2;
         ar_scale = visibleSize.width / 1920.f;
         ar_extension = "16x9";
+        ar_offset = 6;
     }
     
     if(adjustedScale.y < adjustedScale.x)
@@ -198,6 +202,7 @@ Label* MainMenu::CreateLabel(std::string text, Vec2 pos, Vec2 anchors){
     Label* temp = Label::createWithBMFont("dimbo.fnt", text, TextHAlignment::CENTER);
     Vec2 tempScale = GetAdjustedScale(pos, anchors);
     temp->setPosition(GetAdjustedPosition(pos, anchors, tempScale));
+    temp->setScale((screenSize.y / 1080.0)*1.2);
     temp->setAnchorPoint(Point(0.5,0.5));
     temp->setColor(Color3B::BLACK);
     temp->retain();
@@ -291,6 +296,13 @@ std::map<std::string, MenuItemImage*> MainMenu::LoadElementMap(std::string xmldo
             printf("\tCouldn't find a callback\n");
         } else {//If there is a callback for this button//
             temp = MenuItemImage::create(imagePath, imagePath, ref, callbacks[image]);
+        }
+        if(temp->getBoundingBox().size.height == temp->getBoundingBox().size.width){
+            float height = temp->getBoundingBox().size.height;
+            if(height == 101 || height == 187 || height == 200){
+                position.x -= ar_offset * ar_scale;
+                position.y += ar_offset * ar_scale;
+            }
         }
         temp->setPosition(position);
         temp->setScale(ar_scale, ar_scale);

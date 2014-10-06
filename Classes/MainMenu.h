@@ -53,6 +53,7 @@ public:
     static int aspectRatio;
     static std::string ar_extension;
     static float ar_scale;
+    static float ar_offset;
     static std::map<std::string, MenuItemImage*> LoadElementMap(std::string xmlPath, Ref* ref, std::map<std::string, SEL_MenuHandler> callbacks, cocos2d::Vector<MenuItem*>* menuItems, cocos2d::Layer*);
     
     void userCheckCallback(Node* sender, Value data);
