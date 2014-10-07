@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include "cocos2d.h"
+#include <map>
 #if(CC_PLATFORM_ANDROID == CC_TARGET_PLATFORM)
 	#include "extensions/cocos-ext.h"
 #elif(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
@@ -25,7 +26,8 @@ public:
     virtual bool init();
     void menuCloseCallback(cocos2d::Ref* pSender);
     CREATE_FUNC(LogInMenu);
-    
+    std::map<std::string, cocos2d::MenuItemImage*> elements;
+
     bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
     void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
     

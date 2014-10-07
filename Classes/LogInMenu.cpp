@@ -37,6 +37,8 @@ bool LogInMenu::init()
     Instance = this;
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    
+    /*
     cocos2d::Vector<MenuItem*> menuItems;
     
     auto background = MainMenu::CreateButton("MMBackground.png", Vec2(0,1), Vec2(0,0));
@@ -77,27 +79,75 @@ bool LogInMenu::init()
     menu->setAnchorPoint(Point(0.0,0.0));
     menu->setPosition(0,0);
     this->addChild(menu, 1);
+     */
     
-    Size editBoxSize = Size(750*MainMenu::screenScale.x, 100 * MainMenu::screenScale.y);
-    Scale9Sprite* passwordBoxBG = Scale9Sprite::create("line.png");
+    std::map<std::string, SEL_MenuHandler> callbacks;
+    callbacks["RegisterButton"] = menu_selector(LogInMenu::registerButtonCallback);
+    callbacks["LogInBackground"] = menu_selector(LogInMenu::logInButtonCallback);
+    cocos2d::Vector<MenuItem*> menuItems;
+    elements = MainMenu::LoadElementMap("login", this, callbacks, &menuItems, this);
+    Menu* menu = Menu::createWithArray(menuItems);
+    menu->setAnchorPoint(Point(0.0,0.0));
+    menu->setPosition(0,0);
+    this->addChild(menu, 1);
+    
+    Size editBoxSize = Size(elements["UsernamePanel"]->getBoundingBox().size.width * 0.5, elements["UsernamePanel"]->getBoundingBox().size.height * 0.75);
+    Scale9Sprite* passwordBoxBG = Scale9Sprite::create("Slice_9_Inlay.png");
+    passwordBoxBG->setCapInsets(Rect(18,32,89,70));
     passwordBoxBG->setContentSize(editBoxSize);
-    passwordBox = EditBox::create(Size(350,50), passwordBoxBG);
-    passwordBox->setPosition(Point(visibleSize.width / 2.0 + 175, visibleSize.height / 2.0 - 60));
-    passwordBox->setFontSize(30);
+    passwordBoxBG->setAnchorPoint(Vec2(0.1,0));
+    passwordBox = EditBox::create(editBoxSize, passwordBoxBG);
+    passwordBox->setFontColor(Color3B::BLACK);
+    passwordBox->setPlaceholderFontColor(Color3B::BLACK);
+    passwordBox->setPosition(Point(elements["PasswordPanel"]->getBoundingBox().getMaxX() * 0.985, elements["PasswordPanel"]->getBoundingBox().getMidY()));
+    passwordBox->setAnchorPoint(Vec2(1,0.5));
+    passwordBox->setFontSize(90);
     passwordBox->setMaxLength(18);
-    passwordBox->setPlaceHolder("password");
-    passwordBox->setFontColor(Color3B::WHITE);
+    passwordBox->setPlaceHolder(" Password");
+    passwordBox->setFontName("Marker Felt.ttf");
+    passwordBox->setInputFlag(EditBox::InputFlag::PASSWORD);
     this->addChild(passwordBox,1);
     
-    Scale9Sprite* usernameBoxBG = Scale9Sprite::create("line.png");
+    Scale9Sprite* usernameBoxBG = Scale9Sprite::create("Slice_9_Inlay.png");
+    usernameBoxBG->setCapInsets(Rect(18,32,89,70));
     usernameBoxBG->setContentSize(editBoxSize);
-    usernameBox = EditBox::create(Size(350,50), usernameBoxBG);
-    usernameBox->setPosition(Point(visibleSize.width / 2.0 + 175, visibleSize.height / 2.0 + 115));
-    usernameBox->setFontSize(30);
+    usernameBox = EditBox::create(editBoxSize, usernameBoxBG);
+    usernameBox->setPosition(Point(elements["UsernamePanel"]->getBoundingBox().getMaxX() * 0.985, elements["UsernamePanel"]->getBoundingBox().getMidY()));
+    usernameBox->setAnchorPoint(Vec2(1,0.5));
+    usernameBox->setFontSize(90);
     usernameBox->setMaxLength(18);
-    usernameBox->setPlaceHolder("username");
-    usernameBox->setFontColor(Color3B::WHITE);
+    usernameBox->setPlaceHolder(" Username");
+    usernameBox->setFontName("Marker Felt.ttf");
+    usernameBox->setPlaceholderFontColor(Color3B::BLACK);
+    usernameBox->setFontColor(Color3B::BLACK);
     this->addChild(usernameBox,1);
+    
+    auto logInLabel = MainMenu::CreateLabel("Log In", Vec2(0,0), Vec2(0,0));
+    logInLabel->setGlobalZOrder(0);
+    logInLabel->setPosition(Vec2(elements["LogInBackground"]->getBoundingBox().getMidX(), elements["LogInBackground"]->getBoundingBox().getMidY()));
+    this->addChild(logInLabel, 1);
+    
+    auto registerLabel = MainMenu::CreateLabel("Register", Vec2(0,0), Vec2(0,0));
+    registerLabel->setGlobalZOrder(0);
+    registerLabel->setPosition(Vec2(elements["RegisterButton"]->getBoundingBox().getMidX(), elements["RegisterButton"]->getBoundingBox().getMidY()));
+    this->addChild(registerLabel, 1);
+    
+    auto titleLabel = MainMenu::CreateLabel("This'll Only Take a Second", Vec2(0,0), Vec2(0,0));
+    titleLabel->setGlobalZOrder(0);
+    titleLabel->setPosition(Vec2(elements["TitlePanel"]->getBoundingBox().getMidX(), elements["TitlePanel"]->getBoundingBox().getMidY()));
+    this->addChild(titleLabel, 1);
+    
+    auto passwordLabel = MainMenu::CreateLabel("Password:", Vec2(0,0), Vec2(0,0));
+    passwordLabel->setGlobalZOrder(0);
+    passwordLabel->setPosition(Vec2(elements["PasswordPanel"]->getBoundingBox().getMinX() * 1.25, elements["PasswordPanel"]->getBoundingBox().getMidY()));
+    passwordLabel->setAnchorPoint(Vec2(0,0.5));
+    this->addChild(passwordLabel, 1);
+    
+    auto usernameLabel = MainMenu::CreateLabel("Username:", Vec2(0,0), Vec2(0,0));
+    usernameLabel->setGlobalZOrder(0);
+    usernameLabel->setPosition(Vec2(elements["UsernamePanel"]->getBoundingBox().getMinX() * 1.25, elements["UsernamePanel"]->getBoundingBox().getMidY()));
+    usernameLabel->setAnchorPoint(Vec2(0,0.5));
+    this->addChild(usernameLabel, 1);
     
     //-- Set Up Newtork Stuff --//
     //NDKHelper::addSelector("LogIn", "userCheckCallback", CC_CALLBACK_2(MainMenu::userCheckCallback, this), this);

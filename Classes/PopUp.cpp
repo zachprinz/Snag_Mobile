@@ -86,15 +86,19 @@ PopUp::PopUp(std::string title, std::string text, Ref* ref, SEL_MenuHandler call
     declineButton->setAnchorPoint(Vec2(1,0));
     menuItems.pushBack(declineButton);
     
-    Size editBoxSize = Size(750*MainMenu::screenScale.x, 100 * MainMenu::screenScale.y);
-    Scale9Sprite* nameBoxBG = Scale9Sprite::create("line.png");
+    Size editBoxSize = Size(background->getBoundingBox().size.width * 0.7, background->getBoundingBox().size.height * 0.22);
+    Scale9Sprite* nameBoxBG = Scale9Sprite::create("Slice_9_Inlay.png");
+    nameBoxBG->setCapInsets(Rect(18,32,89,70));
     nameBoxBG->setContentSize(editBoxSize);
-    nameBox = EditBox::create(Size(350,50), nameBoxBG);
+    nameBox = EditBox::create(editBoxSize, nameBoxBG);
     nameBox->setPosition(Point(MainMenu::screenSize.x / 2.0, background->getBoundingBox().getMidY() - (MainMenu::screenSize.y * 0.07)));
-    nameBox->setFontSize(30);
+    nameBox->setFontSize(75);
     nameBox->setMaxLength(18);
     nameBox->setPlaceHolder("level name");
-    nameBox->setFontColor(Color3B::WHITE);
+    nameBox->setFontColor(Color3B::BLACK);
+    nameBox->setPlaceholderFontColor(Color3B::BLACK);
+    nameBox->setFontName("Marker Felt.ttf");
+    nameBox->setPlaceholderFontName("Marker Felt.ttf");
     nameBox->setGlobalZOrder(7);
     option1 = nullptr;
     

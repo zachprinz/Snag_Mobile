@@ -50,6 +50,12 @@ bool LevelSelect::init()
     listener->onTouchEnded = CC_CALLBACK_2(LevelSelect::onTouchEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener,this);
     
+    for(int x = 0; x < 4; x++){
+        LevelMenuItem* lvl = new LevelMenuItem(std::to_string(x) + ") New Map");
+        lvl->SetTag(x);
+        levels.push_back(lvl);
+    }
+    
     std::map<std::string, SEL_MenuHandler> callbacks;
     callbacks["CustomImage"] = menu_selector(LevelSelect::customCallback);
     callbacks["RisingImage"] = menu_selector(LevelSelect::risingCallback);
@@ -94,13 +100,10 @@ bool LevelSelect::init()
     currentLevelsTab = elements["RisingTab"];
     
     for(int x = 0; x < 4; x++){
-        LevelMenuItem* lvl = new LevelMenuItem(std::to_string(x) + ") New Map");
-        lvl->SetTag(x);
-        levels.push_back(lvl);
-        this->addChild(lvl->menu,1);
-        this->addChild(lvl->name,1);
-        this->addChild(lvl->number,1);
-        this->addChild(lvl->favorites,1);
+        this->addChild(levels[x]->menu,1);
+        this->addChild(levels[x]->name,1);
+        this->addChild(levels[x]->number,1);
+        this->addChild(levels[x]->favorites,1);
     }
     
     loading = Sprite::create("Loading.png");
