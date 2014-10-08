@@ -15,6 +15,7 @@
 #include "Level.h"
 #include "Game.h"
 #include "MainMenu.h"
+#include <map>
 #include "LevelSelect.h"
 #include "../cocos2d/cocos/ui/UIScrollView.h"
 #include "ui/CocosGUI.h"
@@ -43,7 +44,8 @@ public:
     static Highscores* Instance;
     
     //void getHighscoresCallback(Node* sender, cocos2d::Value data);
-    
+    std::map<std::string, MenuItemImage*> elements;
+
     void playButtonCallback(Ref*);
     void favoriteButtonCallback(Ref*);
     void facebookButtonCallback(Ref*);

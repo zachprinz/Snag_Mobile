@@ -37,77 +37,62 @@ bool Highscores::init()
     Instance = this;
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    
+    std::map<std::string, SEL_MenuHandler> callbacks;
+    callbacks["Facebook"] = menu_selector(Highscores::facebookButtonCallback);
+    callbacks["Play"] = menu_selector(Highscores::playButtonCallback);
+    callbacks["Home"] = menu_selector(Highscores::homeButtonCallback);
+    callbacks["Star"] = menu_selector(Highscores::favoriteButtonCallback);
+    callbacks["ScrollerHandle"] = menu_selector(Highscores::sliderCallback);
     cocos2d::Vector<MenuItem*> menuItems;
-    
-    auto background = MainMenu::CreateButton("MMBackground.png", Vec2(0,1), Vec2(0,0));
-    if(visibleSize.width <= ((Sprite*)background->getNormalImage())->getTextureRect().size.width && visibleSize.height <= ((Sprite*)background->getNormalImage())->getTextureRect().size.height){
-        background->setNormalImage(Sprite::create("MMBackground.png", Rect(0,0,visibleSize.width, visibleSize.height)));
-    }
-    if(background->getScaleX() < 1.0)
-        background->setScaleX(1.0);
-    if(background->getScaleY() < 1.0)
-        background->setScaleY(1.0);
-    background->setPositionZ(-2);
-    menuItems.pushBack(background);
-    
-    auto mainPanel = MainMenu::CreateButton("HSMainPanel.png", Vec2(0.00,0.829),Vec2(0,0));
-    menuItems.pushBack(mainPanel);
-    auto userPanel = MainMenu::CreateButton("HSUserPanel.png", Vec2(.009,0.17),Vec2(0,0));
-    menuItems.pushBack(userPanel);
-    
-    auto facebookButton = MainMenu::CreateButton("LSFacebook.png", this, menu_selector(Highscores::facebookButtonCallback), Vec2(0.715,0.17), Vec2(0,0));
-    menuItems.pushBack(facebookButton);
-    auto playButton = MainMenu::CreateButton("LSPlay.png", this, menu_selector(Highscores::playButtonCallback), Vec2(0.903, 0.17), Vec2(0,0));
-    menuItems.pushBack(playButton);
-    auto homeButton = MainMenu::CreateButton("home.png", this, menu_selector(Highscores::homeButtonCallback), Vec2(0.9, 0.99), Vec2(0,0));
-    menuItems.pushBack(homeButton);
-    auto favoriteButton = MainMenu::CreateButton("FavoritedButton.png", this, menu_selector(Highscores::favoriteButtonCallback), Vec2(0.809, 0.17), Vec2(0,0));
-    menuItems.pushBack(favoriteButton);
-    slider = MainMenu::CreateButton("HSScroller.png", this, menu_selector(Highscores::sliderCallback), Vec2(0.023, 0.247), Vec2(0,0));
-    //menuItems.pushBack(slider);
-    
-    //slider2 = cocos2d::ui::Slider::create();
-    //slider2->loadBarTexture("HSSliderTrack.png");
-    //slider2->loadSlidBallTextures("HSScroller.png","HSScroller.png","");
-    //slider2->setCapInsets(Rect(20,0,-20,0));
-    //slider2->setPosition(Vec2(visibleSize.width * 0.5, visibleSize.height * 0.247));
-    //slider2->setAnchorPoint(Point(0.5,1));
-    //slider2->setScale(visibleSize.width / 1704, visibleSize.height / 960);
-    //slider2->setPercent(50);
+    elements = MainMenu::LoadElementMap("highscores", this, callbacks, &menuItems, this);
     
     scrollview = ui::ScrollView::create();
-    scrollview->setContentSize(Size(mainPanel->getBoundingBox().size.width*.9605, mainPanel->getBoundingBox().size.height * 0.9));
-    scrollview->setSize(Size(mainPanel->getBoundingBox().size.width*.9605, mainPanel->getBoundingBox().size.height * 0.9));
-    scrollview->setPosition(Vec2(mainPanel->getBoundingBox().getMidX(), mainPanel->getBoundingBox().getMidY() + visibleSize.height * 0.0725));
-    scrollview->setAnchorPoint(Point(0.49675,0.5));//475
+    scrollview->setContentSize(Size(elements["MainPanel"]->getBoundingBox().size.width*.9605, elements["MainPanel"]->getBoundingBox().size.height * 0.9));
+    scrollview->setSize(Size(elements["MainPanel"]->getBoundingBox().size.width*.9605, elements["MainPanel"]->getBoundingBox().size.height * 0.9));
+    scrollview->setPosition(Vec2(elements["Inlay"]->getBoundingBox().getMidX(), elements["MainPanel"]->getBoundingBox().getMidY() + visibleSize.height * 0.0435));
+    scrollview->setAnchorPoint(Point(0.5,0.5));
     scrollview->setDirection(ui::ScrollView::Direction::HORIZONTAL);
     scrollview->setInertiaScrollEnabled(true);
-    float innerWidth = mainPanel->getBoundingBox().size.width * 3;
-    float innerHeight = mainPanel->getBoundingBox().size.height * 0.9;
+    float innerWidth = elements["MainPanel"]->getBoundingBox().size.width * 3;
+    float innerHeight = elements["MainPanel"]->getBoundingBox().size.height * 0.9;
     scrollview->setInnerContainerSize(Size(innerWidth,innerHeight));
-    
+    elements["Seperator"]->setVisible(false);
+    if(MainMenu::aspectRatio == 0){
+        elements["Stripes"]->setScaleY(elements["Stripes"]->getScaleY() * 0.98);
+        elements["Stripes"]->setPositionY(scrollview->getBoundingBox().getMinY() + scrollview->getBoundingBox().size.height * 0.02);
+        elements["Stripes"]->setAnchorPoint(Vec2(0,0));
+    }
     for(int x = 0; x < 10; x++){
-        auto seperator1 = MainMenu::CreateButton("HSSeperator.png", Vec2(.009,0.17),Vec2(0,0));
-        seperator1->setPosition(Vec2(15 + (x * 550),0));
-        seperator1->setAnchorPoint(Vec2(0.0,0));
-        seperator1->setScale(visibleSize.height / 960);
+        auto seperator1 = MainMenu::CreateButton("highscores", "Seperator.png");
+        int sepOffset = 5;
+        if(MainMenu::Instance->aspectRatio == 1)
+            sepOffset = -5 * MainMenu::Instance->ar_scale;
+        if(MainMenu::Instance->aspectRatio == 0)
+            seperator1->setScaleY(seperator1->getScaleY() * 0.99);
+        seperator1->setPosition(Vec2(x * 750 * (visibleSize.width / 1920.0),sepOffset));
+        seperator1->setAnchorPoint(Vec2(0,0));
         scrollview->addChild(seperator1,1);
         for(int y = 0; y < 4; y++){
-            float bottom = y * 88 - 14;
-            float left = x * 550 + 62;
+            float bottom = y * (0.25 * elements["Inlay"]->getBoundingBox().size.height) - (elements["Inlay"]->getBoundingBox().size.height * 0.03);
+            float left = seperator1->getBoundingBox().getMaxX() + seperator1->getBoundingBox().size.width * 0.1;
             auto userNameTemp = MainMenu::CreateLabel("PlayerName", Vec2(0,1.0-0.015), Vec2(0,0));
             userNameTemp->setPosition(left, bottom);
             userNameTemp->setAnchorPoint(Vec2(0.0,0));
-            userNameTemp->setScale(0.77);
+            userNameTemp->setScaleX(1.25 * visibleSize.width / 1920.0);
+            userNameTemp->setScaleY(1.25 * visibleSize.height / 1080.0);
             auto userPlaceTemp = MainMenu::CreateLabel(std::to_string(x*4 + (4-y)), Vec2(0,1.0-0.015), Vec2(0,0));
-            userPlaceTemp->setPosition(left,bottom + 85 + 21);
-            userPlaceTemp->setAnchorPoint(Vec2(0,1));
+            userPlaceTemp->setPosition(left, userNameTemp->getBoundingBox().getMaxY() - (userNameTemp->getBoundingBox().size.height * 0.3));
+            userPlaceTemp->setAnchorPoint(Vec2(0,0));
             userPlaceTemp->setColor(Color3B(255,225,107));
-            userPlaceTemp->setScale(0.49);
+            userPlaceTemp->setScaleX(1.25 * 0.5 * (visibleSize.width / 1920.0));
+            userPlaceTemp->setScaleY(1.25 * 0.5 * (visibleSize.height / 1080.0));
             auto userTimeTemp = MainMenu::CreateLabel("0:00", Vec2(0,1.0-0.015), Vec2(0,0));
-            userTimeTemp->setPosition(left + 490, bottom + 50);
+            userTimeTemp->setPosition(left + 750 * (visibleSize.width / 1920.0) - seperator1->getBoundingBox().size.width * 1.1, bottom + 50);
             userTimeTemp->setAnchorPoint(Vec2(1,0.5));
             userTimeTemp->setColor(Color3B(53,107,168));
+            userTimeTemp->setScaleX(visibleSize.width / 1920.0);
+            userTimeTemp->setScaleY(visibleSize.height / 1080.0);
             if(y%2 == 0)
                 userTimeTemp->setColor(Color3B(170,201,228));
             scrollview->addChild(userNameTemp,1);
@@ -117,29 +102,28 @@ bool Highscores::init()
         }
     }
     
-    auto titleBackground = MainMenu::CreateButton("HSTitlePanel.png", Vec2(0,0), Vec2(0,0));
-    titleBackground->setAnchorPoint(Vec2(0.5,1.0));
-    titleBackground->setPosition(Vec2(background->getBoundingBox().getMidX(), background->getBoundingBox().getMaxY()));
-    menuItems.pushBack(titleBackground);
-    
     levelName = MainMenu::CreateLabel("Leve Name", Vec2(0,1.0-0.015), Vec2(0,0));
-    levelName->setPosition(titleBackground->getBoundingBox().getMidX(), titleBackground->getBoundingBox().getMidY());
+    levelName->setPosition(elements["TitlePanel"]->getBoundingBox().getMidX(), elements["TitlePanel"]->getBoundingBox().getMidY());
     levelName->setAnchorPoint(Vec2(0.5,0.5));
     
     userName = MainMenu::CreateLabel("PlayerName", Vec2(0,1.0-0.015), Vec2(0,0));
-    userName->setPosition(userPanel->getBoundingBox().getMinX() + (visibleSize.width * 0.05), userPanel->getBoundingBox().getMinY());
+    userName->setPosition(elements["UserPanel"]->getBoundingBox().getMinX() + (visibleSize.width * 0.05), elements["UserPanel"]->getBoundingBox().getMinY());
     userName->setAnchorPoint(Vec2(0.0,0));
-    userName->setScale(0.83);
+    userName->setScaleX(1.25 * visibleSize.width / 1920.0);
+    userName->setScaleY(1.25 * visibleSize.height / 1080.0);
     
     userPlace = MainMenu::CreateLabel("130,023", Vec2(0,1.0-0.015), Vec2(0,0));
-    userPlace->setPosition(userPanel->getBoundingBox().getMinX() + (visibleSize.width * 0.05), userPanel->getBoundingBox().getMaxY());
-    userPlace->setAnchorPoint(Vec2(0,1));
+    userPlace->setPosition(userName->getBoundingBox().getMinX(), userName->getBoundingBox().getMaxY() - (userName->getBoundingBox().size.height * 0.3));
+    userPlace->setAnchorPoint(Vec2(0,0));
     userPlace->setColor(Color3B(255,225,107));
-    userPlace->setScale(0.49);
+    userPlace->setScaleX(1.25 * 0.5 * (visibleSize.width / 1920.0));
+    userPlace->setScaleY(1.25 * 0.5 * (visibleSize.height / 1080.0));
     
     userTime = MainMenu::CreateLabel("0:00", Vec2(0,1.0-0.015), Vec2(0,0));
-    userTime->setPosition(userPanel->getBoundingBox().getMaxX() - 15, userPanel->getBoundingBox().getMaxY());
-    userTime->setAnchorPoint(Vec2(1,1));
+    userTime->setPosition(elements["UserStripe"]->getBoundingBox().getMaxX() - userTime->getBoundingBox().size.width * 0.1, elements["UserStripe"]->getBoundingBox().getMidY());
+    userTime->setAnchorPoint(Vec2(1,0.5));
+    userTime->setScaleX(1.5 * visibleSize.width / 1920.0);
+    userTime->setScaleY(1.5 * visibleSize.height / 1080.0);
     userTime->setColor(Color3B(53,107,168));
     
     Menu* menu = Menu::createWithArray(menuItems);

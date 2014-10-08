@@ -198,6 +198,34 @@ MenuItemImage* MainMenu::CreateButton(std::string imagePath, Vec2 pos, Vec2 anch
     temp->setEnabled(false);
     return temp;
 };
+MenuItemImage* MainMenu::CreateButton(std::string layer, std::string item, Ref* ref, SEL_MenuHandler callback){
+    std::string path = "Images/";
+    path.append(ar_extension);
+    path.append("/");
+    path.append(layer);
+    path.append("/");
+    path.append(item);
+    std::string imagePath = FileUtils::getInstance()->fullPathForFilename(path);
+    MenuItemImage* temp;
+    temp = MenuItemImage::create(imagePath, imagePath, ref, callback);
+    temp->setScale(ar_scale, ar_scale);
+    temp->retain();
+    return temp;
+};
+MenuItemImage* MainMenu::CreateButton(std::string layer, std::string item){
+    std::string path = "Images/";
+    path.append(ar_extension);
+    path.append("/");
+    path.append(layer);
+    path.append("/");
+    path.append(item);
+    std::string imagePath = FileUtils::getInstance()->fullPathForFilename(path);
+    MenuItemImage* temp;
+    temp = MenuItemImage::create(imagePath, imagePath, MainMenu::Instance, menu_selector(MainMenu::emptyCallback));
+    temp->setScale(ar_scale, ar_scale);
+    temp->retain();
+    return temp;
+};
 Label* MainMenu::CreateLabel(std::string text, Vec2 pos, Vec2 anchors){
     Label* temp = Label::createWithBMFont("dimbo.fnt", text, TextHAlignment::CENTER);
     Vec2 tempScale = GetAdjustedScale(pos, anchors);

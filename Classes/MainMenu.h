@@ -46,6 +46,8 @@ public:
     
     static MenuItemImage* CreateButton(std::string imagePath, Ref* ref, SEL_MenuHandler callback, Vec2 pos, Vec2 anchors);
     static MenuItemImage* CreateButton(std::string imagePath, Vec2 pos, Vec2 anchors);
+    static MenuItemImage* CreateButton(std::string layer, std::string item, Ref* ref, SEL_MenuHandler callback);
+    static MenuItemImage* CreateButton(std::string layer, std::string item);
     static Label* CreateLabel(std::string text, Vec2 pos, Vec2 anchors);
     static Vec2 GetAdjustedScale(Vec2, Vec2);
     static Vec2 GetAdjustedPosition(Vec2, Vec2, Vec2);
