@@ -54,6 +54,7 @@ bool LevelSelect::init()
         LevelMenuItem* lvl = new LevelMenuItem(std::to_string(x) + ") New Map");
         lvl->SetTag(x);
         levels.push_back(lvl);
+        lvl->SetEnabled(false);
     }
     
     std::map<std::string, SEL_MenuHandler> callbacks;
@@ -78,19 +79,14 @@ bool LevelSelect::init()
 
     previewTitle = MainMenu::CreateLabel("Select A", Vec2(0,0), Vec2(0,0));
     previewTitle->setGlobalZOrder(0);
-    previewTitle->setPosition(Vec2(elements["TitleBackground"]->getBoundingBox().getMidX(), elements["TitleBackground"]->getBoundingBox().getMidY()));
+    previewTitle->setPosition(Vec2(elements["LevelTitleBackground"]->getBoundingBox().getMidX(), elements["LevelTitleBackground"]->getBoundingBox().getMidY()));
     previewTitle->setVisible(false);
     this->addChild(previewTitle, 1);
     previewAuthor = MainMenu::CreateLabel("Level", Vec2(0,0), Vec2(0,0));
-    previewAuthor->setPosition(Vec2(elements["AuthorBackground"]->getBoundingBox().getMidX(), elements["AuthorBackground"]->getBoundingBox().getMidY()));
+    previewAuthor->setPosition(Vec2(elements["LevelAuthorBackground"]->getBoundingBox().getMidX(), elements["LevelAuthorBackground"]->getBoundingBox().getMidY()));
     previewAuthor->setGlobalZOrder(0);
     previewAuthor->setVisible(false);
     this->addChild(previewAuthor, 1);
-    auto newLevelLabel = MainMenu::CreateLabel("New Level", Vec2(0,0), Vec2(0,0));
-    newLevelLabel->setPosition(Vec2(elements["NewLevel"]->getBoundingBox().getMidX(), elements["NewLevel"]->getBoundingBox().getMidY()));
-    newLevelLabel->setGlobalZOrder(0);
-    newLevelLabel->setVisible(true);
-    this->addChild(newLevelLabel, 1);
     auto titleLabel = MainMenu::CreateLabel("Level Select", Vec2(0,0), Vec2(0,0));
     titleLabel->setPosition(Vec2(elements["TitlePanel"]->getBoundingBox().getMidX(), elements["TitlePanel"]->getBoundingBox().getMidY()));
     titleLabel->setGlobalZOrder(0);
@@ -394,7 +390,7 @@ void LevelSelect::doneFetching(Node* sender, Value data){
     if(Game::levels.size() > 0){
         for(int x = page * 4; x < Game::levels[currentLevelSet].size() && x < ((page*4)+4); x++){
         	log("\tIterating through levels");
-            levels[x%4]->SetEnabled(true);
+            //levels[x%4]->SetEnabled(true);
             levels[x%4]->SetLevel(Game::levels[currentLevelSet][x], page);
         }
         selectedLevel = levels[0]->level;
