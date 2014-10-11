@@ -14,10 +14,19 @@
 int LevelMenuItem::count;
 
 LevelMenuItem::LevelMenuItem(int position, ui::ScrollView* layer, float center, float inlayHeight){
-    float yPositions[] = {0.24,0.39,0.39 + (.37-.22),0.39 + (2*(0.37-.22))};
-    float xPosition = 0.0125;
-    float x = xPosition;
-    float y = yPositions[count];
+    float a4x3_NumberPanelSize = 88;
+    float a3x2_NumberPanelSize = 41;
+    float a16x9_NumberPanelSize = 78;
+    float numberPanelSize;
+    if(MainMenu::aspectRatio == 0)
+        numberPanelSize = a3x2_NumberPanelSize * MainMenu::ar_scale;
+    if(MainMenu::aspectRatio == 1)
+        numberPanelSize = a4x3_NumberPanelSize * MainMenu::ar_scale;
+    if(MainMenu::aspectRatio == 2)
+        numberPanelSize = a16x9_NumberPanelSize * MainMenu::ar_scale;
+    
+    float x = 0;
+    float y = 0;
     count++;
     Vector<MenuItem*> menuItems;
     std::string levelImageName = "Level_Left.png";
@@ -27,102 +36,214 @@ LevelMenuItem::LevelMenuItem(int position, ui::ScrollView* layer, float center, 
     background->setGlobalZOrder(0);
     background->setScaleX(background->getScaleX() * 0.98);
     background->setPosition(Vec2(center,(inlayHeight) - floor(((int)position)/2)*background->getBoundingBox().size.height*1.1));
-    background->setAnchorPoint(Vec2((position+1) % 2 - (0.075*(0.5-((position+1)%2))),1.0));
+    background->setAnchorPoint(Vec2((position+1) % 2 - (0.0625*(0.5-((position+1)%2))),1.0));
     menuItems.pushBack(background);
     
-    favorited = MainMenu::CreateButton("FavoriteOff.png", LevelSelect::Instance, menu_selector(LevelSelect::favoriteCallback), Vec2(x+0.00, 1.0-(y+0.00)), Vec2(1,0));
-    favorited->setPosition(Vec2(background->getBoundingBox().getMaxX() - (24*MainMenu::screenScale.y), background->getBoundingBox().getMidY()));
-    favorited->setAnchorPoint(Vec2(1,0.5));
-    favorited->setScale(favorited->getScaleX() * 0.925, favorited->getScaleY() * 0.925);
-    favorited->setGlobalZOrder(0);
-    //menuItems.pushBack(favorited);
+    float freeWidth = background->getBoundingBox().size.width - numberPanelSize;
     
-    this->favorites = MainMenu::CreateLabel("0", Vec2(x+0.00,1.0-(y+0.00)), Vec2(0,0));
-    this->favorites->setPosition(Vec2(favorited->getBoundingBox().getMinX() - (30 * MainMenu::minScreenScale), favorited->getBoundingBox().getMidY()));
-    this->favorites->setAnchorPoint(Vec2(1,0.5));
-    this->favorites->setGlobalZOrder(0);
-    
-    this->number = MainMenu::CreateLabel("1) ", Vec2(x+0.00,1.0-(y+0.00)), Vec2(0,0));
-    this->number->setPosition(Vec2(background->getPositionX() + (24*MainMenu::screenScale.x), background->getBoundingBox().getMidY()));
-    this->number->setAnchorPoint(Vec2(0,0.5));
+    float ribbonX = background->getBoundingBox().getMinX() + (numberPanelSize / 2.0);
+    if((position+1)%2 == 0)
+        ribbonX = background->getBoundingBox().getMaxX() - (numberPanelSize / 2.0);
+    this->number = MainMenu::CreateLabel(std::to_string(position+1), Vec2(x+0.00,1.0-(y+0.00)), Vec2(0,0));
+    this->number->setPosition(Vec2(ribbonX, background->getBoundingBox().getMaxY() - (numberPanelSize / 2.0)));
+    this->number->setAnchorPoint(Vec2(0.5,0.5));
     this->number->setGlobalZOrder(0);
+    number->setScaleX(number->getScaleX()* 0.75);
+    number->setScaleY(number->getScaleY()* 0.75);
     
-    this->name = MainMenu::CreateLabel("New Level", Vec2(x+0.00,1.0-(y+0.00)), Vec2(0,0));
-    this->name->setPosition(Vec2(number->getBoundingBox().getMaxX(), background->getBoundingBox().getMidY()));
-    this->name->setAnchorPoint(Vec2(0,0.5));
+    float nameX = background->getBoundingBox().getMinX() + numberPanelSize + ((background->getBoundingBox().size.width - numberPanelSize)/2.0);
+    if((position+1)%2 == 0)
+        nameX = (background->getBoundingBox().getMaxX() - numberPanelSize - ((background->getBoundingBox().size.width - numberPanelSize)/2.0));
+    this->name = MainMenu::CreateLabel("New Level", Vec2(0,0), Vec2(0,0));
+    this->name->setPosition(Vec2(nameX,  background->getBoundingBox().getMinY() + (background->getBoundingBox().size.height - numberPanelSize) + ((background->getBoundingBox().size.height - numberPanelSize)/2.0)));
+    this->name->setAnchorPoint(Vec2(0.5,0.5));
     this->name->setGlobalZOrder(0);
+    name->setScaleX(name->getScaleX()* 0.75);
+    name->setScaleY(name->getScaleY()* 0.75);
+    
+    clock = MainMenu::CreateButton("levelselect", "Clock.png");
+    clock->setAnchorPoint(Vec2(0.5,0.5));
+    float clockX = background->getBoundingBox().getMaxX() - numberPanelSize;
+    if((position+1)%2 == 0)
+        clockX = background->getBoundingBox().getMinX() + numberPanelSize;
+    float clockY = background->getBoundingBox().getMinY() + ((background->getBoundingBox().size.height - numberPanelSize)/2.0);
+    this->name->setAnchorPoint(Vec2(0.5,0.5));
+    clock->setPosition(clockX, clockY);
+    menuItems.pushBack(clock);
+    
+    time = MainMenu::CreateLabel("00:00", Vec2(0,0), Vec2(0,0));
+    time->setPosition(clockX, clockY);
+    time->setAnchorPoint(Vec2(0.5,0.5));
+    time->setScaleX(time->getScaleX()* 0.7);
+    time->setScaleY(time->getScaleY()* 0.7);
+    
+    MenuItemImage* previousStar = MainMenu::CreateButton("levelselect", "Star_Empty.png");
+    previousStar->setScale(previousStar->getScale() * 0.9);
+
+    previousStar->setAnchorPoint(Vec2(0.5,0.5));
+    if((position+1)%2 == 0){
+        previousStar->setPosition(number->getBoundingBox().getMinX(), clock->getBoundingBox().getMidY());
+        stars.push_back(previousStar);
+        for(int x = 0; x < 4; x++){
+            auto star = MainMenu::CreateButton("levelselect", "Star_Empty.png");
+            star->setScale(star->getScale() * 0.9);
+
+            star->setPosition(previousStar->getBoundingBox().getMinX(), previousStar->getBoundingBox().getMidY());
+            star->setAnchorPoint(Vec2(1,0.5));
+            stars.push_back(star);
+            previousStar = star;
+        }
+    } else {
+        previousStar->setPosition(number->getBoundingBox().getMaxX(), clock->getBoundingBox().getMidY());
+        stars.push_back(previousStar);
+        for(int x = 0; x < 4; x++){
+            auto star = MainMenu::CreateButton("levelselect", "Star_Empty.png");
+            star->setScale(star->getScale() * 0.9);
+
+            star->setPosition(previousStar->getBoundingBox().getMaxX(), previousStar->getBoundingBox().getMidY());
+            star->setAnchorPoint(Vec2(0,0.5));
+            stars.push_back(star);
+            previousStar = star;
+        }
+    }
+    for(int x = 0; x < stars.size(); x++){
+        menuItems.pushBack(stars[x]);
+    }
     
     menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0,0));
     menu->setPosition(0,0);
     
     layer->addChild(menu,-11);
-    //layer->addChild(name,-11);
-    //layer->addChild(number,-11);
-    //layer->addChild(favorites,-11);
+    layer->addChild(name,-11);
+    layer->addChild(time, -11);
+    layer->addChild(number,-11);
 }
 
-LevelMenuItem::LevelMenuItem(int position, Layer* layer, float center, float inlayHeight){
-    float yPositions[] = {0.24,0.39,0.39 + (.37-.22),0.39 + (2*(0.37-.22))};
-    float x = center;
-    float y = yPositions[count];
+LevelMenuItem::LevelMenuItem(int position, Layer* layer, float center, float height){
+    float x = 0;
+    float y = 0;
     count++;
-    Vector<MenuItem*> menuItems;
+    float a4x3_NumberPanelSize = 88;
+    float a3x2_NumberPanelSize = 41;
+    float a16x9_NumberPanelSize = 78;
+    float numberPanelSize;
+    if(MainMenu::aspectRatio == 0)
+        numberPanelSize = a3x2_NumberPanelSize * MainMenu::ar_scale;
+    if(MainMenu::aspectRatio == 1)
+        numberPanelSize = a4x3_NumberPanelSize * MainMenu::ar_scale;
+    if(MainMenu::aspectRatio == 2)
+        numberPanelSize = a16x9_NumberPanelSize * MainMenu::ar_scale;
     
-    background = MainMenu::CreateButton("LSSingleLevelBackground.png", LevelSelect::Instance, menu_selector(LevelSelect::selectCallback), Vec2(x,1.0-y), Vec2(0,0));
+    Vector<MenuItem*> menuItems;
+    std::string levelImageName = "Level_Left.png";
+    if((position+1) % 2 == 0)
+        levelImageName = "Level_Right.png";
+    background = MainMenu::CreateButton("levelselect", levelImageName);
     background->setGlobalZOrder(0);
     background->setScaleX(background->getScaleX() * 0.98);
-    background->setPositionX(x);
-    background->setPositionY(2100);
-    background->setAnchorPoint(Vec2(0.5,0.5));
+    background->setPosition(Vec2(center,height));
+    background->setAnchorPoint(Vec2((position+1) % 2 - (0.055*(0.5-((position+1)%2))),0.5));
     menuItems.pushBack(background);
     
-    favorited = MainMenu::CreateButton("FavoriteOff.png", LevelSelect::Instance, menu_selector(LevelSelect::favoriteCallback), Vec2(x+0.00, 1.0-(y+0.00)), Vec2(1,0));
-    favorited->setPosition(Vec2(background->getBoundingBox().getMaxX() - (24*MainMenu::screenScale.y), background->getBoundingBox().getMidY()));
-    favorited->setAnchorPoint(Vec2(1,0.5));
-    favorited->setScale(favorited->getScaleX() * 0.925, favorited->getScaleY() * 0.925);
-    favorited->setGlobalZOrder(0);
-    menuItems.pushBack(favorited);
-    
-    this->favorites = MainMenu::CreateLabel("0", Vec2(x+0.00,1.0-(y+0.00)), Vec2(0,0));
-    this->favorites->setPosition(Vec2(favorited->getBoundingBox().getMinX() - (30 * MainMenu::minScreenScale), favorited->getBoundingBox().getMidY()));
-    this->favorites->setAnchorPoint(Vec2(1,0.5));
-    this->favorites->setGlobalZOrder(0);
+    float ribbonX = background->getBoundingBox().getMinX() + (numberPanelSize / 2.0);
+    if((position+1)%2 == 0)
+        ribbonX = background->getBoundingBox().getMaxX() - (numberPanelSize / 2.0);
+    ribbon = MainMenu::CreateButton("levelselect", "Featured_Icon.png");
+    ribbon->setPosition(Vec2(ribbonX, background->getBoundingBox().getMaxY() - (numberPanelSize / 2.0)));
+    ribbon->setAnchorPoint(Vec2(0.5,0.5));
+    menuItems.pushBack(ribbon);
     
     this->number = MainMenu::CreateLabel("1) ", Vec2(x+0.00,1.0-(y+0.00)), Vec2(0,0));
     this->number->setPosition(Vec2(background->getPositionX() + (24*MainMenu::screenScale.x), background->getBoundingBox().getMidY()));
     this->number->setAnchorPoint(Vec2(0,0.5));
     this->number->setGlobalZOrder(0);
     
-    this->name = MainMenu::CreateLabel("New Level", Vec2(x+0.00,1.0-(y+0.00)), Vec2(0,0));
-    this->name->setPosition(Vec2(number->getBoundingBox().getMaxX(), background->getBoundingBox().getMidY()));
-    this->name->setAnchorPoint(Vec2(0,0.5));
+    float nameX = background->getBoundingBox().getMinX() + numberPanelSize + ((background->getBoundingBox().size.width - numberPanelSize)/2.0);
+    if((position+1)%2 == 0)
+        nameX = (background->getBoundingBox().getMaxX() - numberPanelSize - ((background->getBoundingBox().size.width - numberPanelSize)/2.0));
+    this->name = MainMenu::CreateLabel("New Level", Vec2(0,0), Vec2(0,0));
+    this->name->setPosition(Vec2(nameX,  background->getBoundingBox().getMinY() + (background->getBoundingBox().size.height - numberPanelSize) + ((background->getBoundingBox().size.height - numberPanelSize)/2.0)));
+    this->name->setAnchorPoint(Vec2(0.5,0.5));
     this->name->setGlobalZOrder(0);
+    name->setScaleX(name->getScaleX()* 0.75);
+    name->setScaleY(name->getScaleY()* 0.75);
     
+    clock = MainMenu::CreateButton("levelselect", "Clock.png");
+    clock->setAnchorPoint(Vec2(0.5,0.5));
+    float clockX = background->getBoundingBox().getMaxX() - numberPanelSize;
+    if((position+1)%2 == 0)
+        clockX = background->getBoundingBox().getMinX() + numberPanelSize;
+    float clockY = background->getBoundingBox().getMinY() + ((background->getBoundingBox().size.height - numberPanelSize)/2.0);
+    this->name->setAnchorPoint(Vec2(0.5,0.5));
+    clock->setPosition(clockX, clockY);
+    menuItems.pushBack(clock);
+    
+    time = MainMenu::CreateLabel("00:00", Vec2(0,0), Vec2(0,0));
+    time->setPosition(clockX, clockY);
+    time->setAnchorPoint(Vec2(0.5,0.5));
+    time->setScaleX(time->getScaleX()* 0.7);
+    time->setScaleY(time->getScaleY()* 0.7);
+    
+    MenuItemImage* previousStar = MainMenu::CreateButton("levelselect", "Star_Empty.png");
+    previousStar->setScale(previousStar->getScale() * 0.9);
+
+    previousStar->setAnchorPoint(Vec2(0.5,0.5));
+    if((position+1)%2 == 0){
+        previousStar->setPosition(ribbon->getBoundingBox().getMinX(), clock->getBoundingBox().getMidY());
+        stars.push_back(previousStar);
+        for(int x = 0; x < 4; x++){
+            auto star = MainMenu::CreateButton("levelselect", "Star_Empty.png");
+            star->setScale(star->getScale() * 0.9);
+            star->setPosition(previousStar->getBoundingBox().getMinX(), previousStar->getBoundingBox().getMidY());
+            star->setAnchorPoint(Vec2(1,0.5));
+            stars.push_back(star);
+            previousStar = star;
+        }
+    } else {
+        previousStar->setPosition(ribbon->getBoundingBox().getMaxX(), clock->getBoundingBox().getMidY());
+        stars.push_back(previousStar);
+        for(int x = 0; x < 4; x++){
+            auto star = MainMenu::CreateButton("levelselect", "Star_Empty.png");
+            star->setScale(star->getScale() * 0.9);
+
+            star->setPosition(previousStar->getBoundingBox().getMaxX(), previousStar->getBoundingBox().getMidY());
+            star->setAnchorPoint(Vec2(0,0.5));
+            stars.push_back(star);
+            previousStar = star;
+        }
+    }
+    for(int x = 0; x < stars.size(); x++){
+        menuItems.pushBack(stars[x]);
+    }
     menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0,0));
     menu->setPosition(0,0);
+    layer->addChild(menu,1);
+    layer->addChild(name,1);
+    layer->addChild(time,1);
+
 }
 void LevelMenuItem::SetEnabled(bool is){
     menu->setEnabled(is);
     menu->setVisible(is);
     name->setVisible(is);
     number->setVisible(is);
-    favorites->setVisible(is);
+    time->setVisible(is);
 }
 void LevelMenuItem::SetOrder(int){
 
 }
 void LevelMenuItem::SetFavorited(bool i){
     if(i){
-        int count = std::atoi(favorites->getString().c_str());
-        favorites->setString(std::to_string(count));
-        favorited->setNormalImage(Sprite::create("FavoriteOn.png"));
+        //int count = std::atoi(favorites->getString().c_str());
+        //favorites->setString(std::to_string(count));
+        //favorited->setNormalImage(Sprite::create("FavoriteOn.png"));
     }
     else{
-        int count = std::atoi(favorites->getString().c_str());
-        favorites->setString(std::to_string(count));
-        favorited->setNormalImage(Sprite::create("FavoriteOff.png"));
+        //int count = std::atoi(favorites->getString().c_str());
+        //favorites->setString(std::to_string(count));
+        //favorited->setNormalImage(Sprite::create("FavoriteOff.png"));
     }
 }
 void LevelMenuItem::SetLevel(Level* lvl, int page){
@@ -130,19 +251,17 @@ void LevelMenuItem::SetLevel(Level* lvl, int page){
     myName = lvl->GetName();
     myPath = lvl->GetPath();
     name->setString(myName);
-    number->setString(std::to_string(favorited->getTag() + (page*4) +1) + ") ");
-    name->setScale(1.0);
     while(name->getBoundingBox().size.width >= 320){
         name->setScaleX(name->getScaleX() - 0.05);
         name->setScaleY(name->getScaleY() - 0.05);
     }
-    this->name->setPosition(Vec2(number->getBoundingBox().getMaxX(), background->getBoundingBox().getMidY()));
-    favorites->setString(std::to_string(lvl->GetFavorites()));
+    //this->name->setPosition(Vec2(number->getBoundingBox().getMaxX(), background->getBoundingBox().getMidY()));
+    //favorites->setString(std::to_string(lvl->GetFavorites()));
     SetFavorited(lvl->GetIsFavorited());
     printf("\nSet up a custom leve with %d favorites that %d favorited.", lvl->GetFavorites(), lvl->GetIsFavorited());
 }
 void LevelMenuItem::SetTag(int x){
-    favorited->setTag(x);
+    //favorited->setTag(x);
     background->setTag(x);
     if(myName != "")
         name->setString(std::to_string(x) + ") " + myName);

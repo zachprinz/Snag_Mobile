@@ -84,8 +84,12 @@ bool LevelSelect::init()
     float innerHeight = elements["Inlay"]->getBoundingBox().size.height * 3;
     scrollview->setInnerContainerSize(Size(innerWidth,innerHeight));
     
+    auto pinnedPanel = MainMenu::CreateButton("levelselect", "Pinned_Panel.png");
+    pinnedPanel->setPosition(elements["Inlay"]->getBoundingBox().getMidX(), elements["Inlay"]->getBoundingBox().getMaxY());
+    pinnedPanel->setAnchorPoint(Vec2(0.5,1));
+    
     for(int x = 0; x < 4; x++){
-        LevelMenuItem* lvl = new LevelMenuItem(x, scrollview, ((float)innerWidth) / 2.0, elements["Inlay"]->getBoundingBox().size.height*3-elements["Pinned_Panel"]->getBoundingBox().size.height);
+        LevelMenuItem* lvl = new LevelMenuItem(x, scrollview, ((float)innerWidth) / 2.0, elements["Inlay"]->getBoundingBox().size.height*3-pinnedPanel->getBoundingBox().size.height);
         lvl->SetTag(x);
         levels.push_back(lvl);
     }
@@ -111,10 +115,23 @@ bool LevelSelect::init()
     this->addChild(scrollview,1);
     elements["Pinned_Panel"]->setVisible(false);//(10);
     
-    auto pinnedPanel = MainMenu::CreateButton("levelselect", "Pinned_Panel.png");
-    pinnedPanel->setPosition(elements["Inlay"]->getBoundingBox().getMidX(), elements["Inlay"]->getBoundingBox().getMaxY());
-    pinnedPanel->setAnchorPoint(Vec2(0.5,1));
-    this->addChild(pinnedPanel, 11);
+
+    this->addChild(pinnedPanel, 1);
+    
+    auto featuredLabelPanel = MainMenu::CreateButton("levelselect", "Featured_Label_Panel.png");
+
+    auto featured_label = MainMenu::CreateLabel("Featured", Vec2(0,0), Vec2(0,0));
+    featured_label->setPosition(Vec2(elements["Pinned_Panel"]->getBoundingBox().getMidX(), elements["Pinned_Panel"]->getBoundingBox().getMaxY() - (featuredLabelPanel->getBoundingBox().size.height*0.65/2.0)));
+    featured_label->setAnchorPoint(Vec2(0.5,0.5));
+    featured_label->setScaleX(featured_label->getScaleX()* 0.6);
+    featured_label->setScaleY(featured_label->getScaleY()* 0.5);
+    this->addChild(featured_label,1);
+    
+    for(int x = 0; x < 2; x++){
+        LevelMenuItem* lvl = new LevelMenuItem(x, this, ((float)innerWidth) / 2.0 + scrollview->getBoundingBox().getMinX(), elements["Pinned_Panel"]->getBoundingBox().getMaxY() - featuredLabelPanel->getBoundingBox().size.height - (elements["Pinned_Panel"]->getBoundingBox().size.height*0.85 - featuredLabelPanel->getBoundingBox().size.height)/2.0);
+        lvl->SetTag(x);
+        featuredLevels.push_back(lvl);
+    }
     
     loading = Sprite::create("Loading.png");
     loading->setScale(0.5,0.5);

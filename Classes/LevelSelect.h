@@ -59,6 +59,7 @@ public:
     std::map<std::string, MenuItemImage*> elements;
 
     std::vector<LevelMenuItem*> levels;
+    std::vector<LevelMenuItem*> featuredLevels;
     void LoadLevels();
     
     static Scene* myScene;
