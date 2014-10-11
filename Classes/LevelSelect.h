@@ -17,6 +17,8 @@
 #include "PopUp.h"
 #include <map>
 #include "Preview.h"
+#include "../cocos2d/cocos/ui/UIScrollView.h"
+#include "ui/CocosGUI.h"
 
 #define LEVELS_CUSTOM 0
 #define LEVELS_SOCIAL 1
@@ -65,7 +67,7 @@ public:
     MenuItemImage* levelsBackground;
     int currentLevelSet;
     
-    
+    ui::ScrollView* scrollview;
     
     void Refresh();
     

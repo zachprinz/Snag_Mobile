@@ -50,12 +50,7 @@ bool LevelSelect::init()
     listener->onTouchEnded = CC_CALLBACK_2(LevelSelect::onTouchEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener,this);
     
-    for(int x = 0; x < 4; x++){
-        LevelMenuItem* lvl = new LevelMenuItem(std::to_string(x) + ") New Map");
-        lvl->SetTag(x);
-        levels.push_back(lvl);
-        lvl->SetEnabled(false);
-    }
+
     
     std::map<std::string, SEL_MenuHandler> callbacks;
     callbacks["CustomImage"] = menu_selector(LevelSelect::customCallback);
@@ -76,7 +71,25 @@ bool LevelSelect::init()
     menu->setAnchorPoint(Point(0.0,0.0));
     menu->setPosition(0,0);
     this->addChild(menu, 1);
+    
 
+    scrollview = ui::ScrollView::create();
+    scrollview->setContentSize(Size(elements["Inlay"]->getBoundingBox().size.width*1, elements["Inlay"]->getBoundingBox().size.height * 1));
+    scrollview->setSize(Size(elements["Inlay"]->getBoundingBox().size.width*1, elements["Inlay"]->getBoundingBox().size.height * 1));
+    scrollview->setPosition(Vec2(elements["Inlay"]->getBoundingBox().getMidX(), elements["Inlay"]->getBoundingBox().getMidY()));// + visibleSize.height * 0.0435));
+    scrollview->setAnchorPoint(Point(0.5,0.5));
+    scrollview->setDirection(ui::ScrollView::Direction::VERTICAL);
+    scrollview->setInertiaScrollEnabled(true);
+    float innerWidth = elements["Inlay"]->getBoundingBox().size.width * 1;
+    float innerHeight = elements["Inlay"]->getBoundingBox().size.height * 3;
+    scrollview->setInnerContainerSize(Size(innerWidth,innerHeight));
+    
+    for(int x = 0; x < 4; x++){
+        LevelMenuItem* lvl = new LevelMenuItem(x, scrollview, ((float)innerWidth) / 2.0, elements["Inlay"]->getBoundingBox().size.height*3-elements["Pinned_Panel"]->getBoundingBox().size.height);
+        lvl->SetTag(x);
+        levels.push_back(lvl);
+    }
+    
     previewTitle = MainMenu::CreateLabel("Select A", Vec2(0,0), Vec2(0,0));
     previewTitle->setGlobalZOrder(0);
     previewTitle->setPosition(Vec2(elements["LevelTitleBackground"]->getBoundingBox().getMidX(), elements["LevelTitleBackground"]->getBoundingBox().getMidY()));
@@ -95,12 +108,13 @@ bool LevelSelect::init()
     
     currentLevelsTab = elements["RisingTab"];
     
-    for(int x = 0; x < 4; x++){
-        this->addChild(levels[x]->menu,1);
-        this->addChild(levels[x]->name,1);
-        this->addChild(levels[x]->number,1);
-        this->addChild(levels[x]->favorites,1);
-    }
+    this->addChild(scrollview,1);
+    elements["Pinned_Panel"]->setVisible(false);//(10);
+    
+    auto pinnedPanel = MainMenu::CreateButton("levelselect", "Pinned_Panel.png");
+    pinnedPanel->setPosition(elements["Inlay"]->getBoundingBox().getMidX(), elements["Inlay"]->getBoundingBox().getMaxY());
+    pinnedPanel->setAnchorPoint(Vec2(0.5,1));
+    this->addChild(pinnedPanel, 11);
     
     loading = Sprite::create("Loading.png");
     loading->setScale(0.5,0.5);
@@ -108,6 +122,7 @@ bool LevelSelect::init()
     loading->setAnchorPoint(Vec2(0.5, 0.5));
     loading->setVisible(false);
     this->addChild(loading,1);
+
     
     tabHeight = elements["SocialTab"]->getPosition().y;
     tabHeightSelected = tabHeight - 20;
@@ -390,7 +405,7 @@ void LevelSelect::doneFetching(Node* sender, Value data){
     if(Game::levels.size() > 0){
         for(int x = page * 4; x < Game::levels[currentLevelSet].size() && x < ((page*4)+4); x++){
         	log("\tIterating through levels");
-            //levels[x%4]->SetEnabled(true);
+            levels[x%4]->SetEnabled(true);
             levels[x%4]->SetLevel(Game::levels[currentLevelSet][x], page);
         }
         selectedLevel = levels[0]->level;

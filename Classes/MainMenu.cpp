@@ -304,12 +304,14 @@ std::map<std::string, MenuItemImage*> MainMenu::LoadElementMap(std::string xmldo
     while(element != NULL){
         std::string image = element->Attribute("name");
         std::string posString = element->Attribute("position");
+        std::string imageWidthString = element->Attribute("layerwidth");
+        std::string imageHeightString = element->Attribute("layerheight");
         int commaPosition = (int)posString.find(',');
         int spacePosition = (int)posString.find(' ');
         Vec2 position(std::stoi(posString.substr(0,commaPosition)), std::stoi(posString.substr(spacePosition,posString.length())));
         float originalY = position.y;
         float originalX = position.x;
-        position.y = MainMenu::Instance->screenSize.y - position.y * ar_scale;//MainMenu::Instance->screenSize.y - (position.y * ar_scale);
+        position.y = MainMenu::Instance->screenSize.y - position.y * ar_scale;
         position.x *= ar_scale;
         std::string fullPath;
         fullPath.assign(rootPath);

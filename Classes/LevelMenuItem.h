@@ -12,12 +12,15 @@
 #include <iostream>
 #include "cocos2d.h"
 #include "Level.h"
+#include "../cocos2d/cocos/ui/UIScrollView.h"
+#include "ui/CocosGUI.h"
 
 using namespace cocos2d;
 
 class LevelMenuItem{
 public:
-    LevelMenuItem(std::string);
+    LevelMenuItem(int position, Layer* layer, float center, float inlayHeight);
+    LevelMenuItem(int position, ui::ScrollView* layer, float center, float inlayHeight);
     cocos2d::MenuItemImage* favorited;
     cocos2d::MenuItemImage* background;
     cocos2d::Label* name;

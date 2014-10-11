@@ -13,10 +13,58 @@
 
 int LevelMenuItem::count;
 
-LevelMenuItem::LevelMenuItem(std::string name){
+LevelMenuItem::LevelMenuItem(int position, ui::ScrollView* layer, float center, float inlayHeight){
     float yPositions[] = {0.24,0.39,0.39 + (.37-.22),0.39 + (2*(0.37-.22))};
     float xPosition = 0.0125;
     float x = xPosition;
+    float y = yPositions[count];
+    count++;
+    Vector<MenuItem*> menuItems;
+    std::string levelImageName = "Level_Left.png";
+    if((position+1) % 2 == 0)
+        levelImageName = "Level_Right.png";
+    background = MainMenu::CreateButton("levelselect", levelImageName);
+    background->setGlobalZOrder(0);
+    background->setScaleX(background->getScaleX() * 0.98);
+    background->setPosition(Vec2(center,(inlayHeight) - floor(((int)position)/2)*background->getBoundingBox().size.height*1.1));
+    background->setAnchorPoint(Vec2((position+1) % 2 - (0.075*(0.5-((position+1)%2))),1.0));
+    menuItems.pushBack(background);
+    
+    favorited = MainMenu::CreateButton("FavoriteOff.png", LevelSelect::Instance, menu_selector(LevelSelect::favoriteCallback), Vec2(x+0.00, 1.0-(y+0.00)), Vec2(1,0));
+    favorited->setPosition(Vec2(background->getBoundingBox().getMaxX() - (24*MainMenu::screenScale.y), background->getBoundingBox().getMidY()));
+    favorited->setAnchorPoint(Vec2(1,0.5));
+    favorited->setScale(favorited->getScaleX() * 0.925, favorited->getScaleY() * 0.925);
+    favorited->setGlobalZOrder(0);
+    //menuItems.pushBack(favorited);
+    
+    this->favorites = MainMenu::CreateLabel("0", Vec2(x+0.00,1.0-(y+0.00)), Vec2(0,0));
+    this->favorites->setPosition(Vec2(favorited->getBoundingBox().getMinX() - (30 * MainMenu::minScreenScale), favorited->getBoundingBox().getMidY()));
+    this->favorites->setAnchorPoint(Vec2(1,0.5));
+    this->favorites->setGlobalZOrder(0);
+    
+    this->number = MainMenu::CreateLabel("1) ", Vec2(x+0.00,1.0-(y+0.00)), Vec2(0,0));
+    this->number->setPosition(Vec2(background->getPositionX() + (24*MainMenu::screenScale.x), background->getBoundingBox().getMidY()));
+    this->number->setAnchorPoint(Vec2(0,0.5));
+    this->number->setGlobalZOrder(0);
+    
+    this->name = MainMenu::CreateLabel("New Level", Vec2(x+0.00,1.0-(y+0.00)), Vec2(0,0));
+    this->name->setPosition(Vec2(number->getBoundingBox().getMaxX(), background->getBoundingBox().getMidY()));
+    this->name->setAnchorPoint(Vec2(0,0.5));
+    this->name->setGlobalZOrder(0);
+    
+    menu = Menu::createWithArray(menuItems);
+    menu->setAnchorPoint(Point(0,0));
+    menu->setPosition(0,0);
+    
+    layer->addChild(menu,-11);
+    //layer->addChild(name,-11);
+    //layer->addChild(number,-11);
+    //layer->addChild(favorites,-11);
+}
+
+LevelMenuItem::LevelMenuItem(int position, Layer* layer, float center, float inlayHeight){
+    float yPositions[] = {0.24,0.39,0.39 + (.37-.22),0.39 + (2*(0.37-.22))};
+    float x = center;
     float y = yPositions[count];
     count++;
     Vector<MenuItem*> menuItems;
@@ -24,6 +72,9 @@ LevelMenuItem::LevelMenuItem(std::string name){
     background = MainMenu::CreateButton("LSSingleLevelBackground.png", LevelSelect::Instance, menu_selector(LevelSelect::selectCallback), Vec2(x,1.0-y), Vec2(0,0));
     background->setGlobalZOrder(0);
     background->setScaleX(background->getScaleX() * 0.98);
+    background->setPositionX(x);
+    background->setPositionY(2100);
+    background->setAnchorPoint(Vec2(0.5,0.5));
     menuItems.pushBack(background);
     
     favorited = MainMenu::CreateButton("FavoriteOff.png", LevelSelect::Instance, menu_selector(LevelSelect::favoriteCallback), Vec2(x+0.00, 1.0-(y+0.00)), Vec2(1,0));
