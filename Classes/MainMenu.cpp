@@ -327,13 +327,6 @@ std::map<std::string, MenuItemImage*> MainMenu::LoadElementMap(std::string xmldo
         } else {//If there is a callback for this button//
             temp = MenuItemImage::create(imagePath, imagePath, ref, callbacks[image]);
         }
-        if(temp->getBoundingBox().size.height == temp->getBoundingBox().size.width){
-            float height = temp->getBoundingBox().size.height;
-            if(height == 101 || height == 187 || height == 200){
-                position.x -= ar_offset * ar_scale;
-                position.y += ar_offset * ar_scale;
-            }
-        }
         temp->setPosition(position);
         temp->setScale(ar_scale, ar_scale);
         temp->setAnchorPoint(Point(0,1));

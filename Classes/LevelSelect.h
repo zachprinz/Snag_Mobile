@@ -56,6 +56,8 @@ public:
 
     float tabHeightSelected;
     float tabHeight;
+    float imageHeightSelected;
+    float imageHeight;
     std::map<std::string, MenuItemImage*> elements;
 
     std::vector<LevelMenuItem*> levels;
@@ -91,6 +93,7 @@ private:
     void goToLevelEditor();
     void SetPreview();
     MenuItemImage* currentLevelsTab;
+    MenuItemImage* currentLevelsImage;
     MenuItemImage* hand;
     Sprite* loading;
     Label* previewTitle;

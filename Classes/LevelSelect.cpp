@@ -56,10 +56,10 @@ bool LevelSelect::init()
     callbacks["CustomImage"] = menu_selector(LevelSelect::customCallback);
     callbacks["RisingImage"] = menu_selector(LevelSelect::risingCallback);
     callbacks["SocialImage"] = menu_selector(LevelSelect::socialCallback);
-    callbacks["StarImage"] = menu_selector(LevelSelect::favoritedCallback);
+    callbacks["StarredImage"] = menu_selector(LevelSelect::favoritedCallback);
     callbacks["Delete"] = menu_selector(LevelSelect::deleteCallback);
     callbacks["Edit"] = menu_selector(LevelSelect::editCallback);
-    callbacks["HighScores"] = menu_selector(LevelSelect::highscoresCallback);
+    callbacks["Highscores"] = menu_selector(LevelSelect::highscoresCallback);
     callbacks["Left"] = menu_selector(LevelSelect::scrollLeftCallback);
     callbacks["Right"] = menu_selector(LevelSelect::scrollRightCallback);
     callbacks["Play"] = menu_selector(LevelSelect::playCallback);
@@ -111,6 +111,7 @@ bool LevelSelect::init()
     this->addChild(titleLabel, 1);
     
     currentLevelsTab = elements["RisingTab"];
+    currentLevelsImage = elements["RisingImage"];
     
     this->addChild(scrollview,1);
     elements["Pinned_Panel"]->setVisible(false);//(10);
@@ -142,8 +143,11 @@ bool LevelSelect::init()
 
     
     tabHeight = elements["SocialTab"]->getPosition().y;
-    tabHeightSelected = tabHeight - 20;
+    tabHeightSelected = tabHeight - (20 * (visibleSize.height / 1080.0));
+    imageHeight = elements["SocialImage"]->getPosition().y;
+    imageHeightSelected = imageHeight - (20 * (visibleSize.height / 1080.0));
     currentLevelsTab->setPositionY(tabHeightSelected);
+    currentLevelsImage->setPositionY(imageHeightSelected);
     
     //-- Set Up Newtork Stuff --//
     NDKHelper::addSelector("LevelSelect", "fetchCustomCallback", CC_CALLBACK_2(LevelSelect::fetchCustomCallback, this), this);
@@ -324,20 +328,26 @@ void LevelSelect::SetLevelSet(int set){
 }
 void LevelSelect::SetLevelSetButtons(){
     currentLevelsTab->runAction(MoveTo::create(0.1, Point(currentLevelsTab->getPosition().x, tabHeight)));
+    currentLevelsImage->runAction(MoveTo::create(0.1, Point(currentLevelsImage->getPosition().x, imageHeight)));
     switch(currentLevelSet){
         case LEVELS_RISING:
             currentLevelsTab = elements["RisingTab"];
+            currentLevelsImage = elements["RisingImage"];
             break;
         case LEVELS_FAVORITED:
             currentLevelsTab = elements["StarredTab"];
+            currentLevelsImage = elements["StarredImage"];
             break;
         case LEVELS_SOCIAL:
             currentLevelsTab = elements["SocialTab"];
+            currentLevelsImage = elements["SocialImage"];
             break;
         case LEVELS_CUSTOM:
             currentLevelsTab = elements["CustomTab"];
+            currentLevelsImage = elements["CustomImage"];
             break;
     }
+    currentLevelsImage->runAction(MoveTo::create(0.1, Point(currentLevelsImage->getPosition().x, imageHeightSelected)));
     currentLevelsTab->runAction(MoveTo::create(0.1, Point(currentLevelsTab->getPosition().x, tabHeightSelected)));
 }
 void LevelSelect::Refresh(){
@@ -450,18 +460,18 @@ void LevelSelect::SetPreview(){
         if(currentLevelSet == LEVELS_CUSTOM && selectedLevel->GetStatus().compare("Private") == 0){
             elements["Upload"]->setVisible(true);
             elements["Upload"]->setEnabled(true);
-            elements["HighScores"]->setVisible(false);
-            elements["HighScores"]->setEnabled(false);
+            elements["Highscores"]->setVisible(false);
+            elements["Highscores"]->setEnabled(false);
         }
         if(currentLevelSet == LEVELS_CUSTOM && selectedLevel->GetStatus().compare("Public") == 0){
             elements["Upload"]->setVisible(false);
             elements["Upload"]->setEnabled(false);
-            elements["HighScores"]->setVisible(true);
-            elements["HighScores"]->setEnabled(true);
+            elements["Highscores"]->setVisible(true);
+            elements["Highscores"]->setEnabled(true);
         }
         if(currentLevelSet != LEVELS_CUSTOM){
-            elements["HighScores"]->setVisible(true);
-            elements["HighScores"]->setEnabled(true);
+            elements["Highscores"]->setVisible(true);
+            elements["Highscores"]->setEnabled(true);
         }
         previewTitle->setVisible(true);
         previewAuthor->setVisible(true);

@@ -60,7 +60,7 @@ void Preview::UpdateSprite(int ID){
         sprites[ID]->setScale(baseScales[entities[ID]->GetType()] * mapViewScale,baseScales[entities[ID]->GetType()] * mapViewScale);
 }
 void Preview::AddEntity(Entity* ent){
-    std::string textures[6] = {"wall.png", "spikewall.png", "hook.png", "spawner.png", "goal.png", "user.png"};
+    std::string textures[6] = {"wall.png", "spikewall.png", "game_hook.png", "spawner.png", "goal.png", "user.png"};
     float baseScales[6] = {1,1,1.5,1,1,0.5};
     entities[ent->ID] = ent;
     sprites[ent->ID] = Sprite::create(textures[ent->GetType()]);

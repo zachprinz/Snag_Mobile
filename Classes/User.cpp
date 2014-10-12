@@ -18,7 +18,7 @@ int User::type;
 User::User() : Entity(Vec2(150,150), Vec2(0,0), Vec2(0,0), 5){
     SetUpPhysicsSprite("user.png", Vec2(0.5,0.5));
     isHooked = false;
-    line = Sprite::create("line.png");
+    line = Sprite::create("game_line.png");
     line->retain();
     line->setAnchorPoint(Vec2(0,0.5));
     line->setGlobalZOrder(1);

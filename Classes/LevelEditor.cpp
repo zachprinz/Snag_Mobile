@@ -38,19 +38,19 @@ bool LevelEditor::init(){
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     noticeUp = false;
 
-    verticalAxis = MainMenu::CreateButton("line.png", Vec2(0.5,0.5), Vec2(0,0));
+    verticalAxis = MainMenu::CreateButton("game_line.png", Vec2(0.5,0.5), Vec2(0,0));
     verticalAxis->setAnchorPoint(Vec2(0.5,0.5));
     verticalAxis->setScale(1,1);
     verticalAxis->setScale(MainMenu::screenSize.y / verticalAxis->getBoundingBox().size.height,2);
     verticalAxis->setRotation(90);
-    horizontalAxis = MainMenu::CreateButton("line.png", Vec2(0.5,0.5), Vec2(0,0));
+    horizontalAxis = MainMenu::CreateButton("game_line.png", Vec2(0.5,0.5), Vec2(0,0));
     horizontalAxis->setAnchorPoint(Vec2(0.5,0.5));
     horizontalAxis->setScale(1,1);
     horizontalAxis->setScale(MainMenu::screenSize.x / horizontalAxis->getBoundingBox().size.width, 2);
     horizontalAxis->setGlobalZOrder(-4);
     verticalAxis->setGlobalZOrder(-4);
     for(int x = -50; x < 50; x++){
-        auto tempVertical = MainMenu::CreateButton("line.png", Vec2(0.5,0.5), Vec2(0,0));
+        auto tempVertical = MainMenu::CreateButton("game_line.png", Vec2(0.5,0.5), Vec2(0,0));
         tempVertical->setAnchorPoint(Vec2(0.5,0.5));
         tempVertical->setScale(1,1);
         tempVertical->setScale(MainMenu::screenSize.y / tempVertical->getBoundingBox().size.height,0.75);
@@ -58,7 +58,7 @@ bool LevelEditor::init(){
         verticalGuides.push_back(tempVertical);
         this->addChild(tempVertical,1);
         
-        auto tempHorizontal = MainMenu::CreateButton("line.png", Vec2(0.5,0.5), Vec2(0,0));
+        auto tempHorizontal = MainMenu::CreateButton("game_line.png", Vec2(0.5,0.5), Vec2(0,0));
         tempHorizontal->setAnchorPoint(Vec2(0.5,0.5));
         tempHorizontal->setScale(1,1);
         tempHorizontal->setScale(MainMenu::screenSize.x / tempHorizontal->getBoundingBox().size.width, 0.75);

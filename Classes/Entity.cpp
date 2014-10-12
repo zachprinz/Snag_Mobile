@@ -43,7 +43,7 @@ int Entity::count = 0;
 
 Entity::Entity(Vec2 pos, Vec2 size, Vec2 vel, int type){
     ID = count++;
-    std::string textures[6] = {"wall.png", "spikewall.png", "hook.png", "spawner.png", "goal.png", "user.png"};
+    std::string textures[6] = {"wall.png", "spikewall.png", "game_hook.png", "spawner.png", "goal.png", "user.png"};
     float baseScales[6] = {1,1,1.5,1,1,0.5};
     this->baseScale = Vec2(baseScales[type],baseScales[type]);
     this->type = type;
