@@ -228,6 +228,7 @@ PopUp::PopUp(std::string title, std::string text, Ref* ref, SEL_MenuHandler call
 }
 void PopUp::Show(){
     //menu->setPosition(menu->getPosition().x, menu->getPosition().y + 1000);
+    visible = true;
     menu->setAnchorPoint(Vec2(0,0));
     name->setVisible(true);
     text->setVisible(true);
@@ -246,6 +247,7 @@ void PopUp::Show(){
     }
 }
 void PopUp::Close(){
+    visible = false;
     menu->setAnchorPoint(Vec2(0,1));
     name->setVisible(false);
     text->setVisible(false);

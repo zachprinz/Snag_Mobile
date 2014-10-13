@@ -87,6 +87,9 @@ public:
     Vec2 touchCurrent;
     bool isDragging;
 private:
+    float scrollPercent;
+    float scrollPressDistance;
+    bool recordScrollDistance;
     Preview* preview;
     bool goToEdit;
     void showLoading();

@@ -42,8 +42,9 @@ public:
     float GetScale();
     bool editor;
     void Clear();
-private:
     ClippingNode* clipNode;
+
+private:
     DrawNode* stencil;
     float originalMultitouchDistance;
     float currentMultitouchDistance;

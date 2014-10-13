@@ -43,15 +43,6 @@ bool LevelSelect::init()
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     
-    auto listener = EventListenerTouchOneByOne::create();
-    //listener->setSwallowTouches(true);
-    listener->onTouchBegan = CC_CALLBACK_2(LevelSelect::onTouchBegan, this);
-    listener->onTouchMoved = CC_CALLBACK_2(LevelSelect::onTouchMoved, this);
-    listener->onTouchEnded = CC_CALLBACK_2(LevelSelect::onTouchEnded, this);
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener,this);
-    
-
-    
     std::map<std::string, SEL_MenuHandler> callbacks;
     callbacks["CustomImage"] = menu_selector(LevelSelect::customCallback);
     callbacks["RisingImage"] = menu_selector(LevelSelect::risingCallback);
@@ -71,18 +62,18 @@ bool LevelSelect::init()
     menu->setAnchorPoint(Point(0.0,0.0));
     menu->setPosition(0,0);
     this->addChild(menu, 1);
-    
 
     scrollview = ui::ScrollView::create();
     scrollview->setContentSize(Size(elements["Inlay"]->getBoundingBox().size.width*1, elements["Inlay"]->getBoundingBox().size.height * 1));
     scrollview->setSize(Size(elements["Inlay"]->getBoundingBox().size.width*1, elements["Inlay"]->getBoundingBox().size.height * 1));
-    scrollview->setPosition(Vec2(elements["Inlay"]->getBoundingBox().getMidX(), elements["Inlay"]->getBoundingBox().getMidY()));// + visibleSize.height * 0.0435));
+    scrollview->setPosition(Vec2(elements["Inlay"]->getBoundingBox().getMidX(), elements["Inlay"]->getBoundingBox().getMidY()));
     scrollview->setAnchorPoint(Point(0.5,0.5));
     scrollview->setDirection(ui::ScrollView::Direction::VERTICAL);
     scrollview->setInertiaScrollEnabled(true);
     float innerWidth = elements["Inlay"]->getBoundingBox().size.width * 1;
     float innerHeight = elements["Inlay"]->getBoundingBox().size.height * 3;
     scrollview->setInnerContainerSize(Size(innerWidth,innerHeight));
+    scrollPercent = 0;
     
     auto pinnedPanel = MainMenu::CreateButton("levelselect", "Pinned_Panel.png");
     pinnedPanel->setPosition(elements["Inlay"]->getBoundingBox().getMidX(), elements["Inlay"]->getBoundingBox().getMaxY());
@@ -168,19 +159,47 @@ bool LevelSelect::init()
     deletePopUp = new PopUp("Delete Level", "Are you sure you want to\ndelete this level?", this, menu_selector(LevelSelect::deleteAcceptCallback), menu_selector(LevelSelect::deleteDeclineCallback));
     deletePopUp->Add(this);
     goToEdit = false;
+    
+    auto listener = EventListenerTouchOneByOne::create();
+    listener->setSwallowTouches(true);
+    listener->onTouchBegan = CC_CALLBACK_2(LevelSelect::onTouchBegan, this);
+    listener->onTouchMoved = CC_CALLBACK_2(LevelSelect::onTouchMoved, this);
+    listener->onTouchEnded = CC_CALLBACK_2(LevelSelect::onTouchEnded, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener,scrollview);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener->clone(), preview->clipNode);
+    
     return true;
 }
 bool LevelSelect::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
+    printf("Touch Began Level Select\n");
     touchStart = touch->getLocation();
     touchCurrent = touch->getLocation();
     if(elements["LevelPreviewBackground"]->getBoundingBox().containsPoint(touchStart)){
         isDragging = true;
         hand->setVisible(false);
+        return true;
     }
-    return true;
+    if(scrollview->getBoundingBox().containsPoint(touchStart) && !deletePopUp->visible){
+        recordScrollDistance = true;
+        scrollPressDistance = 0;
+        return true;
+    }
+    return false;
 };
 void LevelSelect::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
-    
+    if(recordScrollDistance && scrollPressDistance < 20){
+        Vec2 touchLocation = touch->getLocation();
+        touchLocation.y-=scrollview->getInnerContainer()->getPosition().y;
+        for(int x = 0; x < levels.size(); x++){
+            Rect levelRect = levels[x]->background->getBoundingBox();
+            if(levels[x]->background->getBoundingBox().containsPoint(touchLocation)){
+                selectedLevel = levels[x]->level;
+                SetPreview();
+            }
+        }
+    }
+    isDragging = false;
+    recordScrollDistance = false;
 };
 void LevelSelect::onTouchMoved(Touch* touch, Event* event){
     if(isDragging){
@@ -188,6 +207,24 @@ void LevelSelect::onTouchMoved(Touch* touch, Event* event){
         touchCurrent = touch->getLocation();
         touchStart  = touchCurrent;
         preview->Drag(touchCurrent - oldTouch);
+    }
+    if(recordScrollDistance){
+        Vec2 oldTouch = touchStart;
+        touchCurrent = touch->getLocation();
+        touchCurrent.x = oldTouch.x;
+        float distance = touchCurrent.getDistance(oldTouch);
+        scrollPressDistance += distance;
+        if(touchCurrent.y - oldTouch.y != 0){
+            float scrollDifference = ((touchCurrent.y - oldTouch.y)/(fabs(touchCurrent.y - oldTouch.y))) * (distance/scrollview->getBoundingBox().size.height);
+            if(scrollDifference != NAN)
+                scrollPercent += scrollDifference;
+            if(scrollPercent > 0.99)
+                scrollPercent = 0.99;
+            if(scrollPercent < 0.01)
+                scrollPercent = 0.01;
+            scrollview->scrollToPercentVertical(scrollPercent*75.0,0.1, true);
+        }
+        touchStart  = touchCurrent;
     }
 };
 void LevelSelect::editCallback(Ref*){

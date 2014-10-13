@@ -47,6 +47,7 @@ public:
     std::string GetText();
     Menu* menu;
     void Remove(Layer*);
+    bool visible;
 private:
 };
 
