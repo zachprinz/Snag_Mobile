@@ -79,67 +79,58 @@ bool LevelEditor::init(){
     currentSprite->setAnchorPoint(Vec2(0,0));
     
     auto listener = EventListenerTouchAllAtOnce::create();
-    //listener->setSwallowTouches(true);
     listener->onTouchesBegan = CC_CALLBACK_2(LevelEditor::onTouchesBegan, this);
     listener->onTouchesMoved = CC_CALLBACK_2(LevelEditor::onTouchesMoved, this);
     listener->onTouchesEnded = CC_CALLBACK_2(LevelEditor::onTouchesEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener,this);
     
-    cocos2d::Vector<MenuItem*> menuItems;
     saveDialog = false;
     
-    selectedSprite = MainMenu::CreateButton("LevelEditorSelected.png", Vec2(0,1.0-0.015), Vec2(0,1));
-    selectedSprite->setScale(0.33);
-    selectedSprite->setPosition(visibleSize.width / 2.0, selectedSprite->getPosition().y);
-    selectedSprite->setAnchorPoint(Point(0.5,1.0));
     auto background = Sprite::create("GRID2.png");
     background->setPosition(0,0);
     background->setAnchorPoint(Point(0,0));
     background->setScale(MainMenu::screenScale.x, MainMenu::screenScale.y);
     background->setGlobalZOrder(-5);
     this->addChild(background);
-    menuItems.pushBack(selectedSprite);
     
-    transform = MainMenu::CreateButton("Transform.png", Vec2(0,0), Vec2(0,0));//this, menu_selector(LevelEditor::transformCallback), Vec2(0,0), Vec2(0,0));
-    menuItems.pushBack(transform);
-    resize = MainMenu::CreateButton("Resize.png", Vec2(0,0), Vec2(0,0));
-    menuItems.pushBack(resize);
-    remove = MainMenu::CreateButton("Remove.png", this, menu_selector(LevelEditor::removeCallback), Vec2(0,0), Vec2(0,0));
-    menuItems.pushBack(remove);
-    duplicate = MainMenu::CreateButton("Duplicate.png", this, menu_selector(LevelEditor::duplicateCallback),Vec2(0,0), Vec2(0,0));
-    menuItems.pushBack(duplicate);
-    target = MainMenu::CreateButton("Target.png", Vec2(0,0), Vec2(0,0));
-    menuItems.pushBack(target);
-    //rotate->setDisabledImage(Sprite::create("RotateDisabled.png"));
-    //remove->setDisabledImage(Sprite::create("RemoveDisabled.png"));
-    //transform->setDisabledImage(Sprite::create("TransformDisabled.png"));
-    //resize->setDisabledImage(Sprite::create("ResizeDisabled.png"));
-    //transform->setRotation(180.f);
-    //resize->setRotation(180.f);
-    transform->setVisible(false);
-    target->setVisible(false);
-    resize->setVisible(false);
-    remove->setVisible(false);
-    duplicate->setVisible(false);
-    duplicate->setAnchorPoint(Vec2(1,0));
-    transform->setAnchorPoint(Vec2(1,1));
-    resize->setAnchorPoint(Vec2(0,0));
-    remove->setAnchorPoint(Vec2(0,1));
-    target->setAnchorPoint(Vec2(0.5,0.5));
+    std::map<std::string, SEL_MenuHandler> callbacks;
+    callbacks["Goal"] = menu_selector(LevelEditor::GoalSelectCallback);
+    callbacks["Wall"] = menu_selector(LevelEditor::WallSelectCallback);
+    callbacks["Spikewall"] = menu_selector(LevelEditor::SpikeWallSelectCallback);
+    callbacks["Spawner"] = menu_selector(LevelEditor::SpawnerSelectCallback);
+    callbacks["Hook"] = menu_selector(LevelEditor::HookSelectCallback);
+    callbacks["Save"] = menu_selector(LevelEditor::saveButtonCallback);
+    callbacks["Play"] = menu_selector(LevelEditor::playButtonCallback);
+    callbacks["Home"] = menu_selector(LevelEditor::homeButtonCallback);
+    callbacks["Duplicate"] = menu_selector(LevelEditor::duplicateCallback);
+    callbacks["Trash"] = menu_selector(LevelEditor::removeCallback);
+    cocos2d::Vector<MenuItem*> menuItems;
+    elements = MainMenu::LoadElementMap("leveleditor", this, callbacks, &menuItems, this);
+    
+    elements["Move"]->setVisible(false);
+    elements["Velocity"]->setVisible(false);
+    elements["Resize"]->setVisible(false);
+    elements["Trash"]->setVisible(false);
+    elements["Duplicate"]->setVisible(false);
+    elements["Duplicate"]->setAnchorPoint(Vec2(1,0));
+    elements["Move"]->setAnchorPoint(Vec2(1,1));
+    elements["Resize"]->setAnchorPoint(Vec2(0,0));
+    elements["Trash"]->setAnchorPoint(Vec2(0,1));
+    elements["Velocity"]->setAnchorPoint(Vec2(0.5,0.5));
     int od = -4;
-    remove->setGlobalZOrder(od);
-    transform->setGlobalZOrder(od);
-    resize->setGlobalZOrder(od);
-    duplicate->setGlobalZOrder(od);
-    target->setGlobalZOrder(od);
+    elements["Trash"]->setGlobalZOrder(od);
+    elements["Move"]->setGlobalZOrder(od);
+    elements["Resize"]->setGlobalZOrder(od);
+    elements["Duplicate"]->setGlobalZOrder(od);
+    elements["Velocity"]->setGlobalZOrder(od);
     hasSelected = false;
     isTransforming = false;
     isRotating = false;
     isScaling = false;
     isTargeting = false;
-    transform->getEventDispatcher()->setEnabled(false);
-    resize->getEventDispatcher()->setEnabled(false);
-    target->getEventDispatcher()->setEnabled(false);
+    elements["Move"]->getEventDispatcher()->setEnabled(false);
+    elements["Resize"]->getEventDispatcher()->setEnabled(false);
+    elements["Velocity"]->getEventDispatcher()->setEnabled(false);
 
     float buttonHeightPixels = 155;
     float tempScale = MainMenu::minScreenScale;
@@ -150,31 +141,12 @@ bool LevelEditor::init(){
     float buttonGap = leftOverHeight / 6.0;
     float jump = buttonGap + buttonPercent;
     
-    spikeWallSelectButton = MainMenu::CreateButton("LevelEditorSpikeWall.png", this, menu_selector(LevelEditor::SpikeWallSelectCallback), Vec2(0.01,1.0-buttonGap), Vec2(1,0));
-    menuItems.pushBack(spikeWallSelectButton);
-    wallSelectButton = MainMenu::CreateButton("LevelEditorWall.png", this, menu_selector(LevelEditor::WallSelectCallback), Vec2(0.01,1.0-buttonGap-jump), Vec2(1,0));
-    menuItems.pushBack(wallSelectButton);
-    spawnerSelectButton = MainMenu::CreateButton("LevelEditorSpawner.png", this, menu_selector(LevelEditor::SpawnerSelectCallback), Vec2(0.01,1.0-buttonGap-(3*jump)), Vec2(1,0));
-    menuItems.pushBack(spawnerSelectButton);
-    hookSelectButton = MainMenu::CreateButton("LevelEditorHook.png", this, menu_selector(LevelEditor::HookSelectCallback), Vec2(0.01,1.0-buttonGap-(2*jump)), Vec2(1,0));
-    menuItems.pushBack(hookSelectButton);
-    goalSelectButton = MainMenu::CreateButton("LevelEditorGoal.png", this, menu_selector(LevelEditor::GoalSelectCallback), Vec2(0.01,1.0-buttonGap-(4*jump)), Vec2(1,0));
-    menuItems.pushBack(goalSelectButton);
-    homeSelectButton = MainMenu::CreateButton("home.png", this, menu_selector(LevelEditor::homeButtonCallback), Vec2(0.9,1.0-buttonGap), Vec2(1,0));
-    menuItems.pushBack(homeSelectButton);
-    trashSelectButton = MainMenu::CreateButton("trash.png", this, menu_selector(LevelEditor::trashButtonCallback), Vec2(0.9,1.0-buttonGap-(2*jump)), Vec2(1,0));
-    saveSelectButton = MainMenu::CreateButton("save.png", this, menu_selector(LevelEditor::saveButtonCallback), Vec2(0.9,1.0-buttonGap-(4 * jump)), Vec2(1,0));
-    menuItems.pushBack(saveSelectButton);
-    eraseSelectButton = MainMenu::CreateButton("LevelEditorErase.png", this, menu_selector(LevelEditor::EraseSelectCallback), Vec2(0.9,1.0-buttonGap-(3*jump)), Vec2(1,0));
-    moveSelectButton = MainMenu::CreateButton("LevelEditorMove.png", this, menu_selector(LevelEditor::moveButtonCallback), Vec2(0.9,1.0-buttonGap-(4*jump)), Vec2(1,0));
-    
     selectedLabel = MainMenu::CreateLabel("Pan Tool", Vec2(0,1.0-0.015), Vec2(0,0));
-    selectedLabel->setGlobalZOrder(0);
-    selectedLabel->setPosition(selectedSprite->getBoundingBox().getMidX(), selectedSprite->getBoundingBox().getMidY());
+    selectedLabel->setPosition(elements["Title"]->getBoundingBox().getMidX(), elements["Title"]->getBoundingBox().getMidY());
     selectedLabel->setAnchorPoint(Vec2(0.5,0.5));
     selectedLabel->setScale(0.8);
         
-    menu = Menu::createWithArray(menuItems);
+    Menu* menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0.0,0.0));
     menu->setPosition(0,0);
     this->addChild(menu, 1);
@@ -252,10 +224,10 @@ void LevelEditor::closePopUpCallback(Ref*){
     hookPopUp->Close();
 }
 void LevelEditor::SpikeWallSelectCallback(Ref*){
-    if(currentSelection != spikeWallSelectButton){
+    if(currentSelection != elements["Spikewall"]){
         ResetToolPos();
         currentTool = SPIKE_WALL;
-        currentSelection = spikeWallSelectButton;
+        currentSelection = elements["Spikewall"];
         SetToolPos();
         selectedLabel->setString("SpikeWall");
     }
@@ -267,10 +239,10 @@ void LevelEditor::SpikeWallSelectCallback(Ref*){
     }
 };
 void LevelEditor::WallSelectCallback(Ref*){
-    if(currentSelection != wallSelectButton){
+    if(currentSelection != elements["Wall"]){
         ResetToolPos();
         currentTool = WALL;
-        currentSelection = wallSelectButton;
+        currentSelection = elements["Wall"];
         SetToolPos();
         selectedLabel->setString("Wall");
     }
@@ -283,10 +255,10 @@ void LevelEditor::WallSelectCallback(Ref*){
 };
 void LevelEditor::SpawnerSelectCallback(Ref*){
     Instance = this;
-    if(currentSelection != spawnerSelectButton){
+    if(currentSelection != elements["Spawner"]){
         ResetToolPos();
         currentTool = SPAWNER;
-        currentSelection = spawnerSelectButton;
+        currentSelection = elements["Spawner"];
         SetToolPos();
         selectedLabel->setString("Spawner");
     }
@@ -298,9 +270,9 @@ void LevelEditor::SpawnerSelectCallback(Ref*){
     }
 };
 void LevelEditor::HookSelectCallback(Ref*){
-    if(currentSelection != hookSelectButton){
+    if(currentSelection != elements["Hook"]){
         ResetToolPos();
-        currentSelection = hookSelectButton;
+        currentSelection = elements["Hook"];
         currentTool = HOOK;
         SetToolPos();
         selectedLabel->setString("Hook");
@@ -313,9 +285,9 @@ void LevelEditor::HookSelectCallback(Ref*){
     }
 };
 void LevelEditor::EraseSelectCallback(Ref*){
-    if(currentSelection != eraseSelectButton){
+    if(currentSelection != elements["Trash"]){
         ResetToolPos();
-        currentSelection = eraseSelectButton;
+        currentSelection = elements["Trash"];
         currentTool = ERASE;
         SetToolPos();
         selectedLabel->setString("Erase Tool");
@@ -376,25 +348,10 @@ void LevelEditor::saveDeclineCallback(Ref* ref){
     saveDialog = false;
     savePopUp->Close();
 }
-void LevelEditor::moveButtonCallback(Ref* ref){
-    if(currentSelection != moveSelectButton){
-        ResetToolPos();
-        currentSelection = moveSelectButton;
-        currentTool = MOVE;
-        SetToolPos();
-        selectedLabel->setString("Move Object");
-    }
-    else{
-        ResetToolPos();
-        currentTool = NO_TOOL;
-        currentSelection = NULL;
-        selectedLabel->setString("Pan Tool");
-    }
-}
 void LevelEditor::GoalSelectCallback(Ref* ref){
-    if(currentSelection != goalSelectButton){
+    if(currentSelection != elements["Goal"]){
         ResetToolPos();
-        currentSelection = goalSelectButton;
+        currentSelection = elements["Goal"];
         currentTool = GOAL;
         SetToolPos();
         selectedLabel->setString("Goal Area");
@@ -452,15 +409,15 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
             touchStart = touch->getLocation();
             touchCurrent = touch->getLocation();
             bool hitTab = false;
-            if(transform->getBoundingBox().containsPoint(touchStart)){
+            if(elements["Move"]->getBoundingBox().containsPoint(touchStart)){
                transformCallback();
                 hitTab = true;
             }
-            if(resize->getBoundingBox().containsPoint(touchStart)){
+            if(elements["Resize"]->getBoundingBox().containsPoint(touchStart)){
                 resizeCallback();
                 hitTab = true;
             }
-            if(target->getBoundingBox().containsPoint(touchStart)){
+            if(elements["Velocity"]->getBoundingBox().containsPoint(touchStart)){
                 targetCallback();
                 hitTab = true;
             }
@@ -504,7 +461,7 @@ void LevelEditor::Select(Entity* entity){
     if(hasSelected)
         Deselect();
     //if(entity->GetType() == HOOK || entity->GetType() == SPAWNER)
-        //resize->setEnabled(false);
+        //elements["Resize"]->setEnabled(false);
     //if(entity->GetType() == HOOK)
         //rotate->setEnabled(false);
     hasSelected = true;
@@ -516,24 +473,24 @@ void LevelEditor::Select(Entity* entity){
     startPosition.y -= selectedEntitySize.height / 2.0;
     currentSprite->setPosition(startPosition);
     currentSprite->setContentSize(selectedEntitySize);
-    duplicate->setVisible(true);
-    resize->setVisible(true);
-    transform->setVisible(true);
-    remove->setVisible(true);
+    elements["Duplicate"]->setVisible(true);
+    elements["Resize"]->setVisible(true);
+    elements["Move"]->setVisible(true);
+    elements["Trash"]->setVisible(true);
     Rect box = currentSprite->getBoundingBox();
-    duplicate->setPosition(Vec2(box.getMinX(), box.getMaxY()));
-    resize->setPosition(Vec2(box.getMaxX(), box.getMaxY()));
-    transform->setPosition(Vec2(box.getMinX(), box.getMinY()));
-    remove->setPosition(Vec2(box.getMaxX(), box.getMinY()));
+    elements["Duplicate"]->setPosition(Vec2(box.getMinX(), box.getMaxY()));
+    elements["Resize"]->setPosition(Vec2(box.getMaxX(), box.getMaxY()));
+    elements["Move"]->setPosition(Vec2(box.getMinX(), box.getMinY()));
+    elements["Trash"]->setPosition(Vec2(box.getMaxX(), box.getMinY()));
     if(selectedEntity->GetType() == SPAWNER){
-        target->setVisible(true);
+        elements["Velocity"]->setVisible(true);
         Vec2 launchVel = selectedEntity->GetLaunchVelocity();
         //launchVel = Vec2(launchVel.x / 2.0, launchVel.x / 2.0);
         Vec2 targetOffset = Vec2(launchVel.x * preview->GetScale(), launchVel.y * preview->GetScale());
         Vec2 tempPos = (Vec2(box.getMidX() + targetOffset.x, box.getMidY() + targetOffset.y));
-        target->setPosition(tempPos);
+        elements["Velocity"]->setPosition(tempPos);
         float angle = atan2(targetOffset.x, targetOffset.y) * (180 / 3.1415);
-        target->setRotation(angle);
+        elements["Velocity"]->setRotation(angle);
     }
 }
 void LevelEditor::Deselect(bool keep){
@@ -543,17 +500,17 @@ void LevelEditor::Deselect(bool keep){
     printf("\nDESELECTED");
     hasSelected = false;
     selectedEntity = nullptr;
-    transform->setVisible(false);
-    duplicate->setVisible(false);
-    remove->setVisible(false);
-    resize->setVisible(false);
+    elements["Move"]->setVisible(false);
+    elements["Duplicate"]->setVisible(false);
+    elements["Trash"]->setVisible(false);
+    elements["Resize"]->setVisible(false);
     currentSprite->setVisible(false);
-    target->setVisible(false);
+    elements["Velocity"]->setVisible(false);
     //rotate->setEnabled(true);
-    //resize->setEnabled(true);
-    //transform->setEnabled(true);
-    //remove->setEnabled(true);
-    //resize->getEventDispatcher()->setEnabled(false);
+    //elements["Resize"]->setEnabled(true);
+    //elements["Move"]->setEnabled(true);
+    //elements["Trash"]->setEnabled(true);
+    //elements["Resize"]->getEventDispatcher()->setEnabled(false);
     //rotate->getEventDispatcher()->setEnabled(false);
     isRotating = false;
     isTransforming = false;
@@ -569,17 +526,17 @@ void LevelEditor::UpdateSelected(){
         currentSprite->setPosition(startPosition);
         currentSprite->setContentSize(selectedEntitySize);
         Rect box = currentSprite->getBoundingBox();
-        duplicate->setPosition(Vec2(box.getMinX(), box.getMaxY()));
-        resize->setPosition(Vec2(box.getMaxX(), box.getMaxY()));
-        transform->setPosition(Vec2(box.getMinX(), box.getMinY()));
-        remove->setPosition(Vec2(box.getMaxX(), box.getMinY()));
+        elements["Duplicate"]->setPosition(Vec2(box.getMinX(), box.getMaxY()));
+        elements["Resize"]->setPosition(Vec2(box.getMaxX(), box.getMaxY()));
+        elements["Move"]->setPosition(Vec2(box.getMinX(), box.getMinY()));
+        elements["Trash"]->setPosition(Vec2(box.getMaxX(), box.getMinY()));
         if(selectedEntity->GetType() == SPAWNER){
             Vec2 launchVel = selectedEntity->GetLaunchVelocity();
             Vec2 targetOffset = Vec2(launchVel.x * preview->GetScale(), launchVel.y * preview->GetScale());
             Vec2 tempPos = (Vec2(box.getMidX() + targetOffset.x, box.getMidY() + targetOffset.y));
-            target->setPosition(tempPos);
+            elements["Velocity"]->setPosition(tempPos);
             float angle = atan2(targetOffset.x, targetOffset.y) * (180 / 3.1415);
-            target->setRotation(angle);
+            elements["Velocity"]->setRotation(angle);
         }
     }
 }
@@ -660,8 +617,8 @@ void LevelEditor::onTouchMoved(Touch* touch, Event* event){
         }
         if(isTargeting){
             if(currentSprite != NULL){
-                target->setPosition(Vec2(target->getPosition().x + (touchCurrent.x - oldTouch.x), target->getPosition().y + (touchCurrent.y - oldTouch.y)));
-                selectedEntity->SetLaunchVelocity(Vec2((target->getBoundingBox().getMidX() - currentSprite->getBoundingBox().getMidX())/preview->GetScale(), (target->getBoundingBox().getMidY() - currentSprite->getBoundingBox().getMidY())/preview->GetScale()));
+                elements["Velocity"]->setPosition(Vec2(elements["Velocity"]->getPosition().x + (touchCurrent.x - oldTouch.x), elements["Velocity"]->getPosition().y + (touchCurrent.y - oldTouch.y)));
+                selectedEntity->SetLaunchVelocity(Vec2((elements["Velocity"]->getBoundingBox().getMidX() - currentSprite->getBoundingBox().getMidX())/preview->GetScale(), (elements["Velocity"]->getBoundingBox().getMidY() - currentSprite->getBoundingBox().getMidY())/preview->GetScale()));
                 this->UpdateSelected();
             }
         }
@@ -749,15 +706,15 @@ void LevelEditor::menuCloseCallback(Ref* pSender){
 #endif
 }
 void LevelEditor::DisableSpawner(){
-    if(currentSelection == spawnerSelectButton){
-        spawnerSelectButton->setEnabled(false);
+    if(currentSelection == elements["Spawner"]){
+        elements["Spawner"]->setEnabled(false);
         ResetToolPos();
         currentTool = NO_TOOL;
         currentSelection = NULL;
     }
 }
 void LevelEditor::EnableSpawner(){
-    spawnerSelectButton->setEnabled(true);
+    elements["Spawner"]->setEnabled(true);
 }
 void LevelEditor::Erase(Vec2 tile){
 

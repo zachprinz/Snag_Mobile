@@ -71,27 +71,7 @@ public:
     void duplicateCallback(Ref*);
     void finishQuit(Node* sender, Value data);
     
-    MenuItemImage* transform;
-    MenuItemImage* resize;
-    MenuItemImage* remove;
-    MenuItemImage* duplicate;
-    MenuItemImage* target;
-    
-    MenuItemImage* homeSelectButton;
-    MenuItemImage* hookSelectButton;
-    MenuItemImage* spikeWallSelectButton;
-    MenuItemImage* spawnerSelectButton;
-    MenuItemImage* eraseSelectButton;
-    MenuItemImage* wallSelectButton;
-    MenuItemImage* playSelectButton;
-    MenuItemImage* moveSelectButton;
-    MenuItemImage* goalSelectButton;
-    MenuItemImage* saveAcceptButton;
-    MenuItemImage* saveDeclineButton;
-    MenuItemImage* trashSelectButton;
-    MenuItemImage* saveSelectButton;
     MenuItemImage* currentSelection;
-    MenuItemImage* shade;
     MenuItemImage* selectedSprite;
     MenuItemImage* verticalAxis;
     MenuItemImage* horizontalAxis;
@@ -101,7 +81,6 @@ public:
     Label* notice;
     Menu* menu;
     Menu* saveMenu;
-    EditBox* nameBox;
     
     virtual void editBoxEditingDidBegin(EditBox* editBox);
     virtual void editBoxEditingDidEnd(EditBox* editBox);
@@ -140,6 +119,8 @@ public:
     PopUp* spawnerPopUp;
     PopUp* hookPopUp;
     PopUp* quitPopUp;
+    
+    std::map<std::string, MenuItemImage*> elements;
 private:
     Entity* selectedEntity;
     bool unsavedChanges;

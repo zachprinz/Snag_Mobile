@@ -161,7 +161,6 @@ bool Game::init(){
     background->setGlobalZOrder(-2);
     this->addChild(background);
     
-    
     user = new User();
     user->Add(this);
     
@@ -172,10 +171,15 @@ bool Game::init(){
     timeLabel->setGlobalZOrder(3);
     this->addChild(timeLabel,1);
     
-    auto resetButton = MainMenu::CreateButton("reset.png", this, menu_selector(Game::resetButtonCallback), Vec2(0.02, 1.0-0.02), Vec2(1,1));
+    auto resetButton = MainMenu::CreateButton("game", "Refresh.png", this, menu_selector(Game::resetButtonCallback));
+    resetButton->setPosition(.017*visibleSize.width, visibleSize.height - 0.025*visibleSize.height);
+    resetButton->setAnchorPoint(Vec2(0.0,1.0));
     menuItems.pushBack(resetButton);
     
-    auto homeButton = MainMenu::CreateButton("home.png", this, menu_selector(Game::homeButtonCallback), Vec2(1.0-0.02, 1.0-0.02), Vec2(1,1));
+    auto homeButton = MainMenu::CreateButton("game", "Home.png", this, menu_selector(Game::homeButtonCallback));
+    homeButton->setPosition(visibleSize.width - .017*visibleSize.width, visibleSize.height - 0.025*visibleSize.height);
+    homeButton->setAnchorPoint(Vec2(1.0,1.0));
+
     homeButton->setAnchorPoint(Point(1,1));
     menuItems.pushBack(homeButton);
     
