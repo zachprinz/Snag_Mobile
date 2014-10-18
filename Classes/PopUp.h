@@ -35,9 +35,7 @@ public:
     cocos2d::MenuItemImage* shade;
     cocos2d::Label* name;
     cocos2d::Label* text;
-    cocos2d::Label* option1;
-    cocos2d::Label* option2;
-    cocos2d::Label* option3;
+    std::vector<cocos2d::Label*> labels;
     EditBox* nameBox;
     std::string myName;
     std::string myText;
@@ -48,6 +46,7 @@ public:
     Menu* menu;
     void Remove(Layer*);
     bool visible;
+    std::map<std::string, MenuItemImage*> elements;
 private:
 };
 

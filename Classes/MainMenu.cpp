@@ -98,29 +98,6 @@ bool MainMenu::init()
     menu->setPosition(0,0);
     this->addChild(menu, 1);
     
-    /*auto background = MainMenu::CreateButton("MMBackground.png", Vec2(0,1), Vec2(0,0));
-    if(visibleSize.width <= ((Sprite*)background->getNormalImage())->getTextureRect().size.width && visibleSize.height <= ((Sprite*)background->getNormalImage())->getTextureRect().size.height){
-        background->setNormalImage(Sprite::create("MMBackground.png", Rect(0,0,visibleSize.width, visibleSize.height)));
-    }
-    if(background->getScaleX() < 1.0)
-        background->setScaleX(1.0);
-    if(background->getScaleY() < 1.0)
-        background->setScaleY(1.0);
-    background->setPositionZ(-2);
-    this->addChild(background,1);
-    auto ballAndHook = MainMenu::CreateButton("MMHookAndUser.png", Vec2(0,0),Vec2(0,1));
-    ballAndHook->setAnchorPoint(Vec2(0.5,ballAndHook->getAnchorPoint().y));
-    ballAndHook->setPosition(Vec2(background->getBoundingBox().getMidX(), (1.0-0.07)*screenSize.y));
-    menuItems.pushBack(ballAndHook);
-    
-    auto playButton = MainMenu::CreateButton("MMPlay.png", this, menu_selector(MainMenu::playButtonCallback), Vec2(0.5, 1.0-0.69), Vec2(1,1));
-    playButton->setAnchorPoint(Vec2(0.5,1));
-    menuItems.pushBack(playButton);
-    auto title = MainMenu::CreateButton("MMSnag.png", Vec2(0,0), Vec2(0,1));
-    title->setAnchorPoint(Vec2(0.5,title->getAnchorPoint().y));
-    title->setPosition(Vec2(background->getBoundingBox().getMidX(), (1.0-0.05)*screenSize.y));
-    menuItems.pushBack(title);*/
-    
     notice = Label::createWithBMFont("dimbo.fnt", "Searching for an account", TextHAlignment::CENTER);
     notice->setScale(1);
     notice->setVisible(false);
@@ -337,7 +314,6 @@ std::map<std::string, MenuItemImage*> MainMenu::LoadElementMap(std::string xmldo
     }
     return elementMap;
 }
-
 void MainMenu::menuCloseCallback(Ref* pSender)
 {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
