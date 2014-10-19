@@ -207,7 +207,7 @@ Label* MainMenu::CreateLabel(std::string text, Vec2 pos, Vec2 anchors){
     Label* temp = Label::createWithBMFont("dimbo.fnt", text, TextHAlignment::CENTER);
     Vec2 tempScale = GetAdjustedScale(pos, anchors);
     temp->setPosition(GetAdjustedPosition(pos, anchors, tempScale));
-    temp->setScale((screenSize.y / 1080.0)*1.2);
+    temp->setScale((screenSize.y / 1080.0)*.5);
     temp->setAnchorPoint(Point(0.5,0.5));
     temp->setColor(Color3B::BLACK);
     temp->retain();
