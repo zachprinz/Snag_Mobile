@@ -79,20 +79,20 @@ bool Highscores::init()
             auto userNameTemp = MainMenu::CreateLabel("PlayerName", Vec2(0,1.0-0.015), Vec2(0,0));
             userNameTemp->setPosition(left, bottom);
             userNameTemp->setAnchorPoint(Vec2(0.0,0));
-            userNameTemp->setScaleX(1.25 * visibleSize.width / 1920.0);
-            userNameTemp->setScaleY(1.25 * visibleSize.height / 1080.0);
+            userNameTemp->setScaleX(userNameTemp->getScaleX() * 0.5 * 1.25 * visibleSize.width / 1920.0);
+            userNameTemp->setScaleY(userNameTemp->getScaleY() * 0.5 * 1.25 * visibleSize.height / 1080.0);
             auto userPlaceTemp = MainMenu::CreateLabel(std::to_string(x*4 + (4-y)), Vec2(0,1.0-0.015), Vec2(0,0));
             userPlaceTemp->setPosition(left, userNameTemp->getBoundingBox().getMaxY() - (userNameTemp->getBoundingBox().size.height * 0.3));
             userPlaceTemp->setAnchorPoint(Vec2(0,0));
             userPlaceTemp->setColor(Color3B(255,225,107));
-            userPlaceTemp->setScaleX(1.25 * 0.5 * (visibleSize.width / 1920.0));
-            userPlaceTemp->setScaleY(1.25 * 0.5 * (visibleSize.height / 1080.0));
+            userPlaceTemp->setScaleX(userPlaceTemp->getScaleX() * 0.5 * 1.25 * 0.5 * (visibleSize.width / 1920.0));
+            userPlaceTemp->setScaleY(userPlaceTemp->getScaleY() * 0.5 * 1.25 * 0.5 * (visibleSize.height / 1080.0));
             auto userTimeTemp = MainMenu::CreateLabel("0:00", Vec2(0,1.0-0.015), Vec2(0,0));
             userTimeTemp->setPosition(left + 750 * (visibleSize.width / 1920.0) - seperator1->getBoundingBox().size.width * 1.1, bottom + 50);
             userTimeTemp->setAnchorPoint(Vec2(1,0.5));
             userTimeTemp->setColor(Color3B(53,107,168));
-            userTimeTemp->setScaleX(visibleSize.width / 1920.0);
-            userTimeTemp->setScaleY(visibleSize.height / 1080.0);
+            userTimeTemp->setScaleX(userTimeTemp->getScaleX() * 0.5 * visibleSize.width / 1920.0);
+            userTimeTemp->setScaleY(userTimeTemp->getScaleY() * 0.5 * visibleSize.height / 1080.0);
             if(y%2 == 0)
                 userTimeTemp->setColor(Color3B(170,201,228));
             scrollview->addChild(userNameTemp,1);
@@ -109,21 +109,21 @@ bool Highscores::init()
     userName = MainMenu::CreateLabel("PlayerName", Vec2(0,1.0-0.015), Vec2(0,0));
     userName->setPosition(elements["UserPanel"]->getBoundingBox().getMinX() + (visibleSize.width * 0.05), elements["UserPanel"]->getBoundingBox().getMinY());
     userName->setAnchorPoint(Vec2(0.0,0));
-    userName->setScaleX(1.25 * visibleSize.width / 1920.0);
-    userName->setScaleY(1.25 * visibleSize.height / 1080.0);
+    userName->setScaleX(userName->getScaleX() * 1.25 * 0.5 * visibleSize.width / 1920.0);
+    userName->setScaleY(userName->getScaleY() * 1.25 * 0.5 * visibleSize.height / 1080.0);
     
     userPlace = MainMenu::CreateLabel("130,023", Vec2(0,1.0-0.015), Vec2(0,0));
     userPlace->setPosition(userName->getBoundingBox().getMinX(), userName->getBoundingBox().getMaxY() - (userName->getBoundingBox().size.height * 0.3));
     userPlace->setAnchorPoint(Vec2(0,0));
     userPlace->setColor(Color3B(255,225,107));
-    userPlace->setScaleX(1.25 * 0.5 * (visibleSize.width / 1920.0));
-    userPlace->setScaleY(1.25 * 0.5 * (visibleSize.height / 1080.0));
+    userPlace->setScaleX(userPlace->getScaleX() * 1.25 * 0.5 * 0.5 * (visibleSize.width / 1920.0));
+    userPlace->setScaleY(userPlace->getScaleY() * 1.25 * 0.5 * 0.5 * (visibleSize.height / 1080.0));
     
     userTime = MainMenu::CreateLabel("0:00", Vec2(0,1.0-0.015), Vec2(0,0));
     userTime->setPosition(elements["UserStripe"]->getBoundingBox().getMaxX() - userTime->getBoundingBox().size.width * 0.1, elements["UserStripe"]->getBoundingBox().getMidY());
     userTime->setAnchorPoint(Vec2(1,0.5));
-    userTime->setScaleX(1.5 * visibleSize.width / 1920.0);
-    userTime->setScaleY(1.5 * visibleSize.height / 1080.0);
+    userTime->setScaleX(userTime->getScaleX() * 1.5 * 0.5 * visibleSize.width / 1920.0);
+    userTime->setScaleY(userTime->getScaleY() * 1.5 * 0.5 * visibleSize.height / 1080.0);
     userTime->setColor(Color3B(53,107,168));
     
     Menu* menu = Menu::createWithArray(menuItems);

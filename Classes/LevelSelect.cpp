@@ -94,6 +94,7 @@ bool LevelSelect::init()
     previewAuthor->setPosition(Vec2(elements["LevelAuthorBackground"]->getBoundingBox().getMidX(), elements["LevelAuthorBackground"]->getBoundingBox().getMidY()));
     previewAuthor->setGlobalZOrder(0);
     previewAuthor->setVisible(false);
+    previewAuthor->setScale(previewAuthor->getScale()*0.5);
     this->addChild(previewAuthor, 1);
     auto titleLabel = MainMenu::CreateLabel("Level Select", Vec2(0,0), Vec2(0,0));
     titleLabel->setPosition(Vec2(elements["TitlePanel"]->getBoundingBox().getMidX(), elements["TitlePanel"]->getBoundingBox().getMidY()));

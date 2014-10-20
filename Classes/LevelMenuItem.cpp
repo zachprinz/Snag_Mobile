@@ -109,7 +109,7 @@ LevelMenuItem::LevelMenuItem(int position, ui::ScrollView* layer, float center, 
     for(int x = 0; x < stars.size(); x++){
         menuItems.pushBack(stars[x]);
     }
-    
+    time->setVisible(false);
     menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0,0));
     menu->setPosition(0,0);
@@ -216,6 +216,8 @@ LevelMenuItem::LevelMenuItem(int position, Layer* layer, float center, float hei
     for(int x = 0; x < stars.size(); x++){
         menuItems.pushBack(stars[x]);
     }
+    time->setVisible(false);
+
     menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0,0));
     menu->setPosition(0,0);
@@ -229,7 +231,7 @@ void LevelMenuItem::SetEnabled(bool is){
     menu->setVisible(is);
     name->setVisible(is);
     number->setVisible(is);
-    time->setVisible(is);
+    time->setVisible(false);//is);
 }
 void LevelMenuItem::SetOrder(int){
 
