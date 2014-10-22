@@ -126,13 +126,15 @@ bool LevelSelect::init()
         featuredLevels.push_back(lvl);
     }
     
-    loading = Sprite::create("Loading.png");
-    loading->setScale(0.5,0.5);
-    loading->setPosition(levels[1]->background->getBoundingBox().getMinY(), levels[1]->background->getBoundingBox().getMidX());
-    loading->setAnchorPoint(Vec2(0.5, 0.5));
-    loading->setVisible(false);
+    loading = elements["Loading"];
+    this->removeChild(loading);
+    loading->removeFromParent();
     this->addChild(loading,1);
-
+    Vec2 loadingMidPosition(loading->getBoundingBox().getMidX(), loading->getBoundingBox().getMidY());
+    loading->setAnchorPoint(Vec2(0.5,0.5));
+    loading->setPosition(loadingMidPosition);
+    loading->setScale(loading->getScaleX() * 0.9, loading->getScaleY() * 0.9);
+    loading->setVisible(false);
     
     tabHeight = elements["SocialTab"]->getPosition().y;
     tabHeightSelected = tabHeight - (20 * (visibleSize.height / 1080.0));
@@ -152,11 +154,12 @@ bool LevelSelect::init()
     NDKHelper::addSelector("LevelSelect", "newLevelResponce", CC_CALLBACK_2(LevelSelect::newLevelResponce, this), this);
     //--------------------------//
     
-    preview = new Preview(Rect(elements["LevelPreviewBackground"]->getBoundingBox().getMinX() + 10,elements["LevelPreviewBackground"]->getBoundingBox().getMinY() + 10,elements["LevelPreviewBackground"]->getBoundingBox().size.width - 20,elements["LevelPreviewBackground"]->getBoundingBox().size.height-20), this, 0.2);
-    hand = MainMenu::CreateButton("Hand.png", Vec2(0,0), Vec2(0,0));
-    hand->setPosition(Vec2(elements["LevelPreviewBackground"]->getBoundingBox().getMidX(), elements["LevelPreviewBackground"]->getBoundingBox().getMidY()));
-    hand->setAnchorPoint(Vec2(0.5,0.5));
+    preview = new Preview(Rect(elements["LevelPreviewBackground"]->getBoundingBox().getMinX() + 10,elements["LevelPreviewBackground"]->getBoundingBox().getMinY() + 10,elements["LevelPreviewBackground"]->getBoundingBox().size.width - 20,elements["LevelPreviewBackground"]->getBoundingBox().size.height-20), this, 0.3 * ((elements["LevelPreviewBackground"]->getBoundingBox().size.width / 612.0)));
+    hand = elements["Hand"];
+    this->removeChild(elements["Hand"]);
+    hand->removeFromParent();
     this->addChild(hand,1);
+    
     deletePopUp = new PopUp("Delete Level", "Are you sure you want to\ndelete this level?", this, menu_selector(LevelSelect::deleteAcceptCallback), menu_selector(LevelSelect::deleteDeclineCallback));
     deletePopUp->Add(this);
     goToEdit = false;
@@ -219,10 +222,10 @@ void LevelSelect::onTouchMoved(Touch* touch, Event* event){
             float scrollDifference = ((touchCurrent.y - oldTouch.y)/(fabs(touchCurrent.y - oldTouch.y))) * (distance/scrollview->getBoundingBox().size.height);
             if(scrollDifference != NAN)
                 scrollPercent += scrollDifference;
-            if(scrollPercent > 0.99)
-                scrollPercent = 0.99;
-            if(scrollPercent < 0.01)
-                scrollPercent = 0.01;
+            if(scrollPercent > 1.0)
+                scrollPercent = 1.0;
+            if(scrollPercent < 0.00)
+                scrollPercent = 0.00;
             scrollview->scrollToPercentVertical(scrollPercent*75.0,0.1, true);
         }
         touchStart  = touchCurrent;
@@ -510,6 +513,8 @@ void LevelSelect::SetPreview(){
         if(currentLevelSet != LEVELS_CUSTOM){
             elements["Highscores"]->setVisible(true);
             elements["Highscores"]->setEnabled(true);
+            elements["Upload"]->setVisible(false);
+            elements["Upload"]->setEnabled(false);
         }
         previewTitle->setVisible(true);
         previewAuthor->setVisible(true);

@@ -98,7 +98,7 @@ private:
     MenuItemImage* currentLevelsTab;
     MenuItemImage* currentLevelsImage;
     MenuItemImage* hand;
-    Sprite* loading;
+    MenuItemImage* loading;
     Label* previewTitle;
     Label* previewAuthor;
     void FetchSocialLevels();
