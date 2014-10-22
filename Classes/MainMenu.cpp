@@ -298,12 +298,36 @@ std::map<std::string, MenuItemImage*> MainMenu::LoadElementMap(std::string xmldo
         MenuItemImage* temp;
         //If there is no included callback for this button//
         printf("Element: %s\n\tPos: (%f, %f)\n\tOriginal Pos: (%f, %f)\n", image.c_str(), position.x, position.y, originalX, originalY);
+        std::string selectedImagePath;
+        if(image.compare("Delete") != 0 &&
+            image.compare("Delete") != 0 &&
+            image.compare("Edit") != 0 &&
+            image.compare("Facebook") != 0 &&
+            image.compare("Goal") != 0 &&
+            image.compare("Highscores") != 0 &&
+            image.compare("Home") != 0 &&
+            image.compare("Hook") != 0 &&
+            image.compare("Play") != 0 &&
+            image.compare("Refresh") != 0 &&
+            image.compare("Save") != 0 &&
+            image.compare("Spawner") != 0 &&
+            image.compare("Spikewall") != 0 &&
+            image.compare("Upload") != 0 &&
+            image.compare("Delete") != 0 &&
+               image.compare("Wall") != 0){
+            selectedImagePath = imagePath;
+        }else{
+            std::string image2 = image;
+            image2.append(".png");
+            selectedImagePath = GetPath("selectedbuttons", image2);
+        }
         if(callbacks.find(image) == callbacks.end()){
-            temp = MenuItemImage::create(imagePath, imagePath, MainMenu::Instance, menu_selector(MainMenu::emptyCallback));
+            temp = MenuItemImage::create(imagePath, selectedImagePath, MainMenu::Instance, menu_selector(MainMenu::emptyCallback));
             printf("\tCouldn't find a callback\n");
         } else {//If there is a callback for this button//
-            temp = MenuItemImage::create(imagePath, imagePath, ref, callbacks[image]);
+            temp = MenuItemImage::create(imagePath, selectedImagePath, ref, callbacks[image]);
         }
+        float width = temp->getBoundingBox().size.width;
         temp->setPosition(position);
         temp->setScale(ar_scale, ar_scale);
         temp->setAnchorPoint(Point(0,1));
@@ -314,6 +338,17 @@ std::map<std::string, MenuItemImage*> MainMenu::LoadElementMap(std::string xmldo
     }
     return elementMap;
 }
+std::string MainMenu::GetPath(std::string layer, std::string item){
+    std::string path = "Images/";
+    path.append(ar_extension);
+    path.append("/");
+    path.append(layer);
+    path.append("/");
+    path.append(item);
+    std::string imagePath = FileUtils::getInstance()->fullPathForFilename(path);
+    return imagePath;
+};
+
 void MainMenu::menuCloseCallback(Ref* pSender)
 {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
