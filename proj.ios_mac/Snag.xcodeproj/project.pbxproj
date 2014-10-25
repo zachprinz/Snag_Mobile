@@ -34,9 +34,7 @@
 		33704C8D1989D1E500D424EB /* Marker Felt.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 33704C431989D1E400D424EB /* Marker Felt.ttf */; };
 		33704C8E1989D1E500D424EB /* goal.png in Resources */ = {isa = PBXBuildFile; fileRef = 33704C441989D1E400D424EB /* goal.png */; };
 		33704C971989D1E500D424EB /* hookGreen.png in Resources */ = {isa = PBXBuildFile; fileRef = 33704C4D1989D1E500D424EB /* hookGreen.png */; };
-		33704CBC1989D1E500D424EB /* spawner.png in Resources */ = {isa = PBXBuildFile; fileRef = 33704C721989D1E500D424EB /* spawner.png */; };
 		33704CBD1989D1E500D424EB /* spikewall.png in Resources */ = {isa = PBXBuildFile; fileRef = 33704C731989D1E500D424EB /* spikewall.png */; };
-		33704CC01989D1E500D424EB /* user.png in Resources */ = {isa = PBXBuildFile; fileRef = 33704C761989D1E500D424EB /* user.png */; };
 		33704CC11989D1E500D424EB /* wall.png in Resources */ = {isa = PBXBuildFile; fileRef = 33704C771989D1E500D424EB /* wall.png */; };
 		33704CC21989D1E500D424EB /* x.png in Resources */ = {isa = PBXBuildFile; fileRef = 33704C781989D1E500D424EB /* x.png */; };
 		3373514B1995619D00DB9C3B /* Parse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3373514A1995619D00DB9C3B /* Parse.framework */; };
@@ -60,6 +58,9 @@
 		337CAEB7199BFF5F00400119 /* Default-Landscape@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 337CAEB0199BFF5F00400119 /* Default-Landscape@2x~ipad.png */; };
 		337CAEB8199BFF5F00400119 /* Launch_2048_1536.png in Resources */ = {isa = PBXBuildFile; fileRef = 337CAEB1199BFF5F00400119 /* Launch_2048_1536.png */; };
 		337CAEBB199C013D00400119 /* Preview.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 337CAEB9199C013D00400119 /* Preview.cpp */; };
+		33AAFB3519FACAEA00356C52 /* user.png in Resources */ = {isa = PBXBuildFile; fileRef = 33AAFB3419FACAEA00356C52 /* user.png */; };
+		33AAFB3819FACBB600356C52 /* user.png in Resources */ = {isa = PBXBuildFile; fileRef = 33AAFB3619FACBB600356C52 /* user.png */; };
+		33AAFB3919FACBB600356C52 /* spawner.png in Resources */ = {isa = PBXBuildFile; fileRef = 33AAFB3719FACBB600356C52 /* spawner.png */; };
 		33AB53B119C7A73C009F9061 /* Hand.png in Resources */ = {isa = PBXBuildFile; fileRef = 33AB53B019C7A73C009F9061 /* Hand.png */; };
 		33B1D00E19F2145500B822BF /* Icon-29.png in Resources */ = {isa = PBXBuildFile; fileRef = 33B1CFFB19F2145500B822BF /* Icon-29.png */; };
 		33B1D00F19F2145500B822BF /* Icon-40.png in Resources */ = {isa = PBXBuildFile; fileRef = 33B1CFFC19F2145500B822BF /* Icon-40.png */; };
@@ -80,7 +81,6 @@
 		33B1D01E19F2145500B822BF /* Icon-180.png in Resources */ = {isa = PBXBuildFile; fileRef = 33B1D00B19F2145500B822BF /* Icon-180.png */; };
 		33B1D01F19F2145500B822BF /* iTunesArtwork.png in Resources */ = {isa = PBXBuildFile; fileRef = 33B1D00C19F2145500B822BF /* iTunesArtwork.png */; };
 		33B1D02019F2145500B822BF /* iTunesArtwork@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 33B1D00D19F2145500B822BF /* iTunesArtwork@2x.png */; };
-		33BA917919EB2FB100CF7CE3 /* game_hook.png in Resources */ = {isa = PBXBuildFile; fileRef = 33BA917719EB2FB100CF7CE3 /* game_hook.png */; };
 		33BA917A19EB2FB100CF7CE3 /* game_line.png in Resources */ = {isa = PBXBuildFile; fileRef = 33BA917819EB2FB100CF7CE3 /* game_line.png */; };
 		33BE6A2319D741ED00F07C50 /* Images in Resources */ = {isa = PBXBuildFile; fileRef = 33BE6A2219D741ED00F07C50 /* Images */; };
 		33D671401994174200DE166D /* IOSNDKHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 33D6713F1994174200DE166D /* IOSNDKHelper.mm */; };
@@ -300,9 +300,7 @@
 		33704C431989D1E400D424EB /* Marker Felt.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Marker Felt.ttf"; sourceTree = "<group>"; };
 		33704C441989D1E400D424EB /* goal.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = goal.png; path = ../proj.ios_mac/goal.png; sourceTree = "<group>"; };
 		33704C4D1989D1E500D424EB /* hookGreen.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = hookGreen.png; path = ../proj.ios_mac/hookGreen.png; sourceTree = "<group>"; };
-		33704C721989D1E500D424EB /* spawner.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spawner.png; path = ../proj.ios_mac/spawner.png; sourceTree = "<group>"; };
 		33704C731989D1E500D424EB /* spikewall.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spikewall.png; path = ../proj.ios_mac/spikewall.png; sourceTree = "<group>"; };
-		33704C761989D1E500D424EB /* user.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = user.png; path = ../proj.ios_mac/user.png; sourceTree = "<group>"; };
 		33704C771989D1E500D424EB /* wall.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = wall.png; path = ../proj.ios_mac/wall.png; sourceTree = "<group>"; };
 		33704C781989D1E500D424EB /* x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = x.png; path = ../proj.ios_mac/x.png; sourceTree = "<group>"; };
 		3373514A1995619D00DB9C3B /* Parse.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Parse.framework; sourceTree = "<group>"; };
@@ -328,6 +326,9 @@
 		337CAEB1199BFF5F00400119 /* Launch_2048_1536.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Launch_2048_1536.png; sourceTree = "<group>"; };
 		337CAEB9199C013D00400119 /* Preview.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Preview.cpp; path = ../Classes/Preview.cpp; sourceTree = "<group>"; };
 		337CAEBA199C013D00400119 /* Preview.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Preview.h; path = ../Classes/Preview.h; sourceTree = "<group>"; };
+		33AAFB3419FACAEA00356C52 /* user.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = user.png; sourceTree = "<group>"; };
+		33AAFB3619FACBB600356C52 /* user.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = user.png; sourceTree = "<group>"; };
+		33AAFB3719FACBB600356C52 /* spawner.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spawner.png; sourceTree = "<group>"; };
 		33AB53B019C7A73C009F9061 /* Hand.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Hand.png; sourceTree = "<group>"; };
 		33B1CFFB19F2145500B822BF /* Icon-29.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-29.png"; sourceTree = "<group>"; };
 		33B1CFFC19F2145500B822BF /* Icon-40.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-40.png"; sourceTree = "<group>"; };
@@ -348,7 +349,6 @@
 		33B1D00B19F2145500B822BF /* Icon-180.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-180.png"; sourceTree = "<group>"; };
 		33B1D00C19F2145500B822BF /* iTunesArtwork.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesArtwork.png; sourceTree = "<group>"; };
 		33B1D00D19F2145500B822BF /* iTunesArtwork@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iTunesArtwork@2x.png"; sourceTree = "<group>"; };
-		33BA917719EB2FB100CF7CE3 /* game_hook.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = game_hook.png; sourceTree = "<group>"; };
 		33BA917819EB2FB100CF7CE3 /* game_line.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = game_line.png; sourceTree = "<group>"; };
 		33BE6A2219D741ED00F07C50 /* Images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Images; sourceTree = "<group>"; };
 		33D6713D1994174200DE166D /* IOSNDKHelper-C-Interface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IOSNDKHelper-C-Interface.h"; sourceTree = "<group>"; };
@@ -704,6 +704,8 @@
 		78C7DDAA14EBA5050085D0C2 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				33AAFB3619FACBB600356C52 /* user.png */,
+				33AAFB3719FACBB600356C52 /* spawner.png */,
 				3356817319E48D0900E50EE5 /* Slice_9_Inlay.png */,
 				33BE6A2219D741ED00F07C50 /* Images */,
 				33AB53B019C7A73C009F9061 /* Hand.png */,
@@ -713,14 +715,12 @@
 				33F5BA7919F4560D007514D8 /* dimbo.fnt */,
 				33704C421989D1E400D424EB /* fonts */,
 				33704C441989D1E400D424EB /* goal.png */,
-				33BA917719EB2FB100CF7CE3 /* game_hook.png */,
 				33BA917819EB2FB100CF7CE3 /* game_line.png */,
 				33704C4D1989D1E500D424EB /* hookGreen.png */,
-				33704C721989D1E500D424EB /* spawner.png */,
 				33704C731989D1E500D424EB /* spikewall.png */,
-				33704C761989D1E500D424EB /* user.png */,
 				33704C771989D1E500D424EB /* wall.png */,
 				33704C781989D1E500D424EB /* x.png */,
+				33AAFB3419FACAEA00356C52 /* user.png */,
 			);
 			name = Resources;
 			path = ../Resources;
@@ -917,20 +917,20 @@
 				33B1D01819F2145500B822BF /* Icon-87.png in Resources */,
 				337CAEAA199BFBF600400119 /* Images.xcassets in Resources */,
 				337CAEB7199BFF5F00400119 /* Default-Landscape@2x~ipad.png in Resources */,
-				33704CBC1989D1E500D424EB /* spawner.png in Resources */,
 				33B1D01A19F2145500B822BF /* Icon-114.png in Resources */,
 				33281B2019C35F8400D87388 /* dimbo_white.png in Resources */,
-				33BA917919EB2FB100CF7CE3 /* game_hook.png in Resources */,
 				33B1D01519F2145500B822BF /* Icon-72.png in Resources */,
 				33B1D02019F2145500B822BF /* iTunesArtwork@2x.png in Resources */,
 				33B1D01C19F2145500B822BF /* Icon-144.png in Resources */,
+				33AAFB3919FACBB600356C52 /* spawner.png in Resources */,
 				33B1D00F19F2145500B822BF /* Icon-40.png in Resources */,
+				33AAFB3519FACAEA00356C52 /* user.png in Resources */,
 				33B1D01F19F2145500B822BF /* iTunesArtwork.png in Resources */,
 				33BE6A2319D741ED00F07C50 /* Images in Resources */,
 				33704C971989D1E500D424EB /* hookGreen.png in Resources */,
+				33AAFB3819FACBB600356C52 /* user.png in Resources */,
 				33B1D01419F2145500B822BF /* Icon-60@2x.png in Resources */,
 				337CAEB8199BFF5F00400119 /* Launch_2048_1536.png in Resources */,
-				33704CC01989D1E500D424EB /* user.png in Resources */,
 				33B1D01119F2145500B822BF /* Icon-57.png in Resources */,
 				337CAEB2199BFF5F00400119 /* Default.png in Resources */,
 				33704CC21989D1E500D424EB /* x.png in Resources */,

@@ -11,28 +11,28 @@
 #include "MainMenu.h"
 #include "Level.h"
 
-#define FALL_SPEED 2500
-
 int User::type;
 
 User::User() : Entity(Vec2(150,150), Vec2(0,0), Vec2(0,0), 5){
-    SetUpPhysicsSprite("user.png", Vec2(0.5,0.5));
+    SetUpPhysicsSprite("user.png", Vec2(1.0,1.0));
     isHooked = false;
     line = Sprite::create("game_line.png");
     line->retain();
-    line->setAnchorPoint(Vec2(0,0.5));
+    line->setAnchorPoint(Vec2(0.0,0.5));
     line->setGlobalZOrder(1);
     line->setVisible(false);
     sprite->setGlobalZOrder(2);
 }
 void User::SetUpPhysicsSprite(std::string texture, Vec2 scale){
-    body = PhysicsBody::createCircle(sprite->getBoundingBox().size.width / 2.0);
-    body->setMass(10.0f);
+    body = PhysicsBody::createCircle(sprite->getBoundingBox().size.width / (PTM_RATIO * 2.0));
+    body->setMass(1.0f);
     body->setDynamic(true);
     body->setTag(type);
     physicsSprite = Sprite::create(texture);
     physicsSprite->setPhysicsBody(body);
-    physicsSprite->setPosition(position.x,position.y);
+    physicsSprite->setPosition(position.x/PTM_RATIO,position.y/PTM_RATIO);
+    //physicsSprite->setScale((baseScale.x*physicsSprite->getBoundingBox().size.width)/PTM_RATIO, (baseScale.y * physicsSprite->getBoundingBox().size.height)/PTM_RATIO);
+    physicsSprite->setAnchorPoint(Vec2(0.5,0.5));
     physicsSprite->setVisible(false);
     physicsSprite->setTag(type);
     physicsSprite->retain();
@@ -47,6 +47,7 @@ void User::Add(Layer* layer){
     layer->addChild(physicsSprite,1);
 }
 void User::update(float boardScale){
+    printf("\nUser Physics Position: (%f, %f)", physicsSprite->getPosition().x, physicsSprite->getPosition().y);
     if(position.y < -400)
         Reset();
     this->CalculateScale(Vec2(0,0), boardScale);
@@ -54,29 +55,34 @@ void User::update(float boardScale){
 void User::Snag(){
     closest = Game::Instance->GetClosestHook(position);
     isHooked = true;
-    line->setVisible(true);
-    joint = PhysicsJointDistance::construct(physicsSprite->getPhysicsBody(), closest->GetPhysicsSprite()->getPhysicsBody(), Vec2(0.5,0.5), Vec2(0.5,0.5));
+    //line->setVisible(true);
+    joint = PhysicsJointDistance::construct(body, closest->GetPhysicsSprite()->getPhysicsBody(), Vec2(0.5,0.5), Vec2(0.5,0.5));
+    joint->setCollisionEnable(false);
+    joint->setDistance(physicsSprite->getPosition().getDistance(closest->GetPhysicsSprite()->getPosition()));
     joint->setEnable(true);
     Game::Instance->AddJoint(joint);
-    lineBaseScale = joint->getDistance() / line->getTexture()->getPixelsWide();
+    //line->setScale(1.0,1.0);
+    lineBaseScale = (joint->getDistance()*PTM_RATIO) / 100.0;//line->getBoundingBox().size.width;
 }
 void User::Release(){
     if(isHooked == true){
         isHooked = false;
         line->setVisible(false);
         Game::Instance->RemoveAllJoints();
-        body->setVelocity(Vec2(body->getVelocity().x * 1.25, body->getVelocity().y * 1.25));
+        body->setVelocity(Vec2(body->getVelocity().x * 1.35, body->getVelocity().y * 1.25));
     }
 }
 void User::Reset(){
     if(isHooked)
         Release();
     Game::Instance->time = 0.0;
-    physicsSprite->setPosition(Game::Instance->currentLevel->GetLaunchPosition());
-    body->setVelocity(Game::Instance->currentLevel->GetLaunchVelocity());
+    Vec2 oLaunch = Game::Instance->currentLevel->GetLaunchPosition();
+    Vec2 oVel = Game::Instance->currentLevel->GetLaunchVelocity();
+    physicsSprite->setPosition(Vec2(oLaunch.x / PTM_RATIO, oLaunch.y / PTM_RATIO));
+    body->setVelocity(Vec2(200.f, 250.f));//oVel.x, oVel.y));
 }
 void User::CalculateScale(Vec2 userPosition, float boardScale){
-    position = physicsSprite->getPosition();
+    position = Vec2(physicsSprite->getPosition().x * PTM_RATIO, physicsSprite->getPosition().y * PTM_RATIO);
     float distanceToGround = 0 - position.y;
     float newDistanceToGround = distanceToGround / boardScale;
     sprite->setPosition((MainMenu::screenSize.x / 2.0), 0 - newDistanceToGround);
@@ -95,19 +101,17 @@ void User::Bounce(const PhysicsContactData* bounceData){
     for(int x = 0; x < PhysicsContactData::POINT_MAX; x++){
         points.push_back(bounceData->points[x]);
     }
-    Vec2 relativePoint = Vec2(points[0].x - position.x, points[0].y - position.y);
-    if(abs(relativePoint.x) < 30){
-        if(abs(backupVelocity.y) > 30)
-            body->setVelocity(Vec2(backupVelocity.x * 0.9, backupVelocity.y * -0.9));
-    }
-    else
-        body->setVelocity(Vec2(backupVelocity.x * -0.9, backupVelocity.y * 1.15));
+    Vec2 relativePoint = Vec2(fabs(points[0].x - (position.x/PTM_RATIO)), fabs(points[0].y - (position.y/PTM_RATIO)));
+    if(relativePoint.x < relativePoint.y){
+        body->setVelocity(Vec2(backupVelocity.x * 0.95, backupVelocity.y * -0.9));
+    } else
+        body->setVelocity(Vec2(backupVelocity.x * -0.95, backupVelocity.y * 1.1));
 }
 void User::SetBackupVelocity(){
     backupVelocity = physicsSprite->getPhysicsBody()->getVelocity();
 }
 Point User::GetPhysicalPosition(){
-    return physicsSprite->getPosition();
+    return Vec2(physicsSprite->getPosition().x*PTM_RATIO, physicsSprite->getPosition().y * PTM_RATIO);
 }
 float User::GetAngle(Vec2 a, Vec2 b){
     float o = a.x - b.x;

@@ -48,14 +48,14 @@ bool Highscores::init()
     elements = MainMenu::LoadElementMap("highscores", this, callbacks, &menuItems, this);
     
     scrollview = ui::ScrollView::create();
-    scrollview->setContentSize(Size(elements["MainPanel"]->getBoundingBox().size.width*.9605, elements["MainPanel"]->getBoundingBox().size.height * 0.9));
-    scrollview->setSize(Size(elements["MainPanel"]->getBoundingBox().size.width*.9605, elements["MainPanel"]->getBoundingBox().size.height * 0.9));
-    scrollview->setPosition(Vec2(elements["Inlay"]->getBoundingBox().getMidX(), elements["MainPanel"]->getBoundingBox().getMidY() + visibleSize.height * 0.0435));
+    scrollview->setContentSize(Size(elements["Inlay"]->getBoundingBox().size.width, elements["Inlay"]->getBoundingBox().size.height * 0.9));
+    scrollview->setSize(Size(elements["Inlay"]->getBoundingBox().size.width, elements["Inlay"]->getBoundingBox().size.height));
+    scrollview->setPosition(Vec2(elements["Inlay"]->getBoundingBox().getMidX(), elements["Inlay"]->getBoundingBox().getMidY()));
     scrollview->setAnchorPoint(Point(0.5,0.5));
     scrollview->setDirection(ui::ScrollView::Direction::HORIZONTAL);
     scrollview->setInertiaScrollEnabled(true);
-    float innerWidth = elements["MainPanel"]->getBoundingBox().size.width * 3;
-    float innerHeight = elements["MainPanel"]->getBoundingBox().size.height * 0.9;
+    float innerWidth = elements["Inlay"]->getBoundingBox().size.width * 3;
+    float innerHeight = elements["Inlay"]->getBoundingBox().size.height;
     scrollview->setInnerContainerSize(Size(innerWidth,innerHeight));
     elements["Seperator"]->setVisible(false);
     if(MainMenu::aspectRatio == 0){
@@ -65,16 +65,11 @@ bool Highscores::init()
     }
     for(int x = 0; x < 10; x++){
         auto seperator1 = MainMenu::CreateButton("highscores", "Seperator.png");
-        int sepOffset = 5;
-        if(MainMenu::Instance->aspectRatio == 1)
-            sepOffset = -5 * MainMenu::Instance->ar_scale;
-        if(MainMenu::Instance->aspectRatio == 0)
-            seperator1->setScaleY(seperator1->getScaleY() * 0.99);
-        seperator1->setPosition(Vec2(x * 750 * (visibleSize.width / 1920.0),sepOffset));
+        seperator1->setPosition(Vec2(x * 750 * (visibleSize.width / 1920.0),0));
         seperator1->setAnchorPoint(Vec2(0,0));
         scrollview->addChild(seperator1,1);
         for(int y = 0; y < 4; y++){
-            float bottom = y * (0.25 * elements["Inlay"]->getBoundingBox().size.height) - (elements["Inlay"]->getBoundingBox().size.height * 0.03);
+            float bottom = y * (0.25 * elements["Inlay"]->getBoundingBox().size.height);
             float left = seperator1->getBoundingBox().getMaxX() + seperator1->getBoundingBox().size.width * 0.1;
             auto userNameTemp = MainMenu::CreateLabel("PlayerName", Vec2(0,1.0-0.015), Vec2(0,0));
             userNameTemp->setPosition(left, bottom);
@@ -98,7 +93,6 @@ bool Highscores::init()
             scrollview->addChild(userNameTemp,1);
             scrollview->addChild(userPlaceTemp,1);
             scrollview->addChild(userTimeTemp,1);
-        
         }
     }
     

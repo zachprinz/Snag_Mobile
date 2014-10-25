@@ -18,6 +18,8 @@
 #define GOAL 4
 #define USER 5
 
+#define PTM_RATIO 7.0
+
 #include <iostream>
 #include "cocos2d.h"
 

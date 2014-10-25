@@ -90,7 +90,7 @@ bool MainMenu::init()
     /////////////////////////////////////
     
     std::map<std::string, SEL_MenuHandler> callbacks;
-    callbacks["Play"] = menu_selector(MainMenu::playButtonCallback);
+    callbacks["Play_Label"] = menu_selector(MainMenu::playButtonCallback);
     cocos2d::Vector<MenuItem*> menuItems;
     elements = LoadElementMap("mainmenu", this, callbacks, &menuItems, this);
     menu = Menu::createWithArray(menuItems);
@@ -183,8 +183,14 @@ MenuItemImage* MainMenu::CreateButton(std::string layer, std::string item, Ref* 
     path.append("/");
     path.append(item);
     std::string imagePath = FileUtils::getInstance()->fullPathForFilename(path);
+    std::string selectedImagePath;
     MenuItemImage* temp;
-    temp = MenuItemImage::create(imagePath, imagePath, ref, callback);
+    if(item.compare("Home.png") != 0 && item.compare("Refresh.png")){
+        selectedImagePath = imagePath;
+    }else{
+        selectedImagePath = GetPath("selectedbuttons", item);
+    }
+    temp = MenuItemImage::create(imagePath, selectedImagePath, ref, callback);
     temp->setScale(ar_scale, ar_scale);
     temp->retain();
     return temp;
@@ -197,8 +203,14 @@ MenuItemImage* MainMenu::CreateButton(std::string layer, std::string item){
     path.append("/");
     path.append(item);
     std::string imagePath = FileUtils::getInstance()->fullPathForFilename(path);
+    std::string selectedImagePath;
     MenuItemImage* temp;
-    temp = MenuItemImage::create(imagePath, imagePath, MainMenu::Instance, menu_selector(MainMenu::emptyCallback));
+    if(item.compare("Home.png") != 0 && item.compare("Refresh.png")){
+        selectedImagePath = imagePath;
+    }else{
+        selectedImagePath = GetPath("selectedbuttons", item);
+    }
+    temp = MenuItemImage::create(imagePath, selectedImagePath, MainMenu::Instance, menu_selector(MainMenu::emptyCallback));
     temp->setScale(ar_scale, ar_scale);
     temp->retain();
     return temp;

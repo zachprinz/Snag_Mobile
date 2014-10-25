@@ -86,7 +86,9 @@ public:
     Vec2 touchStart;
     Vec2 touchCurrent;
     bool isDragging;
+    void SetSelectCustomLevels();
 private:
+    Label* newLevelLabel;
     float scrollPercent;
     float scrollPressDistance;
     bool recordScrollDistance;

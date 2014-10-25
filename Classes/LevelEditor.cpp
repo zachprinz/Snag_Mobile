@@ -38,19 +38,17 @@ bool LevelEditor::init(){
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
     noticeUp = false;
 
-    verticalAxis = MainMenu::CreateButton("game_line.png", Vec2(0.5,0.5), Vec2(0,0));
+    verticalAxis = Sprite::create("game_line.png");
     verticalAxis->setAnchorPoint(Vec2(0.5,0.5));
     verticalAxis->setScale(1,1);
     verticalAxis->setScale(MainMenu::screenSize.y / verticalAxis->getBoundingBox().size.height,2);
     verticalAxis->setRotation(90);
-    horizontalAxis = MainMenu::CreateButton("game_line.png", Vec2(0.5,0.5), Vec2(0,0));
+    horizontalAxis = Sprite::create("game_line.png");
     horizontalAxis->setAnchorPoint(Vec2(0.5,0.5));
     horizontalAxis->setScale(1,1);
     horizontalAxis->setScale(MainMenu::screenSize.x / horizontalAxis->getBoundingBox().size.width, 2);
-    horizontalAxis->setGlobalZOrder(-4);
-    verticalAxis->setGlobalZOrder(-4);
     for(int x = -50; x < 50; x++){
-        auto tempVertical = MainMenu::CreateButton("game_line.png", Vec2(0.5,0.5), Vec2(0,0));
+        auto tempVertical = Sprite::create("game_line.png");
         tempVertical->setAnchorPoint(Vec2(0.5,0.5));
         tempVertical->setScale(1,1);
         tempVertical->setScale(MainMenu::screenSize.y / tempVertical->getBoundingBox().size.height,0.75);
@@ -58,7 +56,7 @@ bool LevelEditor::init(){
         verticalGuides.push_back(tempVertical);
         this->addChild(tempVertical,1);
         
-        auto tempHorizontal = MainMenu::CreateButton("game_line.png", Vec2(0.5,0.5), Vec2(0,0));
+        auto tempHorizontal = Sprite::create("game_line.png");
         tempHorizontal->setAnchorPoint(Vec2(0.5,0.5));
         tempHorizontal->setScale(1,1);
         tempHorizontal->setScale(MainMenu::screenSize.x / tempHorizontal->getBoundingBox().size.width, 0.75);
@@ -84,6 +82,9 @@ bool LevelEditor::init(){
     listener->onTouchesEnded = CC_CALLBACK_2(LevelEditor::onTouchesEnded, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(listener,this);
     
+    auto listener2 = EventListenerTouchOneByOne::create();
+    listener2->onTouchBegan = CC_CALLBACK_2(LevelEditor::onTouchBegan, this);
+
     saveDialog = false;
     
     auto background = Sprite::create("GRID2.png");
@@ -112,6 +113,11 @@ bool LevelEditor::init(){
     elements["Resize"]->setVisible(false);
     elements["Trash"]->setVisible(false);
     elements["Duplicate"]->setVisible(false);
+    elements["Move"]->setEnabled(false);
+    elements["Velocity"]->setEnabled(false);
+    elements["Resize"]->setEnabled(false);
+    elements["Trash"]->setEnabled(false);
+    elements["Duplicate"]->setEnabled(false);
     elements["Duplicate"]->setAnchorPoint(Vec2(1,0));
     elements["Move"]->setAnchorPoint(Vec2(1,1));
     elements["Resize"]->setAnchorPoint(Vec2(0,0));
@@ -131,6 +137,12 @@ bool LevelEditor::init(){
     elements["Move"]->getEventDispatcher()->setEnabled(false);
     elements["Resize"]->getEventDispatcher()->setEnabled(false);
     elements["Velocity"]->getEventDispatcher()->setEnabled(false);
+    //_eventDispatcher->addEventListenerWithSceneGraphPriority(listener->clone(),elements["Velocity"]);
+    //_eventDispatcher->addEventListenerWithSceneGraphPriority(listener->clone(),elements["Move"]);
+    //_eventDispatcher->addEventListenerWithSceneGraphPriority(listener->clone(),elements["Resize"]);
+    //_eventDispatcher->addEventListenerWithSceneGraphPriority(listener2,elements["Move"]);
+    //_eventDispatcher->addEventListenerWithSceneGraphPriority(listener2->clone(),elements["Resize"]);
+    //_eventDispatcher->addEventListenerWithSceneGraphPriority(listener2->clone(),elements["Velocity"]);
 
     float buttonHeightPixels = 155;
     float tempScale = MainMenu::minScreenScale;
@@ -167,6 +179,18 @@ bool LevelEditor::init(){
     quitPopUp->Add(this);
     
     this->addChild(currentSprite);
+    
+    this->removeChild(elements["Resize"]);
+    elements["Resize"]->removeFromParent();
+    this->addChild(elements["Resize"]);
+    
+    this->removeChild(elements["Velocity"]);
+    elements["Velocity"]->removeFromParent();
+    this->addChild(elements["Velocity"]);
+    
+    this->removeChild(elements["Move"]);
+    elements["Move"]->removeFromParent();
+    this->addChild(elements["Move"]);
     
     currentSelection = NULL;
     currentTool = NO_TOOL;
@@ -409,47 +433,55 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
             touchStart = touch->getLocation();
             touchCurrent = touch->getLocation();
             bool hitTab = false;
-            if(elements["Move"]->getBoundingBox().containsPoint(touchStart)){
+            if(elements["Move"]->isVisible() && elements["Move"]->getBoundingBox().containsPoint(touchStart)){
                transformCallback();
                 hitTab = true;
+                return true;
             }
-            if(elements["Resize"]->getBoundingBox().containsPoint(touchStart)){
+            if(elements["Resize"]->isVisible() && elements["Resize"]->getBoundingBox().containsPoint(touchStart)){
                 resizeCallback();
                 hitTab = true;
+                return true;
             }
-            if(elements["Velocity"]->getBoundingBox().containsPoint(touchStart)){
+            if(elements["Velocity"]->isVisible() && elements["Velocity"]->getBoundingBox().containsPoint(touchStart)){
                 targetCallback();
                 hitTab = true;
+                return true;
             }
             //Check if the user selected an entity//
             if(hitTab == false){
                 if(hasSelected){
                     Deselect();
-                } else {
-                    Entity* target = preview->GetTarget(touchStart);
-                    if(target != nullptr)
-                        Select(target);
+                    return false;
                 }
+                Entity* target = preview->GetTarget(touchStart);
+                if(target != nullptr){
+                    Select(target);
+                    return false;
+                }
+            }
+            if(currentTool == HOOK || currentTool == SPAWNER){
+                touchStart = preview->MapToScreen(CheckSnap(preview->ScreenToMap(touchStart)));
+                touchCurrent = touchStart;
+                Entity* tempEnt = (preview->CreateEntity(touchStart, touchStart, currentTool));
+                entities[tempEnt->ID] = tempEnt;
+                preview->AddEntity(tempEnt);
+                UnselectTool();
+                return false;
             } else {
-            //End Check//
-                if(isRotating || isTransforming || isScaling || isTargeting){
-                    
+                if(currentTool == NO_TOOL){
+                    if(hasSelected)
+                        Deselect();
                 } else {
-                    if(currentTool == HOOK || currentTool == SPAWNER){
-                        Entity* tempEnt = (preview->CreateEntity(touchStart, touchStart, currentTool));
-                        entities[tempEnt->ID] = tempEnt;
-                        preview->AddEntity(tempEnt);
-                    } else {
-                        if(currentTool == NO_TOOL){
-                            if(hasSelected)
-                                Deselect();
-                        } else {
-                            currentSprite->setPosition(touchStart);
-                            currentSprite->setContentSize(Size(1,1));
-                            currentSprite->setVisible(true);
-                        }
-                    }
-                } // This may be innapropriately placed.
+                    Vec2 screenToMap = preview->ScreenToMap(touchStart);
+                    Vec2 snapped = CheckSnap(screenToMap);
+                    Vec2 snappedScreen = preview->MapToScreen(snapped);
+                    touchStart = snappedScreen;
+                    currentSprite->setPosition(touchStart);
+                    printf("\n Current Sprite Pos: (%f, %f)\n", touchStart.x, touchStart.y);
+                    currentSprite->setContentSize(Size(1,1));
+                    currentSprite->setVisible(true);
+                }
             }
             return true;
         }
@@ -460,10 +492,6 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
 void LevelEditor::Select(Entity* entity){
     if(hasSelected)
         Deselect();
-    //if(entity->GetType() == HOOK || entity->GetType() == SPAWNER)
-        //elements["Resize"]->setEnabled(false);
-    //if(entity->GetType() == HOOK)
-        //rotate->setEnabled(false);
     hasSelected = true;
     currentSprite->setVisible(true);
     selectedEntity = entity;
@@ -473,6 +501,10 @@ void LevelEditor::Select(Entity* entity){
     startPosition.y -= selectedEntitySize.height / 2.0;
     currentSprite->setPosition(startPosition);
     currentSprite->setContentSize(selectedEntitySize);
+    elements["Duplicate"]->setEnabled(true);
+    elements["Resize"]->setEnabled(true);
+    elements["Move"]->setEnabled(true);
+    elements["Trash"]->setEnabled(true);
     elements["Duplicate"]->setVisible(true);
     elements["Resize"]->setVisible(true);
     elements["Move"]->setVisible(true);
@@ -500,12 +532,16 @@ void LevelEditor::Deselect(bool keep){
     printf("\nDESELECTED");
     hasSelected = false;
     selectedEntity = nullptr;
-    elements["Move"]->setVisible(false);
-    elements["Duplicate"]->setVisible(false);
-    elements["Trash"]->setVisible(false);
-    elements["Resize"]->setVisible(false);
+    elements["Move"]->setEnabled(false);
+    elements["Duplicate"]->setEnabled(false);
+    elements["Trash"]->setEnabled(false);
+    elements["Resize"]->setEnabled(false);
     currentSprite->setVisible(false);
     elements["Velocity"]->setVisible(false);
+    elements["Duplicate"]->setVisible(false);
+    elements["Resize"]->setVisible(false);
+    elements["Move"]->setVisible(false);
+    elements["Trash"]->setVisible(false);
     //rotate->setEnabled(true);
     //elements["Resize"]->setEnabled(true);
     //elements["Move"]->setEnabled(true);
@@ -542,17 +578,21 @@ void LevelEditor::UpdateSelected(){
 }
 void LevelEditor::UpdateAxis(){
     Vec2 originPos = preview->MapToScreen(Vec2(0,0));
-    verticalAxis->setPosition(originPos.x, verticalAxis->getPosition().y);
-    horizontalAxis->setPosition(horizontalAxis->getPosition().x, originPos.y);
+    verticalAxis->setPosition(originPos.x, MainMenu::screenSize.y / 2.0);
+    horizontalAxis->setPosition(MainMenu::screenSize.x / 2.0, originPos.y);
+    horizontalAxis->setScaleY(3);
+    verticalAxis->setScaleY(3);
     for(int x = 0; x < 100; x++){
-        Vec2 tempPos = preview->MapToScreen(Vec2(250 * (-10 + x), 250 * (-10 + x)));
+        Vec2 tempPos = preview->MapToScreen(Vec2((PTM_RATIO/4.0) * (-20 + x), (PTM_RATIO/4.0) * (-20 + x)));
         verticalGuides[x]->setPosition(tempPos.x, verticalGuides[x]->getPosition().y);
-        horizontalGuides[x]->setPosition(horizontalGuides[x]->getPosition().x, tempPos.y);
+        horizontalGuides[x]->setPosition(MainMenu::screenSize.x / 2.0, tempPos.y);
         float tempScale = preview->GetScale() * 1;
         if(tempScale > 1)
             tempScale = 1;
         if(tempScale < 0.5)
             tempScale = 0.5;
+        if(x%4 == 0)
+            tempScale *= 2;
         horizontalGuides[x]->setScaleY(tempScale);
         verticalGuides[x]->setScaleY(tempScale);
     }
@@ -564,9 +604,9 @@ void LevelEditor::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
         isTransforming = false;
         isTargeting = false;
     } else {
-        if(currentTool != ERASE && currentTool != NO_TOOL){
+        if(!hasSelected && currentTool != ERASE && currentTool != NO_TOOL){
             if(currentTool != SPAWNER && currentTool != HOOK){
-                if(std::abs(currentSprite->getContentSize().width) < (0.5 * TILE_SIZE * (1.0/preview->GetScale())) || std::abs(currentSprite->getContentSize().height) < (0.5 * (TILE_SIZE*(1.0/preview->GetScale())))){
+                if(false){//std::abs(currentSprite->getContentSize().width) < (0.5 * TILE_SIZE * (1.0/preview->GetScale())) || std::abs(currentSprite->getContentSize().height) < (0.5 * (TILE_SIZE*(1.0/preview->GetScale())))){
                     currentSprite->setVisible(false);
                 } else{
                     Rect bb = currentSprite->getBoundingBox();
@@ -586,6 +626,7 @@ void LevelEditor::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
                     currentSprite->setVisible(false);
                 }
             }
+            UnselectTool();
         }
         if(currentTool == ERASE){
             Entity* entToRemove = preview->GetTarget(currentTouches[0]->getLocation());
@@ -625,8 +666,10 @@ void LevelEditor::onTouchMoved(Touch* touch, Event* event){
     } else {
         if(currentTool != NO_TOOL && currentTool != ERASE){
             touchCurrent = touch->getLocation();
+            Vec2 touchCurrent2;
             if(currentSprite != NULL)
-                currentSprite->setContentSize(Size(touchCurrent.x - touchStart.x, touchCurrent.y - touchStart.y));
+                touchCurrent2 = preview->MapToScreen(CheckSnap(preview->ScreenToMap(touchCurrent)));
+                currentSprite->setContentSize(Size(touchCurrent2.x - touchStart.x, touchCurrent2.y - touchStart.y));
         }
         if(currentTool == NO_TOOL){
             Vec2 oldTouch = touchStart;
@@ -780,6 +823,29 @@ void LevelEditor::ResetToolPos(){
             break;
     }
     }
+}
+Vec2 LevelEditor::CheckSnap(Vec2 touchMap){
+    float snapRatio = 0.33;
+    printf("\nMap Pos Touch: (%f, %f)\n", touchMap.x, touchMap.y);
+    if(fmod(touchMap.x,PTM_RATIO / 4.0) < (PTM_RATIO * 0.25 * snapRatio)){
+        touchMap.x -= fmod(touchMap.x, PTM_RATIO / 4.0);
+    }
+    if(fmod(touchMap.x, PTM_RATIO / 4.0) > (PTM_RATIO * 0.25 * (1.0 - snapRatio))){
+        touchMap.x += PTM_RATIO / 4.0 - (fmod(touchMap.x, PTM_RATIO / 4.0));
+    }
+    if(fmod(touchMap.y,PTM_RATIO / 4.0) < (PTM_RATIO * 0.25 * snapRatio)){
+        touchMap.y -= fmod(touchMap.y, PTM_RATIO / 4.0);
+    }
+    if(fmod(touchMap.y, PTM_RATIO / 4.0) > (PTM_RATIO * 0.25 * (1.0 - snapRatio))){
+        touchMap.y += PTM_RATIO / 4.0 - (fmod(touchMap.y, PTM_RATIO / 4.0));
+    }
+    return touchMap;
+}
+void LevelEditor::UnselectTool(){
+    ResetToolPos();
+    currentTool = NO_TOOL;
+    currentSelection = NULL;
+    selectedLabel->setString("Pan Tool");
 }
 void LevelEditor::Export(){
     currentLevel->SetName(name);

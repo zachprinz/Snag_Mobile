@@ -52,6 +52,8 @@ public:
     Level* currentLevel;
     User* user;
 private:
+    MenuItemImage* resetButton;
+    MenuItemImage* homeButton;
     bool winPopUpAdded;
     PopUp* winPopUp;
     PhysicsWorld* world;

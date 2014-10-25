@@ -13,6 +13,8 @@
 #include "cocos2d.h"
 #include "Entity.h"
 
+#define PTM_RATIO 7.0
+
 USING_NS_CC;
 
 class User : public Entity{
@@ -31,6 +33,8 @@ public:
     void SetBackupVelocity();
     void UpdateBounce();
     Vec2 GetPhysicalPosition();
+    bool isHooked;
+
 private:
     void CalculateScale(Vec2 userPosition, float boardScale);
     Vec2 backupVelocity;
@@ -39,7 +43,6 @@ private:
     Sprite* line;
     Entity* hook;
     Entity* closest;
-    bool isHooked;
     void updatePhysics(float dt);
     float lineBaseScale;
     float GetAngle(Vec2 a, Vec2 b);

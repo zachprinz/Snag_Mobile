@@ -29,6 +29,7 @@
 #define NO_TOOL 7
 #define MOVE 8
 #define TILE_SIZE 40
+#define PTM_RATIO 512.0
 
 using namespace cocos2d::extension;
 
@@ -73,10 +74,10 @@ public:
     
     MenuItemImage* currentSelection;
     MenuItemImage* selectedSprite;
-    MenuItemImage* verticalAxis;
-    MenuItemImage* horizontalAxis;
-    std::vector<MenuItemImage*> horizontalGuides;
-    std::vector<MenuItemImage*> verticalGuides;
+    Sprite* verticalAxis;
+    Sprite* horizontalAxis;
+    std::vector<Sprite*> horizontalGuides;
+    std::vector<Sprite*> verticalGuides;
     Label* selectedLabel;
     Label* notice;
     Menu* menu;
@@ -122,6 +123,8 @@ public:
     
     std::map<std::string, MenuItemImage*> elements;
 private:
+    void UnselectTool();
+    Vec2 CheckSnap(Vec2);
     Entity* selectedEntity;
     bool unsavedChanges;
     void goToHome();

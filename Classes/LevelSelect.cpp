@@ -78,6 +78,8 @@ bool LevelSelect::init()
     auto pinnedPanel = MainMenu::CreateButton("levelselect", "Pinned_Panel.png");
     pinnedPanel->setPosition(elements["Inlay"]->getBoundingBox().getMidX(), elements["Inlay"]->getBoundingBox().getMaxY());
     pinnedPanel->setAnchorPoint(Vec2(0.5,1));
+    this->removeChild(elements["NewLevel"]);
+    elements["NewLevel"]->removeFromParent();
     
     for(int x = 0; x < 4; x++){
         LevelMenuItem* lvl = new LevelMenuItem(x, scrollview, ((float)innerWidth) / 2.0, elements["Inlay"]->getBoundingBox().size.height*3-pinnedPanel->getBoundingBox().size.height);
@@ -110,6 +112,15 @@ bool LevelSelect::init()
     
 
     this->addChild(pinnedPanel, 1);
+    this->addChild(elements["NewLevel"],1);
+    elements["NewLevel"]->setVisible(false);
+    newLevelLabel = MainMenu::CreateLabel("New Level", Vec2(0,0), Vec2(0,0));
+    newLevelLabel->setPosition(Vec2(elements["NewLevel"]->getBoundingBox().getMidX(), elements["NewLevel"]->getBoundingBox().getMidY()));
+    newLevelLabel->setAnchorPoint(Vec2(0.5,0.5));
+    //newLevelLabel->setScaleX(newLevelLabel->getScaleX());
+    //newLevelLabel->setScaleY(newLevelLabel->getScaleY());
+    newLevelLabel->setVisible(false);
+    this->addChild(newLevelLabel,1);
     
     auto featuredLabelPanel = MainMenu::CreateButton("levelselect", "Featured_Label_Panel.png");
 
@@ -182,6 +193,20 @@ bool LevelSelect::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
         isDragging = true;
         hand->setVisible(false);
         return true;
+    }
+    if(elements["NewLevel"]->getBoundingBox().containsPoint(touchStart)){
+        if(elements["NewLevel"]->isVisible()){
+            newLevelCallback(NULL);
+            return false;
+        }
+        for(int x = 0; x < featuredLevels.size(); x++){
+            if(featuredLevels[x]->background->getBoundingBox().containsPoint(touchStart)){
+                selectedLevel = featuredLevels[x]->level;
+                SetPreview();
+                return false;
+            }
+        }
+        return false;
     }
     if(scrollview->getBoundingBox().containsPoint(touchStart) && !deletePopUp->visible){
         recordScrollDistance = true;
@@ -479,6 +504,7 @@ void LevelSelect::doneFetching(Node* sender, Value data){
         selectedLevel = levels[0]->level;
         SetPreview();
     }
+    SetSelectCustomLevels();
     if(goToEdit){
         goToEdit = false;
         for(int x = 0; x < Game::levels[currentLevelSet].size(); x++){
@@ -534,6 +560,21 @@ void LevelSelect::SetPreview(){
             preview->AddEntity(tempEnts[x]);
         }
         log("\t\tOut of Loop");
+    }
+}
+void LevelSelect::SetSelectCustomLevels(){
+    if(currentLevelSet != LEVELS_CUSTOM){
+        for(int x = 0; x < featuredLevels.size(); x++){
+            featuredLevels[x]->SetEnabled(true);
+        }
+        elements["NewLevel"]->setVisible(false);
+        newLevelLabel->setVisible(false);
+    } else {
+        for(int x = 0; x < featuredLevels.size(); x++){
+            featuredLevels[x]->SetEnabled(false);
+        }
+        elements["NewLevel"]->setVisible(true);
+        newLevelLabel->setVisible(true);
     }
 }
 void LevelSelect::menuCloseCallback(Ref* pSender){

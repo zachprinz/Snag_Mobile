@@ -15,6 +15,7 @@
 #define SPAWNER 3
 #define GOAL 4
 #define USER 5
+#define PTM_RATIO 512.0
 
 USING_NS_CC;
 
@@ -47,6 +48,14 @@ void Game::SetUpLevels(){
     }
 };
 void Game::update(float dt){
+    if(user->isHooked){
+        if(user->GetPhysicsSprite()->getPhysicsBody()->getVelocity().y > 0){
+            world->setGravity(Vec2(0,-250));
+        }
+        else{
+            world->setGravity(Vec2(0,-275));
+        }
+    }
     Vec2 userPos = user->GetPhysicalPosition();
     float dist = userPos.y;
     if(dist < visibleSize.height)
@@ -125,8 +134,8 @@ void Game::LoadLevel(Level* lvl){
 }
 void Game::setPhyWorld(PhysicsWorld* world2){
     world = world2;
-    world->setSpeed(3.0);
-    world->setGravity(Vec2(0,-300));
+    world->setSpeed(1.2);//1.2
+    world->setGravity(Vec2(0,-275));
 }
 
 bool Game::init(){
@@ -171,12 +180,12 @@ bool Game::init(){
     timeLabel->setGlobalZOrder(3);
     this->addChild(timeLabel,1);
     
-    auto resetButton = MainMenu::CreateButton("game", "Refresh.png", this, menu_selector(Game::resetButtonCallback));
+    resetButton = MainMenu::CreateButton("game", "Refresh.png", this, menu_selector(Game::resetButtonCallback));
     resetButton->setPosition(.017*visibleSize.width, visibleSize.height - 0.025*visibleSize.height);
     resetButton->setAnchorPoint(Vec2(0.0,1.0));
     menuItems.pushBack(resetButton);
     
-    auto homeButton = MainMenu::CreateButton("game", "Home.png", this, menu_selector(Game::homeButtonCallback));
+    homeButton = MainMenu::CreateButton("game", "Home.png", this, menu_selector(Game::homeButtonCallback));
     homeButton->setPosition(visibleSize.width - .017*visibleSize.width, visibleSize.height - 0.025*visibleSize.height);
     homeButton->setAnchorPoint(Vec2(1.0,1.0));
 
@@ -207,6 +216,7 @@ void Game::AddJoint(PhysicsJointDistance* joint){
 };
 void Game::RemoveAllJoints(){
     world->removeAllJoints();
+    world->setGravity(Vec2(0,-275));
 };
 void Game::UpdateTimer(float dt){
     time += 0.1;
@@ -238,7 +248,7 @@ void Game::homeButtonCallback(Ref* ref){
 }
 void Game::winLevelSelectCallback(Ref*){
     winPopUp->Close();
-    world->setSpeed(3.0);
+    world->setSpeed(1.0);
     homeButtonCallback(nullptr);
 }
 void Game::winHighscoresSelectCallback(Ref*){
@@ -256,11 +266,15 @@ void Game::winHighscoresSelectCallback(Ref*){
 };
 void Game::winReplaySelectCallback(Ref*){
     winPopUp->Close();
-    world->setSpeed(3.0);
+    world->setSpeed(1.2);
     resetButtonCallback(nullptr);
 };
 bool Game::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
     user->Snag();
+    Vec2 touchPosition = touch->getLocation();
+    if(resetButton->getBoundingBox().containsPoint(touchPosition) || homeButton->getBoundingBox().containsPoint(touchPosition)){
+        return false;
+    }
     return true;
 }
 void Game::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){

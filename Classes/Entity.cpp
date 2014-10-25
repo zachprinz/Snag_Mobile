@@ -44,7 +44,7 @@ int Entity::count = 0;
 Entity::Entity(Vec2 pos, Vec2 size, Vec2 vel, int type){
     ID = count++;
     std::string textures[6] = {"wall.png", "spikewall.png", "game_hook.png", "spawner.png", "goal.png", "user.png"};
-    float baseScales[6] = {1,1,1.5,1,1,0.5};
+    float baseScales[6] = {1,1,1,1,1,1};
     this->baseScale = Vec2(baseScales[type],baseScales[type]);
     this->type = type;
     this->size = size;
@@ -58,22 +58,24 @@ Entity::Entity(Vec2 pos, Vec2 size, Vec2 vel, int type){
         baseScale.x = size.x / sprite->getBoundingBox().size.width;
         baseScale.y = size.y / sprite->getBoundingBox().size.height;
     }
-    this->launchVelocity = Vec2(600,600);
+    this->launchVelocity = Vec2(10.f,10.f);
     sprite->setScale(baseScale.x, baseScale.y);
     if(type != USER)
         this->SetUpPhysicsSprite(textures[type], baseScale);
 }
 void Entity::SetUpPhysicsSprite(std::string texture, Vec2 scale){
-    body = PhysicsBody::createBox(Size(sprite->getBoundingBox().size));
+    body = PhysicsBody::createBox(Size(sprite->getBoundingBox().size.width / PTM_RATIO, sprite->getBoundingBox().size.height/ PTM_RATIO));
     body->setMass(PHYSICS_INFINITY);
     body->setDynamic(false);
     body->setTag(type);
     physicsSprite = Sprite::create(texture);
     physicsSprite->setPhysicsBody(body);
-    physicsSprite->setPosition(position.x,position.y);
+    physicsSprite->setPosition(position.x/PTM_RATIO,position.y/PTM_RATIO);
     physicsSprite->setVisible(false);
     physicsSprite->setTag(type);
     physicsSprite->retain();
+    physicsSprite->setAnchorPoint(Vec2(0.5,0.5));
+    physicsSprite->setScale(1,1);//(baseScale.x*physicsSprite->getBoundingBox().size.width)/PTM_RATIO, (baseScale.y * physicsSprite->getBoundingBox().size.height)/PTM_RATIO);
     if(type == SPAWNER || type == HOOK){// || type == GOAL){
         body->setContactTestBitmask(false);
         body->setCategoryBitmask(false);
@@ -87,7 +89,8 @@ void Entity::update(Vec2 userPosition, float boardScale){
 }
 void Entity::CalculateScale(Vec2 userPosition, float boardScale){
     if(type != USER){
-        position = physicsSprite->getPosition();
+        position = Vec2(physicsSprite->getPosition().x * PTM_RATIO, physicsSprite->getPosition().y * PTM_RATIO);
+        
         float distanceToCenter = position.x - userPosition.x;
         float newDistanceToCenter = distanceToCenter / boardScale;
         float distanceToGround = 0 - position.y;
@@ -118,10 +121,11 @@ void Entity::SetPosition(Vec2 pos){
     position = pos;
 }
 Vec2 Entity::GetLaunchVelocity(){
+    return Vec2(0.1f,0.1f);
     return launchVelocity;
 }
 void Entity::SetLaunchVelocity(Vec2 vl){
-    launchVelocity = vl;
+    launchVelocity = Vec2(0.1f, 0.1f);//vl;
 }
 int Entity::GetType(){
     return type;

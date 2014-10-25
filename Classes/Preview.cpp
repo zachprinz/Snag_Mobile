@@ -61,7 +61,7 @@ void Preview::UpdateSprite(int ID){
 }
 void Preview::AddEntity(Entity* ent){
     std::string textures[6] = {"wall.png", "spikewall.png", "game_hook.png", "spawner.png", "goal.png", "user.png"};
-    float baseScales[6] = {1,1,1.5,1,1,0.5};
+    float baseScales[6] = {1,1,1,1,1,1};
     entities[ent->ID] = ent;
     sprites[ent->ID] = Sprite::create(textures[ent->GetType()]);
     sprites[ent->ID]->setTag(ent->GetType());
@@ -84,6 +84,7 @@ void Preview::RemoveEntity(int entID){
     entities.erase(entID);
 };
 Entity* Preview::PopEntity(Entity* ent){
+    sprites[ent->ID]->removeFromParent();
     clipNode->removeChild(sprites[ent->ID]);
     sprites.erase(ent->ID);
     Entity* returnEnt = entities[ent->ID];
@@ -91,6 +92,7 @@ Entity* Preview::PopEntity(Entity* ent){
     return returnEnt;
 };
 Entity* Preview::PopEntity(int entID){
+    sprites[entID]->removeFromParent();
     clipNode->removeChild(sprites[entID]);
     sprites.erase(entID);
     Entity* returnEnt = entities[entID];
@@ -103,8 +105,8 @@ void Preview::SetZoom(float newScale){
     if(newScale > 2.0)
         newScale = 2.0;
     mapViewScale = mapViewScaleOriginal * newScale;
-    if(mapViewScale < 0.075)
-        mapViewScale = 0.075;
+    if(mapViewScale < 0.14)
+        mapViewScale = 0.14;
     Update();
 };
 void Preview::onTouchesBegan(std::vector<Touch*> touches){
@@ -202,8 +204,7 @@ Vec2 Preview::ScreenToMap(Vec2 pos){
 }
 Vec2 Preview::MapToScreen(Vec2 pos){
     Vec2 mapPosWithoutOrigin(pos.x - mapViewOrigin.x, pos.y - mapViewOrigin.y);
-    Vec2 viewPercent(mapPosWithoutOrigin.x*mapViewScale, mapPosWithoutOrigin.y*mapViewScale);
-    Vec2 screenPos = viewPercent;//(viewPercent.x + screenViewOrigin.x, viewPercent.y + screenViewOrigin.y);
+    Vec2 screenPos(mapPosWithoutOrigin.x*mapViewScale, mapPosWithoutOrigin.y*mapViewScale);
     return screenPos;
 }
 float Preview::GetScale(){
