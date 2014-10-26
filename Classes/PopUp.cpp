@@ -31,22 +31,22 @@ PopUp::PopUp(std::string title, std::string text, Ref* ref, SEL_MenuHandler call
     declineButton->setGlobalZOrder(8);
     menuItems.pushBack(declineButton);
     
-    labels.push_back(MainMenu::CreateLabel("Accept", Vec2(0,0), Vec2(0,0)));
+    labels.push_back(MainMenu::CreateLabel("Accept",1));
     labels[0]->setPosition(acceptButton->getBoundingBox().getMidX(), acceptButton->getBoundingBox().getMidY());
     labels[0]->setGlobalZOrder(8);
     labels[0]->setAnchorPoint(Vec2(0.5,0.5));
     
-    labels.push_back(MainMenu::CreateLabel("Decline", Vec2(0,0), Vec2(0,0)));
+    labels.push_back(MainMenu::CreateLabel("Decline", 1));
     labels[1]->setPosition(declineButton->getBoundingBox().getMidX(), declineButton->getBoundingBox().getMidY());
     labels[1]->setGlobalZOrder(8);
     labels[1]->setAnchorPoint(Vec2(0.5,0.5));
     
-    name = MainMenu::CreateLabel(title, Vec2(0,0), Vec2(0,0));
+    name = MainMenu::CreateLabel(title, 1);
     name->setPosition(elements["Panel"]->getBoundingBox().getMidX(), elements["Panel"]->getBoundingBox().getMaxY() - (MainMenu::screenSize.y * 0.01));
     name->setGlobalZOrder(8);
     name->setAnchorPoint(Vec2(0.5,1));
     
-    this->text = MainMenu::CreateLabel(text, Vec2(0,0), Vec2(0,0));
+    this->text = MainMenu::CreateLabel(text, 1);
     this->text->setPosition(elements["Panel"]->getBoundingBox().getMidX(), elements["Panel"]->getBoundingBox().getMidY());
     this->text->setAnchorPoint(Vec2(0.5,0.5));
     this->text->setGlobalZOrder(8);
@@ -75,12 +75,12 @@ PopUp::PopUp(std::string title, std::string text, Ref* ref, SEL_MenuHandler call
     declineButton->setAnchorPoint(Vec2(1,0));
     menuItems.pushBack(declineButton);
     
-    labels.push_back(MainMenu::CreateLabel("Accept", Vec2(0,0), Vec2(0,0)));
+    labels.push_back(MainMenu::CreateLabel("Accept", 1));
     labels[0]->setPosition(acceptButton->getBoundingBox().getMidX(), acceptButton->getBoundingBox().getMidY());
     labels[0]->setGlobalZOrder(8);
     labels[0]->setAnchorPoint(Vec2(0.5,0.5));
     
-    labels.push_back(MainMenu::CreateLabel("Decline", Vec2(0,0), Vec2(0,0)));
+    labels.push_back(MainMenu::CreateLabel("Decline", 1));
     labels[1]->setPosition(declineButton->getBoundingBox().getMidX(), declineButton->getBoundingBox().getMidY());
     labels[1]->setGlobalZOrder(8);
     labels[1]->setAnchorPoint(Vec2(0.5,0.5));
@@ -100,11 +100,11 @@ PopUp::PopUp(std::string title, std::string text, Ref* ref, SEL_MenuHandler call
     nameBox->setPlaceholderFontName("Marker Felt.ttf");
     nameBox->setGlobalZOrder(7);
     
-    this->text = MainMenu::CreateLabel(text, Vec2(0,0), Vec2(0,0));
+    this->text = MainMenu::CreateLabel(text, 1);
     this->text->setPosition(elements["Panel"]->getBoundingBox().getMidX(), elements["Panel"]->getBoundingBox().getMidY() + (MainMenu::screenSize.y * 0.1));
     this->text->setAnchorPoint(Vec2(0.5,0.5));
     
-    name = MainMenu::CreateLabel(title, Vec2(0,0), Vec2(0,0));
+    name = MainMenu::CreateLabel(title, 1);
     name->setPosition(elements["Panel"]->getBoundingBox().getMidX(), elements["Panel"]->getBoundingBox().getMaxY() - (MainMenu::screenSize.y * 0.01));
     name->setAnchorPoint(Vec2(0.5,1));
     
@@ -128,16 +128,16 @@ PopUp::PopUp(std::string title, std::string text, Ref* ref, SEL_MenuHandler call
     acceptButton->setGlobalZOrder(3);
     menuItems.pushBack(acceptButton);
     
-    labels.push_back(MainMenu::CreateLabel("Ok", Vec2(0,0), Vec2(0,0)));
+    labels.push_back(MainMenu::CreateLabel("Ok", 1));
     labels[0]->setPosition(acceptButton->getBoundingBox().getMidX(), acceptButton->getBoundingBox().getMidY());
     labels[0]->setGlobalZOrder(8);
     labels[0]->setAnchorPoint(Vec2(0.5,0.5));
     
-    this->text = MainMenu::CreateLabel(text, Vec2(0,0), Vec2(0,0));
+    this->text = MainMenu::CreateLabel(text, 1);
     this->text->setPosition(elements["Panel"]->getBoundingBox().getMidX(), elements["Panel"]->getBoundingBox().getMidY() + (0.05 * MainMenu::screenSize.y));
     this->text->setAnchorPoint(Vec2(0.5,0.5));
     
-    name = MainMenu::CreateLabel(title, Vec2(0,0), Vec2(0,0));
+    name = MainMenu::CreateLabel(title, 1);
     name->setPosition(elements["Panel"]->getBoundingBox().getMidX(), elements["Panel"]->getBoundingBox().getMaxY() - (MainMenu::screenSize.y * 0.01));
     name->setAnchorPoint(Vec2(0.5,1));
     nameBox = nullptr;
@@ -173,27 +173,27 @@ PopUp::PopUp(std::string title, std::string text, Ref* ref, SEL_MenuHandler call
     thirdButton->setGlobalZOrder(8);
     menuItems.pushBack(thirdButton);
     
-    labels.push_back(MainMenu::CreateLabel("Level Select", Vec2(0,0), Vec2(0,0)));
+    labels.push_back(MainMenu::CreateLabel("Level Select", 1));
     labels[0]->setPosition(acceptButton->getBoundingBox().getMidX(), acceptButton->getBoundingBox().getMidY());
     labels[0]->setGlobalZOrder(8);
     labels[0]->setAnchorPoint(Vec2(0.5,0.5));
     
-    labels.push_back(MainMenu::CreateLabel("Highscores", Vec2(0,0), Vec2(0,0)));
+    labels.push_back(MainMenu::CreateLabel("Highscores", 1));
     labels[1]->setPosition(declineButton->getBoundingBox().getMidX(), declineButton->getBoundingBox().getMidY());
     labels[1]->setGlobalZOrder(8);
     labels[1]->setAnchorPoint(Vec2(0.5,0.5));
     
-    labels.push_back(MainMenu::CreateLabel("Replay", Vec2(0,0), Vec2(0,0)));
+    labels.push_back(MainMenu::CreateLabel("Replay", 1));
     labels[2]->setPosition(thirdButton->getBoundingBox().getMidX(), thirdButton->getBoundingBox().getMidY());
     labels[2]->setGlobalZOrder(8);
     labels[2]->setAnchorPoint(Vec2(0.5,0.5));
     
-    name = MainMenu::CreateLabel(title, Vec2(0,0), Vec2(0,0));
+    name = MainMenu::CreateLabel(title, 1);
     name->setPosition(elements["Panel"]->getBoundingBox().getMidX(), elements["Panel"]->getBoundingBox().getMaxY() - (MainMenu::screenSize.y * 0.01));
     name->setGlobalZOrder(8);
     name->setAnchorPoint(Vec2(0.5,1));
     
-    this->text = MainMenu::CreateLabel(text, Vec2(0,0), Vec2(0,0));
+    this->text = MainMenu::CreateLabel(text, 1);
     this->text->setPosition(elements["Panel"]->getBoundingBox().getMidX(), elements["Panel"]->getBoundingBox().getMidY() + (MainMenu::screenSize.y * 0.1));
     this->text->setAnchorPoint(Vec2(0.5,0.5));
     this->text->setGlobalZOrder(8);

@@ -153,7 +153,7 @@ bool LevelEditor::init(){
     float buttonGap = leftOverHeight / 6.0;
     float jump = buttonGap + buttonPercent;
     
-    selectedLabel = MainMenu::CreateLabel("Pan Tool", Vec2(0,1.0-0.015), Vec2(0,0));
+    selectedLabel = MainMenu::CreateLabel("Pan Tool", 1);
     selectedLabel->setPosition(elements["Title"]->getBoundingBox().getMidX(), elements["Title"]->getBoundingBox().getMidY());
     selectedLabel->setAnchorPoint(Vec2(0.5,0.5));
     selectedLabel->setScale(0.8);

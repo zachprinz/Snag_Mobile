@@ -122,28 +122,28 @@ bool LogInMenu::init()
     usernameBox->setFontColor(Color3B::BLACK);
     this->addChild(usernameBox,1);
     
-    auto logInLabel = MainMenu::CreateLabel("Log In", Vec2(0,0), Vec2(0,0));
+    auto logInLabel = MainMenu::CreateLabel("Log In", 1);
     logInLabel->setGlobalZOrder(0);
     logInLabel->setPosition(Vec2(elements["LogInBackground"]->getBoundingBox().getMidX(), elements["LogInBackground"]->getBoundingBox().getMidY()));
     this->addChild(logInLabel, 1);
     
-    auto registerLabel = MainMenu::CreateLabel("Register", Vec2(0,0), Vec2(0,0));
+    auto registerLabel = MainMenu::CreateLabel("Register", 1);
     registerLabel->setGlobalZOrder(0);
     registerLabel->setPosition(Vec2(elements["RegisterButton"]->getBoundingBox().getMidX(), elements["RegisterButton"]->getBoundingBox().getMidY()));
     this->addChild(registerLabel, 1);
     
-    auto titleLabel = MainMenu::CreateLabel("This'll Only Take a Second", Vec2(0,0), Vec2(0,0));
+    auto titleLabel = MainMenu::CreateLabel("This'll Only Take a Second", 1);
     titleLabel->setGlobalZOrder(0);
     titleLabel->setPosition(Vec2(elements["TitlePanel"]->getBoundingBox().getMidX(), elements["TitlePanel"]->getBoundingBox().getMidY()));
     this->addChild(titleLabel, 1);
     
-    auto passwordLabel = MainMenu::CreateLabel("Password:", Vec2(0,0), Vec2(0,0));
+    auto passwordLabel = MainMenu::CreateLabel("Password:", 1);
     passwordLabel->setGlobalZOrder(0);
     passwordLabel->setPosition(Vec2(elements["PasswordPanel"]->getBoundingBox().getMinX() * 1.25, elements["PasswordPanel"]->getBoundingBox().getMidY()));
     passwordLabel->setAnchorPoint(Vec2(0,0.5));
     this->addChild(passwordLabel, 1);
     
-    auto usernameLabel = MainMenu::CreateLabel("Username:", Vec2(0,0), Vec2(0,0));
+    auto usernameLabel = MainMenu::CreateLabel("Username:", 1);
     usernameLabel->setGlobalZOrder(0);
     usernameLabel->setPosition(Vec2(elements["UsernamePanel"]->getBoundingBox().getMinX() * 1.25, elements["UsernamePanel"]->getBoundingBox().getMidY()));
     usernameLabel->setAnchorPoint(Vec2(0,0.5));

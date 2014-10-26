@@ -215,12 +215,19 @@ MenuItemImage* MainMenu::CreateButton(std::string layer, std::string item){
     temp->retain();
     return temp;
 };
-Label* MainMenu::CreateLabel(std::string text, Vec2 pos, Vec2 anchors){
-    Label* temp = Label::createWithBMFont("dimbo.fnt", text, TextHAlignment::CENTER);
-    Vec2 tempScale = GetAdjustedScale(pos, anchors);
-    temp->setPosition(GetAdjustedPosition(pos, anchors, tempScale));
-    temp->setScale((screenSize.y / 1080.0)*.5);
+Label* MainMenu::CreateLabel(std::string text, int size, bool decorative){
+    std::string fonts[3] = {"dimbo-paragraph.fnt", "dimbo-header.fnt", "dimbo-title.fnt"};
+    std::string path = "Labels/";
+    path.append(ar_extension);
+    path.append("/");
+    if(decorative == true){
+        path.append("decorative/");
+    }
+    path.append(fonts[size]);
+    std::string imagePath = FileUtils::getInstance()->fullPathForFilename(path);
+    Label* temp = Label::createWithBMFont(imagePath, text, TextHAlignment::CENTER);
     temp->setAnchorPoint(Point(0.5,0.5));
+    temp->setScale(ar_scale);
     temp->setColor(Color3B::BLACK);
     temp->retain();
     return temp;

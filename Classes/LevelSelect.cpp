@@ -87,18 +87,17 @@ bool LevelSelect::init()
         levels.push_back(lvl);
     }
     
-    previewTitle = MainMenu::CreateLabel("Select A", Vec2(0,0), Vec2(0,0));
+    previewTitle = MainMenu::CreateLabel("Select A", 1);
     previewTitle->setGlobalZOrder(0);
     previewTitle->setPosition(Vec2(elements["LevelTitleBackground"]->getBoundingBox().getMidX(), elements["LevelTitleBackground"]->getBoundingBox().getMidY()));
     previewTitle->setVisible(false);
     this->addChild(previewTitle, 1);
-    previewAuthor = MainMenu::CreateLabel("Level", Vec2(0,0), Vec2(0,0));
+    previewAuthor = MainMenu::CreateLabel("Level", 1);
     previewAuthor->setPosition(Vec2(elements["LevelAuthorBackground"]->getBoundingBox().getMidX(), elements["LevelAuthorBackground"]->getBoundingBox().getMidY()));
     previewAuthor->setGlobalZOrder(0);
     previewAuthor->setVisible(false);
-    previewAuthor->setScale(previewAuthor->getScale()*0.5);
     this->addChild(previewAuthor, 1);
-    auto titleLabel = MainMenu::CreateLabel("Level Select", Vec2(0,0), Vec2(0,0));
+    auto titleLabel = MainMenu::CreateLabel("Level Select", 2);
     titleLabel->setPosition(Vec2(elements["TitlePanel"]->getBoundingBox().getMidX(), elements["TitlePanel"]->getBoundingBox().getMidY()));
     titleLabel->setGlobalZOrder(0);
     titleLabel->setVisible(true);
@@ -114,21 +113,17 @@ bool LevelSelect::init()
     this->addChild(pinnedPanel, 1);
     this->addChild(elements["NewLevel"],1);
     elements["NewLevel"]->setVisible(false);
-    newLevelLabel = MainMenu::CreateLabel("New Level", Vec2(0,0), Vec2(0,0));
+    newLevelLabel = MainMenu::CreateLabel("New Level", 2);
     newLevelLabel->setPosition(Vec2(elements["NewLevel"]->getBoundingBox().getMidX(), elements["NewLevel"]->getBoundingBox().getMidY()));
     newLevelLabel->setAnchorPoint(Vec2(0.5,0.5));
-    //newLevelLabel->setScaleX(newLevelLabel->getScaleX());
-    //newLevelLabel->setScaleY(newLevelLabel->getScaleY());
     newLevelLabel->setVisible(false);
     this->addChild(newLevelLabel,1);
     
     auto featuredLabelPanel = MainMenu::CreateButton("levelselect", "Featured_Label_Panel.png");
 
-    auto featured_label = MainMenu::CreateLabel("Featured", Vec2(0,0), Vec2(0,0));
+    auto featured_label = MainMenu::CreateLabel("Featured", 0);
     featured_label->setPosition(Vec2(elements["Pinned_Panel"]->getBoundingBox().getMidX(), elements["Pinned_Panel"]->getBoundingBox().getMaxY() - (featuredLabelPanel->getBoundingBox().size.height*0.65/2.0)));
     featured_label->setAnchorPoint(Vec2(0.5,0.5));
-    featured_label->setScaleX(featured_label->getScaleX()* 0.6);
-    featured_label->setScaleY(featured_label->getScaleY()* 0.5);
     this->addChild(featured_label,1);
     
     for(int x = 0; x < 2; x++){
@@ -144,7 +139,6 @@ bool LevelSelect::init()
     Vec2 loadingMidPosition(loading->getBoundingBox().getMidX(), loading->getBoundingBox().getMidY());
     loading->setAnchorPoint(Vec2(0.5,0.5));
     loading->setPosition(loadingMidPosition);
-    loading->setScale(loading->getScaleX() * 0.9, loading->getScaleY() * 0.9);
     loading->setVisible(false);
     
     tabHeight = elements["SocialTab"]->getPosition().y;
@@ -545,11 +539,6 @@ void LevelSelect::SetPreview(){
         previewTitle->setVisible(true);
         previewAuthor->setVisible(true);
         previewTitle->setString(selectedLevel->GetName());
-        previewTitle->setScale(1.0);
-        while(previewTitle->getBoundingBox().size.width >= 320){
-            previewTitle->setScaleX(previewTitle->getScaleX() - 0.05);
-            previewTitle->setScaleY(previewTitle->getScaleY() - 0.05);
-        }
         previewAuthor->setString(selectedLevel->GetAuthor());
         log("\tFinished changing Buttons");
         preview->Reset();
