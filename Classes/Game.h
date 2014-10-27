@@ -51,7 +51,10 @@ public:
     Entity* GetClosestHook(Vec2 pos);
     Level* currentLevel;
     User* user;
+    std::vector<Layer*> layers;
 private:
+    Sprite* gameSprite;
+    RenderTexture* gameTexture;
     MenuItemImage* resetButton;
     MenuItemImage* homeButton;
     bool winPopUpAdded;

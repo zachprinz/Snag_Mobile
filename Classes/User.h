@@ -13,7 +13,6 @@
 #include "cocos2d.h"
 #include "Entity.h"
 
-#define PTM_RATIO 7.0
 
 USING_NS_CC;
 
@@ -22,10 +21,10 @@ public:
     static int type;
     User();
     virtual void SetUpPhysicsSprite(std::string, Vec2);
-    virtual void Add(Layer*);
+    virtual void Add(Game*);
     
     void Snag();
-    void Release();
+    void Release(bool add = true);
     void update(float dt);
     void collide(Vec2);
     void Reset();
@@ -34,13 +33,13 @@ public:
     void UpdateBounce();
     Vec2 GetPhysicalPosition();
     bool isHooked;
+    Sprite* line;
 
 private:
     void CalculateScale(Vec2 userPosition, float boardScale);
     Vec2 backupVelocity;
     Vec2 closestPosition;
     PhysicsJointDistance* joint;
-    Sprite* line;
     Entity* hook;
     Entity* closest;
     void updatePhysics(float dt);

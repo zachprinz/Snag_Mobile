@@ -18,7 +18,6 @@
 #define GOAL 4
 #define USER 5
 
-#define PTM_RATIO 7.0
 
 #include <iostream>
 #include "cocos2d.h"
@@ -49,11 +48,13 @@ public:
     Point GetPosition();
     Vec2 GetLaunchVelocity();
     void SetLaunchVelocity(Vec2);
-    Sprite* GetPhysicsSprite();
     int GetType();
     Vec2 GetOriginalSize();
     void SetPosition(Vec2);
     int ID;
+    Sprite* line;
+    void SetLine(float size, float angle);
+    void SetLineOff();
 protected:
     virtual void CalculateScale(Vec2 userPosition, float boardScale);
     Vec2 size;
@@ -64,7 +65,6 @@ protected:
     Vec2 imageSize;
     DrawNode* boundsDebug;
     PhysicsBody* body;
-    Sprite* physicsSprite;
     Vec2 originalSize;
     int type;
 };

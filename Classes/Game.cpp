@@ -49,24 +49,53 @@ void Game::SetUpLevels(){
 };
 void Game::update(float dt){
     if(user->isHooked){
-        if(user->GetPhysicsSprite()->getPhysicsBody()->getVelocity().y > 0){
-            world->setGravity(Vec2(0,-250));
+        if(user->GetSprite()->getPhysicsBody()->getVelocity().y > 0){
+            world->setGravity(Vec2(0,-240));
         }
         else{
-            world->setGravity(Vec2(0,-275));
+            world->setGravity(Vec2(0,-270));
         }
     }
-    Vec2 userPos = user->GetPhysicalPosition();
-    float dist = userPos.y;
-    if(dist < visibleSize.height)
-        dist = visibleSize.height;
-    scale = 1.0 / ((visibleSize.height - (visibleSize.height * 0.15)) / dist);
-    user->update(scale);
-    userPos = user->GetPhysicalPosition();
-    for(int x = 0; x < currentLevel->ents.size(); x++){
-        currentLevel->ents[x]->update(userPos, scale);
+    if(!user->isHooked){
+        world->setGravity(Vec2(0,-180));
     }
-    user->update(scale);
+    float oldScale = scale;
+        scale = visibleSize.height / (user->GetSprite()->getBoundingBox().getMaxY() + (visibleSize.height / 5.0));
+    if(scale > 1.2)
+        scale = 1.2;
+    if(scale < 0.5)
+        scale = 0.5;
+    float newScale;
+    float MAX_CHANGE = 0.001;
+    float targetScale = scale;
+    if(abs(targetScale-oldScale) > MAX_CHANGE){
+        if(targetScale > oldScale){
+            newScale = oldScale + MAX_CHANGE;
+        }
+        else{
+            newScale = oldScale - MAX_CHANGE;
+        }
+    } else
+        newScale = targetScale;
+    //for(int x = 0; x < layers.size(); x++){
+    //    layers[x]->setScale(newScale);
+     //   layers[x]->setPosition(Vec2(0,0));
+    //}
+    user->update(newScale);
+
+    gameTexture->setScale(1.0);
+    gameTexture->beginWithClear(0,0,0,0);
+    for(int x = 0; x < layers.size(); x++){
+        layers[x]->setScale(0.5);//targetScale);
+        layers[x]->setPosition((visibleSize.width /2) - ((user->GetSprite()->getBoundingBox().getMidX())*0.5),0);
+        layers[x]->setVisible(true);
+        layers[x]->visit();
+    }
+    gameTexture->end();
+    for(int x = 0; x < layers.size(); x++){
+        layers[x]->setVisible(false);
+    }
+    gameSprite->setScale(targetScale);
 }
 Scene* Game::myScene;
 
@@ -79,27 +108,21 @@ Scene* Game::createScene() {
     scene->addChild(layer);
     return scene;
 }
-
-void Game::onContactPostSolve(PhysicsContact& contact){
+bool Game::onContactBegin(PhysicsContact& contact){
     int type = contact.getShapeB()->getBody()->getTag();
-    if(type == WALL)
-        user->Bounce(contact.getContactData());
     if(type == SPIKE_WALL)
         user->Reset();
-    if(type == GOAL)
-        onWin();
-}
-bool Game::onContactBegin(PhysicsContact& contact){
-    if(contact.getShapeB()->getBody()->getTag() == GOAL){
+    if(type == GOAL){
         onWin();
         return false;
     }
-    user->SetBackupVelocity();
+    if(type == WALL)
+        user->Bounce(contact.getContactData());
     return true;
 }
 void Game::onWin(){
-    world->setSpeed(0.2);
     winPopUp->Show();
+    world->setSpeed(0.2);
 }
 Entity* Game::GetClosestHook(Point pos){
     float smallestDistance = 9999;
@@ -134,8 +157,8 @@ void Game::LoadLevel(Level* lvl){
 }
 void Game::setPhyWorld(PhysicsWorld* world2){
     world = world2;
-    world->setSpeed(1.2);//1.2
-    world->setGravity(Vec2(0,-275));
+    world->setGravity(Vec2(0,-270));
+    world->setSpeed(2.0);
 }
 
 bool Game::init(){
@@ -156,7 +179,6 @@ bool Game::init(){
     Instance = this;
 
     auto contactListener = EventListenerPhysicsContact::create();
-    contactListener->onContactPostSolve = CC_CALLBACK_1(Game::onContactPostSolve, this);
     contactListener->onContactBegin = CC_CALLBACK_1(Game::onContactBegin, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(contactListener, this);
     
@@ -170,10 +192,33 @@ bool Game::init(){
     background->setGlobalZOrder(-2);
     this->addChild(background);
     
+    for(int x = 0; x < 6; x++){
+        Layer* tempLayer = Layer::create();
+        tempLayer->setAnchorPoint(Vec2(0.0,0));
+        tempLayer->setPosition(0,0);
+        layers.push_back(tempLayer);
+        this->addChild(tempLayer);
+    }
     user = new User();
     user->Add(this);
     
-    timeLabel = MainMenu::CreateLabel("0:00", 2);//Label::createWithBMFont("dimbo.fnt", "0.00", TextHAlignment::LEFT);
+    gameTexture = RenderTexture::createWithPixels(visibleSize.width * 2.0, visibleSize.height*2.0,Texture2D::PixelFormat::RGBA8888, 0);
+    gameTexture->setPosition(0,0);
+    gameTexture->setKeepMatrix(true);
+    gameTexture->retain();
+    gameTexture->setVisible(false);
+    this->addChild(gameTexture,1);
+    
+    gameSprite = Sprite::createWithTexture(gameTexture->getSprite()->getTexture());
+    gameSprite->setPosition(visibleSize.width / 2.0,0);
+    gameSprite->setAnchorPoint(Vec2(0.5,0));
+    //gameSprite->setAnchorPoint(Vec2(0.5,0.5));
+    gameSprite->retain();
+    gameSprite->setFlippedY(true);
+   // gameSprite->setRotation(180);
+    this->addChild(gameSprite,1);
+    
+    timeLabel = MainMenu::CreateLabel("0:00", 2);
     timeLabel->setPosition(visibleSize.width / 2.0 - (80 * MainMenu::screenScale.x), visibleSize.height);
     timeLabel->setColor(Color3B::BLACK);
     timeLabel->setAnchorPoint(Point(0.0,1.0));
@@ -196,7 +241,7 @@ bool Game::init(){
     menu->setAnchorPoint(Point(0.0,0.0));
     menu->setPosition(0,0);
     this->addChild(menu, 1);
-    
+    scale = 1.0;
     winPopUp = new PopUp("You Win!", "What Next?", this, menu_selector(Game::winLevelSelectCallback), menu_selector(Game::winHighscoresSelectCallback), menu_selector(Game::winReplaySelectCallback), 8);
     winPopUpAdded = false;
     return true;
@@ -213,10 +258,11 @@ void Game::menuCloseCallback(Ref* pSender) {
 }
 void Game::AddJoint(PhysicsJointDistance* joint){
     world->addJoint(joint);
+    world->setGravity(Vec2(0,-270));
 };
 void Game::RemoveAllJoints(){
     world->removeAllJoints();
-    world->setGravity(Vec2(0,-275));
+    world->setGravity(Vec2(0,-270));
 };
 void Game::UpdateTimer(float dt){
     time += 0.1;
@@ -248,7 +294,6 @@ void Game::homeButtonCallback(Ref* ref){
 }
 void Game::winLevelSelectCallback(Ref*){
     winPopUp->Close();
-    world->setSpeed(1.0);
     homeButtonCallback(nullptr);
 }
 void Game::winHighscoresSelectCallback(Ref*){
@@ -266,7 +311,7 @@ void Game::winHighscoresSelectCallback(Ref*){
 };
 void Game::winReplaySelectCallback(Ref*){
     winPopUp->Close();
-    world->setSpeed(1.2);
+    world->setSpeed(2.0);
     resetButtonCallback(nullptr);
 };
 bool Game::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){

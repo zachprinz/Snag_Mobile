@@ -186,27 +186,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../Classes/Game.cpp"
-            timestampString = "435891706.442506"
+            timestampString = "436142210.524786"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "104"
-            endingLineNumber = "104"
-            landmarkName = "Game::GetClosestHook(Point pos)"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../Classes/Game.cpp"
-            timestampString = "435891706.442506"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "101"
-            endingLineNumber = "101"
+            startingLineNumber = "126"
+            endingLineNumber = "126"
             landmarkName = "Game::onWin()"
             landmarkType = "5">
          </BreakpointContent>
@@ -218,76 +202,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../Classes/Game.cpp"
-            timestampString = "435891706.442506"
+            timestampString = "436142210.524786"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "90"
-            endingLineNumber = "90"
-            landmarkName = "Game::onContactPostSolve(PhysicsContact&amp; contact)"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../Classes/Game.cpp"
-            timestampString = "435891706.442506"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "89"
-            endingLineNumber = "89"
-            landmarkName = "Game::onContactPostSolve(PhysicsContact&amp; contact)"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../Classes/Game.cpp"
-            timestampString = "435891706.442506"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "84"
-            endingLineNumber = "84"
-            landmarkName = "Game::onContactPostSolve(PhysicsContact&amp; contact)"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../Classes/Game.cpp"
-            timestampString = "435891706.442506"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "93"
-            endingLineNumber = "93"
-            landmarkName = "Game::onContactBegin(PhysicsContact&amp; contact)"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../Classes/Game.cpp"
-            timestampString = "435891706.442506"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "94"
-            endingLineNumber = "94"
-            landmarkName = "Game::onContactBegin(PhysicsContact&amp; contact)"
+            startingLineNumber = "123"
+            endingLineNumber = "123"
+            landmarkName = "Game::onWin()"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1174,11 +1094,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../Classes/Game.cpp"
-            timestampString = "436057907.237534"
+            timestampString = "436142210.524786"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "182"
-            endingLineNumber = "182"
+            startingLineNumber = "227"
+            endingLineNumber = "227"
             landmarkName = "Game::init()"
             landmarkType = "5">
          </BreakpointContent>
@@ -1638,11 +1558,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../classes/Entity.cpp"
-            timestampString = "435880294.607084"
+            timestampString = "436143084.816076"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "67"
-            endingLineNumber = "67"
+            startingLineNumber = "89"
+            endingLineNumber = "89"
             landmarkName = "Entity::SetUpPhysicsSprite(std::string texture, Vec2 scale)"
             landmarkType = "5">
          </BreakpointContent>
@@ -1654,12 +1574,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../classes/User.cpp"
-            timestampString = "435879573.205963"
+            timestampString = "436143309.921323"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "43"
-            endingLineNumber = "43"
-            landmarkName = "User::Add(Layer* layer)"
+            startingLineNumber = "40"
+            endingLineNumber = "40"
+            landmarkName = "User::Add(Game* layer)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1670,11 +1590,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../classes/User.cpp"
-            timestampString = "435883895.275422"
+            timestampString = "436143309.921323"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "98"
-            endingLineNumber = "98"
+            startingLineNumber = "86"
+            endingLineNumber = "86"
             landmarkName = "User::Bounce(const PhysicsContactData* bounceData)"
             landmarkType = "5">
          </BreakpointContent>
@@ -1686,59 +1606,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../classes/User.cpp"
-            timestampString = "435883895.275422"
+            timestampString = "436143309.921323"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "105"
-            endingLineNumber = "105"
-            landmarkName = "User::Bounce(const PhysicsContactData* bounceData)"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../classes/User.cpp"
-            timestampString = "435883895.275422"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "108"
-            endingLineNumber = "108"
-            landmarkName = "User::Bounce(const PhysicsContactData* bounceData)"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../classes/User.cpp"
-            timestampString = "435883895.275422"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "106"
-            endingLineNumber = "106"
-            landmarkName = "User::Bounce(const PhysicsContactData* bounceData)"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../classes/User.cpp"
-            timestampString = "435881790.277583"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "56"
-            endingLineNumber = "56"
+            startingLineNumber = "51"
+            endingLineNumber = "51"
             landmarkName = "User::Snag()"
             landmarkType = "5">
          </BreakpointContent>
@@ -1749,28 +1621,12 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../classes/User.cpp"
-            timestampString = "435883895.275422"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "70"
-            endingLineNumber = "70"
-            landmarkName = "User::Release()"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "../Classes/Game.cpp"
-            timestampString = "435891706.442506"
+            timestampString = "436142210.524786"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "156"
-            endingLineNumber = "156"
+            startingLineNumber = "178"
+            endingLineNumber = "178"
             landmarkName = "Game::init()"
             landmarkType = "5">
          </BreakpointContent>
@@ -1781,13 +1637,29 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../Classes/Game.cpp"
-            timestampString = "435891706.442506"
+            filePath = "../classes/Entity.cpp"
+            timestampString = "436143084.816076"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "83"
-            endingLineNumber = "83"
-            landmarkName = "Game::onContactPostSolve(PhysicsContact&amp; contact)"
+            startingLineNumber = "117"
+            endingLineNumber = "117"
+            landmarkName = "Entity::Add(Game* game)"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../classes/Entity.cpp"
+            timestampString = "436143084.816076"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "116"
+            endingLineNumber = "116"
+            landmarkName = "Entity::Add(Game* game)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

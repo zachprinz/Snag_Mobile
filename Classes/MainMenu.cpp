@@ -98,12 +98,12 @@ bool MainMenu::init()
     menu->setPosition(0,0);
     this->addChild(menu, 1);
     
-    notice = Label::createWithBMFont("dimbo.fnt", "Searching for an account", TextHAlignment::CENTER);
-    notice->setScale(1);
-    notice->setVisible(false);
-    notice->setPosition(Vec2(visibleSize.width /2.0, visibleSize.height / 2.0));
-    notice->setAnchorPoint(Vec2(0.5,0.5));
-    this->addChild(notice,1);
+    //notice = Label::createWithBMFont("dimbo.fnt", "Searching for an account", TextHAlignment::CENTER);
+    //notice->setScale(1);
+    //notice->setVisible(false);
+    //notice->setPosition(Vec2(visibleSize.width /2.0, visibleSize.height / 2.0));
+    //notice->setAnchorPoint(Vec2(0.5,0.5));
+    //this->addChild(notice,1);
     
     //-- Set Up Newtork Stuff --//
     NDKHelper::addSelector("MainMenu", "userCheckCallback", CC_CALLBACK_2(MainMenu::userCheckCallback, this), this);
@@ -114,7 +114,7 @@ bool MainMenu::init()
 
 void MainMenu::playButtonCallback(Ref* pSender){
     menu->setVisible(false);
-    notice->setVisible(true);
+    //notice->setVisible(true);
     checkForUser();
 }
 void MainMenu::checkForUser(){

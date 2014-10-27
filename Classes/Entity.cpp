@@ -47,36 +47,53 @@ Entity::Entity(Vec2 pos, Vec2 size, Vec2 vel, int type){
     float baseScales[6] = {1,1,1,1,1,1};
     this->baseScale = Vec2(baseScales[type],baseScales[type]);
     this->type = type;
-    this->size = size;
-    this->position = Vec2(pos.x, pos.y);
+    this->size = Vec2(size.x*.66,size.y*.66);
+    this->position = Vec2(pos.x*.66, pos.y*.66);
     sprite = Sprite::create(textures[type]);
     this->originalSize = Vec2(sprite->getBoundingBox().size.width, sprite->getBoundingBox().size.height);
     sprite->setAnchorPoint(Vec2(0.5,0.5));
     sprite->retain();
     sprite->setGlobalZOrder(0);
-    if(size.x != 0 && size.y != 0){
-        baseScale.x = size.x / sprite->getBoundingBox().size.width;
-        baseScale.y = size.y / sprite->getBoundingBox().size.height;
+    if(this->size.x != 0 && this->size.y != 0){
+        baseScale.x = this->size.x / sprite->getBoundingBox().size.width;
+        baseScale.y = this->size.y / sprite->getBoundingBox().size.height;
     }
     this->launchVelocity = Vec2(10.f,10.f);
     sprite->setScale(baseScale.x, baseScale.y);
     if(type != USER)
         this->SetUpPhysicsSprite(textures[type], baseScale);
+    sprite->setPosition(position);
+    if(type == HOOK){
+        line = Sprite::create("game_line.png");
+        line->retain();
+        line->setAnchorPoint(Vec2(0.0,0.5));
+        line->setVisible(false);
+        line->setPosition(this->position.x,this->position.y);
+    }
+}
+void Entity::SetLine(float size, float angle){
+    if(type == HOOK){
+        line->setRotation(0);
+        line->setScale((size * 2)/100,5);
+        line->setRotation(angle);
+        line->setVisible(true);
+    }
+}
+void Entity::SetLineOff(){
+    if(type == HOOK){
+        line->setVisible(false);
+    }
 }
 void Entity::SetUpPhysicsSprite(std::string texture, Vec2 scale){
-    body = PhysicsBody::createBox(Size(sprite->getBoundingBox().size.width / PTM_RATIO, sprite->getBoundingBox().size.height/ PTM_RATIO));
+    auto physMat = PhysicsMaterial(0.1,1,0);
+    body = PhysicsBody::createBox(Size(sprite->getBoundingBox().size.width, sprite->getBoundingBox().size.height),physMat);
     body->setMass(PHYSICS_INFINITY);
     body->setDynamic(false);
     body->setTag(type);
-    physicsSprite = Sprite::create(texture);
-    physicsSprite->setPhysicsBody(body);
-    physicsSprite->setPosition(position.x/PTM_RATIO,position.y/PTM_RATIO);
-    physicsSprite->setVisible(false);
-    physicsSprite->setTag(type);
-    physicsSprite->retain();
-    physicsSprite->setAnchorPoint(Vec2(0.5,0.5));
-    physicsSprite->setScale(1,1);//(baseScale.x*physicsSprite->getBoundingBox().size.width)/PTM_RATIO, (baseScale.y * physicsSprite->getBoundingBox().size.height)/PTM_RATIO);
-    if(type == SPAWNER || type == HOOK){// || type == GOAL){
+    sprite->setPhysicsBody(body);
+    sprite->setTag(type);
+    sprite->setAnchorPoint(Vec2(0.5,0.5));
+    if(type == SPAWNER || type == HOOK){
         body->setContactTestBitmask(false);
         body->setCategoryBitmask(false);
     } else {
@@ -85,34 +102,26 @@ void Entity::SetUpPhysicsSprite(std::string texture, Vec2 scale){
     }
 }
 void Entity::update(Vec2 userPosition, float boardScale){
-    this->CalculateScale(userPosition, boardScale);
+    
 }
 void Entity::CalculateScale(Vec2 userPosition, float boardScale){
-    if(type != USER){
-        position = Vec2(physicsSprite->getPosition().x * PTM_RATIO, physicsSprite->getPosition().y * PTM_RATIO);
-        
-        float distanceToCenter = position.x - userPosition.x;
-        float newDistanceToCenter = distanceToCenter / boardScale;
-        float distanceToGround = 0 - position.y;
-        float newDistanceToGround = distanceToGround / boardScale;
-        sprite->setPosition((MainMenu::screenSize.x / 2.0) + newDistanceToCenter, 0 - newDistanceToGround);
-        sprite->setScale(baseScale.x/boardScale, baseScale.y/boardScale);
-    }
+
 }
 void Entity::Add(Game* game){
     sprite->setGlobalZOrder(0);
-    game->addChild(sprite,-1);
-    game->addChild(physicsSprite,1);
+    game->layers[type]->addChild(sprite,1);
+    if(type == HOOK){
+        game->layers[type]->addChild(line,1);
+    }
+    if(type == USER){
+        game->layers[HOOK]->addChild(((User*)this)->line,1);
+    }
 }
 void Entity::Remove(Game* game){
     game->removeChild(sprite);
-    game->removeChild(physicsSprite);
 }
 Sprite* Entity::GetSprite(){
     return sprite;
-}
-Sprite* Entity::GetPhysicsSprite(){
-    return physicsSprite;
 }
 Point Entity::GetPosition(){
     return position;
