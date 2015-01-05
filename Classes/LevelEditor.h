@@ -108,6 +108,7 @@ public:
     float saveButtonsOnY;
     float saveButtonsOffY;
     void ResetSaveDialog();
+    void RemoveButtons(bool);
     void Export();
     void Clear();
     void Select(Entity*);
@@ -125,6 +126,7 @@ public:
 private:
     void UnselectTool();
     Vec2 CheckSnap(Vec2);
+    Vec2 touchDifference;
     Entity* selectedEntity;
     bool unsavedChanges;
     void goToHome();
@@ -137,6 +139,7 @@ private:
     bool isScaling;
     bool isRotating;
     bool isTargeting;
+    bool buttonsOn;
 };
 
 #endif /* defined(__Snag__LevelEditor__) */

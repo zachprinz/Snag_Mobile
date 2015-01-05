@@ -34,12 +34,19 @@ public:
     Vec2 GetPhysicalPosition();
     bool isHooked;
     Sprite* line;
-
+    std::vector<Sprite*> pastSprites;
+    void SetStretch(Sprite*, float angle, float magnitude);
+    std::vector<PhysicsBody*> bodies;
+    std::vector<Sprite*> sprites;
+    std::vector<PhysicsJointDistance*> joints;
+    PhysicsJointDistance* joint;
+    std::vector<PhysicsJointDistance*> distanceJoints;
 private:
+    int tailCount;
+    int spriteUpdateCount;
     void CalculateScale(Vec2 userPosition, float boardScale);
     Vec2 backupVelocity;
     Vec2 closestPosition;
-    PhysicsJointDistance* joint;
     Entity* hook;
     Entity* closest;
     void updatePhysics(float dt);

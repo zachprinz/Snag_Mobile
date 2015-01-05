@@ -137,12 +137,6 @@ bool LevelEditor::init(){
     elements["Move"]->getEventDispatcher()->setEnabled(false);
     elements["Resize"]->getEventDispatcher()->setEnabled(false);
     elements["Velocity"]->getEventDispatcher()->setEnabled(false);
-    //_eventDispatcher->addEventListenerWithSceneGraphPriority(listener->clone(),elements["Velocity"]);
-    //_eventDispatcher->addEventListenerWithSceneGraphPriority(listener->clone(),elements["Move"]);
-    //_eventDispatcher->addEventListenerWithSceneGraphPriority(listener->clone(),elements["Resize"]);
-    //_eventDispatcher->addEventListenerWithSceneGraphPriority(listener2,elements["Move"]);
-    //_eventDispatcher->addEventListenerWithSceneGraphPriority(listener2->clone(),elements["Resize"]);
-    //_eventDispatcher->addEventListenerWithSceneGraphPriority(listener2->clone(),elements["Velocity"]);
 
     float buttonHeightPixels = 155;
     float tempScale = MainMenu::minScreenScale;
@@ -166,6 +160,23 @@ bool LevelEditor::init(){
     
     NDKHelper::addSelector("LevelEditor", "finishQuit", CC_CALLBACK_2(LevelEditor::finishQuit, this), this);
     
+    std::string buttons[6] = {"Resize", "Velocity", "Move", "Trash", "Duplicate", "Title"};
+    for(int x = 0; x < 5; x++){
+        this->removeChild(elements[buttons[x]]);
+        elements[buttons[x]]->removeFromParent();
+        this->addChild(elements[buttons[x]],1);
+    }
+    
+    this->addChild(currentSprite,1);
+    
+    this->removeChild(elements["Title"]);
+    elements["Title"]->removeFromParent();
+    this->addChild(elements["Title"],1);
+    
+    this->removeChild(selectedLabel);
+    selectedLabel->removeFromParent();
+    this->addChild(selectedLabel,1);
+    
     savePopUp = new PopUp("Save", "Please name your level.", this, menu_selector(LevelEditor::saveAcceptCallback), menu_selector(LevelEditor::saveDeclineCallback),true);
     savePopUp->Add(this);
     
@@ -178,24 +189,38 @@ bool LevelEditor::init(){
     quitPopUp = new PopUp("Warning: Unsaved Changes", "Unsaved changes will be lost.\nDo you want to exit?", this, menu_selector(LevelEditor::acceptQuitCallback), menu_selector(LevelEditor::declineQuitCallback));
     quitPopUp->Add(this);
     
-    this->addChild(currentSprite);
-    
-    this->removeChild(elements["Resize"]);
-    elements["Resize"]->removeFromParent();
-    this->addChild(elements["Resize"]);
-    
-    this->removeChild(elements["Velocity"]);
-    elements["Velocity"]->removeFromParent();
-    this->addChild(elements["Velocity"]);
-    
-    this->removeChild(elements["Move"]);
-    elements["Move"]->removeFromParent();
-    this->addChild(elements["Move"]);
-    
+    buttonsOn = true;
     currentSelection = NULL;
     currentTool = NO_TOOL;
     UpdateAxis();
     return true;
+}
+void LevelEditor::RemoveButtons(bool on){
+    std::string buttons[8] = {"Wall", "Spikewall", "Hook", "Spawner", "Goal", "Home", "Play", "Save"};
+    if(on && !buttonsOn)
+        return;
+    if(!on && buttonsOn)
+        return;
+    if(on)
+        buttonsOn = false;
+    if(!on)
+        buttonsOn = true;
+    for(int x = 0; x < 8; x++){
+        float moveDistance = 2*elements[buttons[x]]->getBoundingBox().size.width;
+        auto setAction = MoveTo::create(0.2, Point(elements[buttons[x]]->getPosition().x + moveDistance, elements[buttons[x]]->getPosition().y));
+        auto setActionNegative = MoveTo::create(0.2, Point(elements[buttons[x]]->getPosition().x - moveDistance, elements[buttons[x]]->getPosition().y));
+        if(on){
+            if(x <= 4)
+                elements[buttons[x]]->runAction(setActionNegative);
+            else
+                elements[buttons[x]]->runAction(setAction);
+        } else{
+            if(x <= 4)
+                elements[buttons[x]]->runAction(setAction);
+            else
+                elements[buttons[x]]->runAction(setActionNegative);
+        }
+    }
 }
 void LevelEditor::transformCallback(){
     isTransforming = true;
@@ -435,11 +460,15 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
             bool hitTab = false;
             if(elements["Move"]->isVisible() && elements["Move"]->getBoundingBox().containsPoint(touchStart)){
                transformCallback();
+                touchDifference.x = currentSprite->getPosition().x - touchStart.x;
+                touchDifference.y = currentSprite->getPosition().y - touchStart.y;
                 hitTab = true;
                 return true;
             }
             if(elements["Resize"]->isVisible() && elements["Resize"]->getBoundingBox().containsPoint(touchStart)){
                 resizeCallback();
+                touchDifference.x = touchStart.x - currentSprite->getBoundingBox().getMaxX();
+                touchDifference.y = touchStart.y - currentSprite->getBoundingBox().getMaxY();
                 hitTab = true;
                 return true;
             }
@@ -524,10 +553,12 @@ void LevelEditor::Select(Entity* entity){
         float angle = atan2(targetOffset.x, targetOffset.y) * (180 / 3.1415);
         elements["Velocity"]->setRotation(angle);
     }
+    RemoveButtons(true);
 }
 void LevelEditor::Deselect(bool keep){
     if(keep && selectedEntity != nullptr){
         preview->AddEntity(selectedEntity);
+        preview->Update();
     }
     printf("\nDESELECTED");
     hasSelected = false;
@@ -542,16 +573,11 @@ void LevelEditor::Deselect(bool keep){
     elements["Resize"]->setVisible(false);
     elements["Move"]->setVisible(false);
     elements["Trash"]->setVisible(false);
-    //rotate->setEnabled(true);
-    //elements["Resize"]->setEnabled(true);
-    //elements["Move"]->setEnabled(true);
-    //elements["Trash"]->setEnabled(true);
-    //elements["Resize"]->getEventDispatcher()->setEnabled(false);
-    //rotate->getEventDispatcher()->setEnabled(false);
     isRotating = false;
     isTransforming = false;
     isScaling = false;
     isTargeting = false;
+    RemoveButtons(false);
 }
 void LevelEditor::UpdateSelected(){
     if(hasSelected){
@@ -612,18 +638,11 @@ void LevelEditor::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
                     Rect bb = currentSprite->getBoundingBox();
                     Vec2 minPoint(bb.getMinX(), bb.getMinY());
                     Vec2 maxPoint(bb.getMaxX(), bb.getMaxY());
-                    if(touchStart.x > touchCurrent.x){
-                        maxPoint = Vec2(maxPoint.x + 20, maxPoint.y);
-                        minPoint = Vec2(minPoint.x - 20, minPoint.y);
-                    }
-                    if(touchStart.y > touchCurrent.y){
-                        maxPoint = Vec2(maxPoint.x, maxPoint.y + 20);
-                        minPoint = Vec2(minPoint.x, minPoint.y - 20);
-                    }
                     Entity* tempEnt = (preview->CreateEntity(minPoint , maxPoint, currentTool));
                     entities[tempEnt->ID] = tempEnt;
                     preview->AddEntity(tempEnt);
                     currentSprite->setVisible(false);
+                    preview->Update();
                 }
             }
             UnselectTool();
@@ -641,13 +660,29 @@ void LevelEditor::onTouchMoved(Touch* touch, Event* event){
         touchCurrent = touch->getLocation();
         if(isScaling){
             if(currentSprite != NULL){
-                currentSprite->setContentSize(Size(currentSprite->getContentSize().width + (touchCurrent.x - oldTouch.x), currentSprite->getContentSize().height + (touchCurrent.y - oldTouch.y)));
+                Vec2 touchCurrentMod(touchCurrent.x - touchDifference.x, touchCurrent.y - touchDifference.y);
+                touchCurrent = preview->MapToScreen(CheckSnap(preview->ScreenToMap(touchCurrentMod)));
+                touchCurrent.x += touchDifference.x;
+                touchCurrent.y += touchDifference.y;
+                Vec2 tempCurrentSize = currentSprite->getContentSize();
+                currentSprite->setContentSize(Size(currentSprite->getContentSize().width + 0.5*(touchCurrent.x - oldTouch.x), currentSprite->getContentSize().height + 0.5*(touchCurrent.y - oldTouch.y)));
+                if(currentSprite->getContentSize().width < 100 * preview->GetScale())
+                    currentSprite->setContentSize(Size(tempCurrentSize.x, currentSprite->getContentSize().height));
+                if(currentSprite->getContentSize().height < 100 * preview->GetScale())
+                    currentSprite->setContentSize(Size(currentSprite->getContentSize().width, tempCurrentSize.y));
+                Vec2 endResult(currentSprite->getContentSize().width - tempCurrentSize.x, currentSprite->getContentSize().height - tempCurrentSize.y);
+                currentSprite->setPosition(currentSprite->getPosition().x + endResult.x, currentSprite->getPosition().y + endResult.y);
+                selectedEntity->SetPosition(Vec2(selectedEntity->GetPosition().x + 0.5*(endResult.x/preview->GetScale()), selectedEntity->GetPosition().y + 0.5*(endResult.y / preview->GetScale())));
                 selectedEntity->SetSize(Vec2(currentSprite->getContentSize().width / preview->GetScale(), currentSprite->getContentSize().height / preview->GetScale()));
                 this->UpdateSelected();
             }
         }
         if(isTransforming){
             if(currentSprite != NULL){
+                Vec2 touchCurrentMod(touchCurrent.x + touchDifference.x, touchCurrent.y + touchDifference.y);
+                touchCurrent = preview->MapToScreen(CheckSnap(preview->ScreenToMap(touchCurrentMod)));
+                touchCurrent.x -= touchDifference.x;
+                touchCurrent.y -= touchDifference.y;
                 currentSprite->setPosition(Vec2(currentSprite->getPosition().x + (touchCurrent.x - oldTouch.x), currentSprite->getPosition().y + (touchCurrent.y - oldTouch.y)));
                 selectedEntity->SetPosition(preview->ScreenToMap(Vec2(currentSprite->getBoundingBox().getMidX(), currentSprite->getBoundingBox().getMidY())));
                 this->UpdateSelected();
@@ -736,6 +771,7 @@ void LevelEditor::SetLevel(Level* lvl){
         entities[tempEnts[x]->ID] = tempEnts[x];
         preview->AddEntity(tempEnts[x]);
     }
+    preview->Update();
 }
 void LevelEditor::menuCloseCallback(Ref* pSender){
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WP8) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)

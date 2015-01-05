@@ -66,6 +66,7 @@ void Preview::AddEntity(Entity* ent){
     sprites[ent->ID] = Sprite::create(textures[ent->GetType()]);
     sprites[ent->ID]->setTag(ent->GetType());
     sprites[ent->ID]->setPosition(MapToScreen(ent->GetPosition()));
+    printf("\nFinal Position Start: (%f, %f)", sprites[ent->ID]->getPosition().x, sprites[ent->ID]->getPosition().y);
     sprites[ent->ID]->setAnchorPoint(Vec2(0.5,0.5));
     if(ent->GetType() != SPAWNER && ent->GetType() != HOOK)
         sprites[ent->ID]->setScale((ent->GetSize().x * mapViewScale)/sprites[ent->ID]->getBoundingBox().size.width, (ent->GetSize().y * mapViewScale) / sprites[ent->ID]->getBoundingBox().size.height);
@@ -149,24 +150,14 @@ Entity* Preview::CreateEntity(Vec2 startTouch2, Vec2 endTouch2, int type){
     printf("\nScreen Start: (%f, %f)    Map Start: (%f, %f)", startTouch2.x,startTouch2.y,startTouch.x,startTouch.y);
     Vec2 endTouch = ScreenToMap(endTouch2);
     printf("\nScreen End:   (%f, %f)    Map End:   (%f, %f)", endTouch2.x, endTouch2.y, endTouch.x,endTouch.y);
-    Vec2 minCoord;
-    Vec2 maxCoord;
-    if(startTouch.x > endTouch.x){
-        maxCoord.x = startTouch.x;
-        minCoord.x = endTouch.x;
-    } else{
-        maxCoord.x = endTouch.x;
-        minCoord.x = startTouch.x;
-    }
-    if(startTouch.y > endTouch.y){
-        maxCoord.y = startTouch.y;
-        minCoord.y = endTouch.y;
-    } else {
-        maxCoord.y = endTouch.y;
-        minCoord.y = startTouch.y;
-    }
+    Vec2 minCoord = startTouch;
+    Vec2 maxCoord = endTouch;
     Vec2 size(maxCoord.x - minCoord.x, maxCoord.y - minCoord.y);
+    size.x *= 1.5;
+    size.y *= 1.5;
     Vec2 pos = minCoord;
+    pos.x *= 1.5;
+    pos.y *= 1.5;
     pos = Vec2(pos.x + (size.x / 2.0), pos.y + (size.y / 2.0));
     Entity* ent;
     switch(type){
@@ -205,6 +196,8 @@ Vec2 Preview::ScreenToMap(Vec2 pos){
 Vec2 Preview::MapToScreen(Vec2 pos){
     Vec2 mapPosWithoutOrigin(pos.x - mapViewOrigin.x, pos.y - mapViewOrigin.y);
     Vec2 screenPos(mapPosWithoutOrigin.x*mapViewScale, mapPosWithoutOrigin.y*mapViewScale);
+    screenPos.x += screenViewOrigin.x;
+    screenPos.y += screenViewOrigin.y;
     return screenPos;
 }
 float Preview::GetScale(){

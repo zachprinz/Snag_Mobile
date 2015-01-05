@@ -60,7 +60,7 @@ void Game::update(float dt){
         world->setGravity(Vec2(0,-180));
     }
     float oldScale = scale;
-        scale = visibleSize.height / (user->GetSprite()->getBoundingBox().getMaxY() + (visibleSize.height / 5.0));
+        scale = visibleSize.height / (user->GetSprite()->getBoundingBox().getMidY() + (visibleSize.height / 5.0));
     if(scale > 1.2)
         scale = 1.2;
     if(scale < 0.5)
@@ -84,7 +84,7 @@ void Game::update(float dt){
     user->update(newScale);
 
     gameTexture->setScale(1.0);
-    gameTexture->beginWithClear(0,0,0,0);
+    gameTexture->beginWithClear(0,0,0,0.0);
     for(int x = 0; x < layers.size(); x++){
         layers[x]->setScale(0.5);//targetScale);
         layers[x]->setPosition((visibleSize.width /2) - ((user->GetSprite()->getBoundingBox().getMidX())*0.5),0);
@@ -159,6 +159,13 @@ void Game::setPhyWorld(PhysicsWorld* world2){
     world = world2;
     world->setGravity(Vec2(0,-270));
     world->setSpeed(2.0);
+    world->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+    for(int x = 0; x < user->joints.size(); x++){
+        world->addJoint(user->joints[x]);
+    }
+    for(int x = 0; x < user->distanceJoints.size(); x++){
+        world->addJoint(user->distanceJoints[x]);
+    }
 }
 
 bool Game::init(){
@@ -217,7 +224,7 @@ bool Game::init(){
     gameSprite->setFlippedY(true);
    // gameSprite->setRotation(180);
     this->addChild(gameSprite,1);
-    
+
     timeLabel = MainMenu::CreateLabel("0:00", 2);
     timeLabel->setPosition(visibleSize.width / 2.0 - (80 * MainMenu::screenScale.x), visibleSize.height);
     timeLabel->setColor(Color3B::BLACK);
@@ -261,7 +268,7 @@ void Game::AddJoint(PhysicsJointDistance* joint){
     world->setGravity(Vec2(0,-270));
 };
 void Game::RemoveAllJoints(){
-    world->removeAllJoints();
+    world->removeJoint(user->joint);
     world->setGravity(Vec2(0,-270));
 };
 void Game::UpdateTimer(float dt){

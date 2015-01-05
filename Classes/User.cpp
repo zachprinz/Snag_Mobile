@@ -10,6 +10,7 @@
 #include "Game.h"
 #include "MainMenu.h"
 #include "Level.h"
+#include <math.h>
 
 int User::type;
 
@@ -21,6 +22,63 @@ User::User() : Entity(Vec2(150,150), Vec2(0,0), Vec2(0,0), 5){
     line->setAnchorPoint(Vec2(0.0,0.5));
     line->setVisible(false);
     sprite->setGlobalZOrder(2);
+    body->setRotationEnable(false);
+    tailCount = 5;
+    for(int x = 0; x < tailCount; x++){
+        pastSprites.push_back(Sprite::create("user.png"));
+        pastSprites[x]->setPosition(position.x,position.y);
+        pastSprites[x]->retain();
+        pastSprites[x]->setAnchorPoint(Vec2(0.5,0.5));
+        pastSprites[x]->setVisible(true);
+        pastSprites[x]->setOpacity(240);
+    }
+    auto physMat = PhysicsMaterial(2,1,0);
+    PhysicsBody* previousBody = nullptr;
+    for(int x = 0; x < 4; x++){
+        bodies.push_back(PhysicsBody::createCircle(10, physMat));
+        bodies[x]->setMass(0.0001);
+        bodies[x]->setGravityEnable(false);
+        bodies[x]->retain();
+        bodies[x]->setContactTestBitmask(false);
+        //bodies[x]->setCategoryBitmask(false);
+        //bodies[x]->setRotationEnable(false);
+        sprites.push_back(Sprite::create());
+        sprites[sprites.size()-1]->setPhysicsBody(bodies[bodies.size()-1]);
+        sprites[sprites.size()-1]->retain();
+        Vec2 userPos;
+        switch (x) {
+            case 0:
+                userPos = Vec2(-1,-1);
+                break;
+            case 1:
+                userPos = Vec2(1,-1);
+                break;
+            case 2:
+                userPos = Vec2(1,1);
+                break;
+            case 3:
+                userPos = Vec2(-1,1);
+                break;
+        }
+        sprites[x]->setPosition(body->getPosition().x + (userPos.x * 60), body->getPosition().y + (userPos.y *60));
+        //if(x == 0){
+        joints.push_back(PhysicsJointDistance::construct(bodies[x], body, Vec2(0.5,0.5), Vec2(0.5,0.5)));
+        joints[x]->setCollisionEnable(false);
+        //joints[x]->setDistance(100);//bodies[x]->getPosition().getDistance(body->getPosition()));
+        //}
+        if(previousBody != nullptr){
+            distanceJoints.push_back(PhysicsJointDistance::construct(previousBody, bodies[bodies.size()-1], Vec2(0.5,0.5), Vec2(0.5,0.5)));//,1,100));
+            //distanceJoints[distanceJoints.size()-1]->setRestLength(150);//previousBody->getPosition().getDistance(bodies[bodies.size()-1]->getPosition()));
+            //distanceJoints[distanceJoints.size()-1]->set
+        }
+        if(x == 3){
+            distanceJoints.push_back(PhysicsJointDistance::construct(bodies[0], bodies[bodies.size()-1], Vec2(0.5,0.5), Vec2(0.5,0.5)));//,1,100));
+            //distanceJoints[distanceJoints.size()-1]->setRestLength(150);//bodies[0]->getPosition().getDistance(bodies[bodies.size()-1]->getPosition()));
+        }
+        previousBody = bodies[x];
+    }
+    
+    spriteUpdateCount = 0;
 }
 void User::SetUpPhysicsSprite(std::string texture, Vec2 scale){
     auto physMat = PhysicsMaterial(2,1,0);
@@ -41,12 +99,38 @@ void User::Add(Game* layer){
     line->setGlobalZOrder(-1);
     layer->layers[HOOK]->addChild(line,1);
     layer->layers[5]->addChild(sprite,1);
+    //for(int x = 0; x < pastSprites.size(); x++){
+    //    layer->layers[5]->addChild(pastSprites[x],1);
+    //}
+    for(int x = 0; x < sprites.size(); x++){
+        layer->layers[5]->addChild(sprites[x]);
+    }
 }
 void User::update(float boardScale){
     if(position.y < -400)
         Reset();
     this->CalculateScale(Vec2(0,0), boardScale);
+
+    float angle;
+    float scale;
+    Vec2 vel = sprite->getPhysicsBody()->getVelocity();
+    angle = GetAngle(Vec2(0,0),vel);
+    float velMag = sqrtf(pow(vel.x,2) + pow(vel.y,2));
+    float over = 100;
+    if(velMag == 0)
+        velMag = 1;
+    scale = 1/((std::log10((velMag/31)+1)));
+    if(scale > 1.0)
+        scale = 1.0;
+    SetStretch(sprite, angle, scale);
 }
+void User::SetStretch(Sprite* sprite, float angle, float magnitude){
+    sprite->setRotation(0);
+    sprite->setScaleY(magnitude);
+    sprite->setScaleX(1/magnitude);
+    sprite->setRotation(angle);
+}
+
 void User::Snag(){
     closest = Game::Instance->GetClosestHook(position);
     isHooked = true;
@@ -72,8 +156,26 @@ void User::Reset(){
     Game::Instance->time = 0.0;
     Vec2 oLaunch = Game::Instance->currentLevel->GetLaunchPosition();
     Vec2 oVel = Game::Instance->currentLevel->GetLaunchVelocity();
-    sprite->setPosition(Vec2(oLaunch.x, oLaunch.y));
-    body->setVelocity(Vec2(300.f, 300.f));//oVel.x, oVel.y));
+    sprite->setPosition(Vec2(oLaunch.x, 300+oLaunch.y));
+    body->setVelocity(Vec2(0.f, 0.f));//oVel.x, oVel.y));
+    for(int x = 0;x < sprites.size(); x++){
+        Vec2 userPos;
+        switch (x) {
+            case 0:
+                userPos = Vec2(0.5,0);
+                break;
+            case 1:
+                userPos = Vec2(0,0.5);
+                break;
+            case 2:
+                userPos = Vec2(-0.5,0);
+                break;
+            case 3:
+                userPos = Vec2(0,-0.5);
+                break;
+        }
+        sprites[x]->setPosition(body->getPosition().x + (userPos.x * 60), body->getPosition().y + (userPos.y *60));
+    }
 }
 void User::CalculateScale(Vec2 userPosition, float boardScale){
     position = Vec2(sprite->getPosition().x, sprite->getPosition().y);
@@ -95,6 +197,18 @@ Point User::GetPhysicalPosition(){
 float User::GetAngle(Vec2 a, Vec2 b){
     float o = a.x - b.x;
     float adj = a.y - b.y;
+    if(a.x == b.x){
+        if(a.y > b.y)
+            return 90;
+        else
+            return 270;
+    }
+    if(a.y == b.y){
+        if(a.x > b.x)
+            return 0;
+        else
+            return 180;
+    }
     float angle = atan(o/adj) * 57.29;
     if(adj < 0){ //Left two
         if(adj > 0) // bottom left
