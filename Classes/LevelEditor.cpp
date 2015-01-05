@@ -160,8 +160,8 @@ bool LevelEditor::init(){
     
     NDKHelper::addSelector("LevelEditor", "finishQuit", CC_CALLBACK_2(LevelEditor::finishQuit, this), this);
     
-    std::string buttons[6] = {"Resize", "Velocity", "Move", "Trash", "Duplicate", "Title"};
-    for(int x = 0; x < 5; x++){
+    std::string buttons[4] = {"Resize", "Velocity", "Move", "Title"};
+    for(int x = 0; x < 3; x++){
         this->removeChild(elements[buttons[x]]);
         elements[buttons[x]]->removeFromParent();
         this->addChild(elements[buttons[x]],1);
@@ -386,12 +386,14 @@ void LevelEditor::saveButtonCallback(Ref* ref){
         savePopUp->Show();
         saveDialog = true;
     }
+    //Taken from export, doesn't save to server but updates Level object.
 }
 void LevelEditor::saveAcceptCallback(Ref* ref){
     name = savePopUp->GetText();
     Export();
     saveDialog = false;
     savePopUp->Close();
+    unsavedChanges = false;
 }
 void LevelEditor::saveDeclineCallback(Ref* ref){
     saveDialog = false;

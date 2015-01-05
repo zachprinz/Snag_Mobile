@@ -34,7 +34,7 @@ User::User() : Entity(Vec2(150,150), Vec2(0,0), Vec2(0,0), 5){
     }
     auto physMat = PhysicsMaterial(2,1,0);
     PhysicsBody* previousBody = nullptr;
-    for(int x = 0; x < 4; x++){
+    /*for(int x = 0; x < 4; x++){
         bodies.push_back(PhysicsBody::createCircle(10, physMat));
         bodies[x]->setMass(0.0001);
         bodies[x]->setGravityEnable(false);
@@ -76,7 +76,7 @@ User::User() : Entity(Vec2(150,150), Vec2(0,0), Vec2(0,0), 5){
             //distanceJoints[distanceJoints.size()-1]->setRestLength(150);//bodies[0]->getPosition().getDistance(bodies[bodies.size()-1]->getPosition()));
         }
         previousBody = bodies[x];
-    }
+    }*/
     
     spriteUpdateCount = 0;
 }

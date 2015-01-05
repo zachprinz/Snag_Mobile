@@ -12,6 +12,7 @@
 #include <iostream>
 #include "Game.h"
 #include "cocos2d.h"
+#include "tinyxml2.h"
 
 USING_NS_CC;
 
@@ -19,7 +20,7 @@ class Level{
 public:
     static Level* createWithValueMap(ValueMap);
 
-    Level();
+    Level(bool isNew);
     
     void AddEntity(Entity*);
     void Add(Game* game);
@@ -44,6 +45,8 @@ public:
     Vec2 GetLaunchPosition();
     std::vector<Entity*> GetEntities();
     void Clear();
+    std::string toString();
+    void fromString(std::string);
 private:
     void CreateFromMapValues();
     bool hasMapObjects;
@@ -58,6 +61,7 @@ private:
     Vec2 launchVelocity;
     Vec2 launchPosition;
     int entCount;
+    bool saved;
 };
 
 #endif /* defined(__Snag__Level__) */

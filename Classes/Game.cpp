@@ -159,7 +159,7 @@ void Game::setPhyWorld(PhysicsWorld* world2){
     world = world2;
     world->setGravity(Vec2(0,-270));
     world->setSpeed(2.0);
-    world->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+    //world->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
     for(int x = 0; x < user->joints.size(); x++){
         world->addJoint(user->joints[x]);
     }

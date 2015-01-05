@@ -9,87 +9,45 @@
 #include "Level.h"
 #include "NDKHelper/NDKHelper.h"
 #include "User.h"
+#include <string.h>
+#include <iostream>
 
 Level* Level::createWithValueMap(ValueMap map){
-    Level* level = new Level();
+    Level* level = new Level(false);
     level->SetName(map["name"].asString());
     level->SetAuthor(map["author"].asString());
+    //std::string dataStr = map["data"].asString();
+    if(map.find("data") != map.end())
+        level->fromString(map["data"].asString());
     level->SetMap(map);
     return level;
 };
 
-Level::Level(){
+Level::Level(bool isNew){
     entCount = 0;
+    if(isNew){
+        this->fromString("<Map></Map>");
+        saved = false;
+    }
 }
 void Level::AddEntity(Entity* e){
     ents.push_back(e);
-    AddMapValue(e);
-}
-void Level::AddMapValue(Entity* ent){
-    Vec2 pos = ent->GetPosition();
-    Vec2 size = ent->GetSize();
-    std::string pre = "entity" + std::to_string(ents.size());
-    map[pre + "type"] = std::to_string(ent->GetType());
-    map[pre + "x"] = std::to_string(pos.x);
-    map[pre + "y"] = std::to_string(pos.y);
-    map[pre + "width"] = "0";
-    map[pre + "height"] = "0";
-    map[pre + "velocityX"] = "0";
-    map[pre + "velocityY"] = "0";
-    if(ent->GetType() == WALL || ent->GetType() == SPIKE_WALL || ent->GetType() == GOAL){
-        map[pre + "width"] = std::to_string(ent->GetSize().x);
-        map[pre + "height"] = std::to_string(ent->GetSize().y);
-    }
-    if(ent->GetType() == SPAWNER){
-        map[pre + "velocityX"] = std::to_string(ent->GetLaunchVelocity().x);
-        map[pre + "velocityY"] = std::to_string(ent->GetLaunchVelocity().y);
-    }
-    map["entcount"] = std::to_string(ents.size());
-}
-void Level::CreateFromMapValues(){
-	log("CreateFromMapValues()");
-    ents.clear();
-    log("\tFinished Clearing");
-    ValueVector entities = map["entities"].asValueVector();
-    log("\tCreated ValueVector");
-    int count = std::atoi(map["entcount"].asString().c_str());
-    log("\tEntering Loop");
-    for (int i = 0; i < count; i++) {
-        int z = i*7;
-        Vec2 pos;
-        Vec2 size;
-        Vec2 velocity;
-        int type;
-        type = std::atoi(entities.at(z).asString().c_str());
-        pos.x = std::atof(entities.at(z+1).asString().c_str());
-        pos.y = std::atof(entities.at(z+2).asString().c_str());
-        size.x = std::atof(entities.at(z+3).asString().c_str());
-        size.y = std::atof(entities.at(z+4).asString().c_str());
-        velocity.x = std::atof(entities.at(z+5).asString().c_str());
-        velocity.y = std::atof(entities.at(z+6).asString().c_str());
-        if(type == SPAWNER){
-            launchPosition = pos;
-            launchVelocity = velocity;
-        }
-        //printf("\nType: %i\nPos: (%f, %f)\nSize: (%f, %f)\nVelocity: (%f, %f)\n", type, pos.x, pos.y, size.x, size.y, velocity.x, velocity.y);
-        log("\tAdding Entity");
-        AddEntity(new Entity(pos,size,Vec2(0,0),type));
-    }
-    hasMapObjects = true;
 }
 std::vector<Entity*> Level::GetEntities(){
-	log("Getting Entities");
     if(hasMapObjects){
-    	log("\thasMapObjects");
         return ents;
     }
-    CreateFromMapValues();
     return ents;
 }
 void Level::Save(){
     map["name"] = name;
+    map["data"] = toString();
     Value parameters = Value(map);
-    sendMessageWithParams("saveLevel", parameters);
+    if(saved)
+        sendMessageWithParams("saveLevel", parameters);
+    else
+        sendMessageWithParams("newLevel", parameters);
+    saved = true;
 }
 void Level::Add(Game* game){
     GetEntities();
@@ -106,7 +64,7 @@ void Level::Remove(Game* game){
 void Level::makePublic(){
     map["status"] = "Public";
     Value parameters = Value(map);
-    sendMessageWithParams("saveLevelInfo", parameters);
+    Save();
 }
 void Level::Clear(){
     ents.clear();
@@ -173,3 +131,50 @@ void Level::SetMap(ValueMap map){
     if(entCount == 0)
         hasMapObjects = true;
 }
+std::string Level::toString(){
+    tinyxml2::XMLDocument doc;
+    tinyxml2::XMLElement* map = doc.NewElement("Map");
+    for(int x = 0; x < ents.size(); x++){
+        tinyxml2::XMLElement* entity = doc.NewElement("entity");
+        entity->SetAttribute("type", ents[x]->GetType());
+        entity->SetAttribute("x", ents[x]->GetPosition().x);
+        entity->SetAttribute("y", ents[x]->GetPosition().y);
+        entity->SetAttribute("width", ents[x]->GetSize().x);
+        entity->SetAttribute("height", ents[x]->GetSize().y);
+        entity->SetAttribute("xVelocity", ents[x]->GetLaunchVelocity().x);
+        entity->SetAttribute("yVelocity", ents[x]->GetLaunchVelocity().y);
+        map->InsertFirstChild(entity);
+    }
+    doc.InsertFirstChild(map);
+    std::string returnMap;
+    tinyxml2::XMLPrinter printer;
+    doc.Print(&printer);
+    return printer.CStr();
+};
+void Level::fromString(std::string xmlString){
+    printf(xmlString.c_str());
+    Clear();
+    tinyxml2::XMLDocument doc;
+    doc.Parse(xmlString.c_str());
+    if(doc.ErrorID())
+        printf("Error Parsing Map from String");
+    tinyxml2::XMLElement* root = doc.RootElement();
+    if(root->FirstChildElement() != NULL){
+        tinyxml2::XMLElement* iterEnt = root->FirstChild()->ToElement();
+        bool first = true;
+        do{
+            if(!first){
+                iterEnt = iterEnt->NextSiblingElement();
+            } else {
+                first = false;
+            }
+            Vec2 tempPos(iterEnt->IntAttribute("x"), iterEnt->IntAttribute("y"));
+            Vec2 tempSize(iterEnt->IntAttribute("width"), iterEnt->IntAttribute("height"));
+            Vec2 tempVelocity(iterEnt->IntAttribute("xVelocity"), iterEnt->IntAttribute("yVelocity"));
+            int tempType = iterEnt->IntAttribute("type");
+            AddEntity(new Entity(tempPos,tempSize,tempVelocity,tempType));
+        } while(iterEnt->NextSiblingElement());
+    }
+    hasMapObjects = true;
+    saved = true;
+};

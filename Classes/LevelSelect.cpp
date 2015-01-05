@@ -316,7 +316,9 @@ void LevelSelect::scrollLeftCallback(Ref*){
     }
 }
 void LevelSelect::newLevelCallback(Ref*){
-    sendMessageWithParams("newLevel", Value());
+    Level* newLevel = new Level(true);
+    selectedLevel = newLevel;
+    goToLevelEditor();
 }
 void LevelSelect::newLevelResponce(cocos2d::Node *sender, cocos2d::Value data){
     goToEdit = true;
