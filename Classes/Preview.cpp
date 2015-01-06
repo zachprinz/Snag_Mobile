@@ -66,7 +66,6 @@ void Preview::AddEntity(Entity* ent){
     sprites[ent->ID] = Sprite::create(textures[ent->GetType()]);
     sprites[ent->ID]->setTag(ent->GetType());
     sprites[ent->ID]->setPosition(MapToScreen(ent->GetPosition()));
-    printf("\nFinal Position Start: (%f, %f)", sprites[ent->ID]->getPosition().x, sprites[ent->ID]->getPosition().y);
     sprites[ent->ID]->setAnchorPoint(Vec2(0.5,0.5));
     if(ent->GetType() != SPAWNER && ent->GetType() != HOOK)
         sprites[ent->ID]->setScale((ent->GetSize().x * mapViewScale)/sprites[ent->ID]->getBoundingBox().size.width, (ent->GetSize().y * mapViewScale) / sprites[ent->ID]->getBoundingBox().size.height);
@@ -142,14 +141,11 @@ void Preview::Drag(Vec2 difference){
         mapViewOrigin.x = 5000;
     if(mapViewOrigin.y > 5000)
         mapViewOrigin.y = 5000;
-    printf("\nUpdating for Drag");
     Update();
 };
 Entity* Preview::CreateEntity(Vec2 startTouch2, Vec2 endTouch2, int type){
     Vec2 startTouch = ScreenToMap(startTouch2);
-    printf("\nScreen Start: (%f, %f)    Map Start: (%f, %f)", startTouch2.x,startTouch2.y,startTouch.x,startTouch.y);
     Vec2 endTouch = ScreenToMap(endTouch2);
-    printf("\nScreen End:   (%f, %f)    Map End:   (%f, %f)", endTouch2.x, endTouch2.y, endTouch.x,endTouch.y);
     Vec2 minCoord = startTouch;
     Vec2 maxCoord = endTouch;
     Vec2 size(maxCoord.x - minCoord.x, maxCoord.y - minCoord.y);
@@ -174,7 +170,6 @@ Entity* Preview::GetTarget(Vec2 touch){
     for (std::map<int,Sprite*>::iterator it=sprites.begin(); it!=sprites.end(); ++it){
         Rect bb = it->second->getBoundingBox();
         if(it->second->getTag() == HOOK || it->second->getTag() == SPAWNER){
-            printf("\nScale: %f",GetScale());
             bb = Rect(bb.getMinX() - ((1.0/GetScale()) * bb.size.width), bb.getMinY() - ((1.0/GetScale()) * bb.size.height), bb.size.width * 2 * (1.0/GetScale()) + bb.size.width, bb.size.height * 2 * (1.0/GetScale()) + bb.size.height);
         }
         if(bb.containsPoint(touch)){
@@ -198,6 +193,11 @@ Vec2 Preview::MapToScreen(Vec2 pos){
 }
 float Preview::GetScale(){
     return mapViewScale;
+}
+void Preview::SetOrigin(Vec2 newOrigin){
+    this->mapViewOrigin.x = newOrigin.x + 1.5*(screenViewSize.x / GetScale());
+    this->mapViewOrigin.y = newOrigin.y;// + screenViewSize.y  GetScale();
+    Update();
 }
 void Preview::Reset(){
     log("\tReseting Preview");

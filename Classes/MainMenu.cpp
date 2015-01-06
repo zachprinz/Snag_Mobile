@@ -316,7 +316,6 @@ std::map<std::string, MenuItemImage*> MainMenu::LoadElementMap(std::string xmldo
         std::string imagePath = FileUtils::getInstance()->fullPathForFilename(fullPath);
         MenuItemImage* temp;
         //If there is no included callback for this button//
-        printf("Element: %s\n\tPos: (%f, %f)\n\tOriginal Pos: (%f, %f)\n", image.c_str(), position.x, position.y, originalX, originalY);
         std::string selectedImagePath;
         if(image.compare("Delete") != 0 &&
             image.compare("Delete") != 0 &&
@@ -342,7 +341,6 @@ std::map<std::string, MenuItemImage*> MainMenu::LoadElementMap(std::string xmldo
         }
         if(callbacks.find(image) == callbacks.end()){
             temp = MenuItemImage::create(imagePath, selectedImagePath, MainMenu::Instance, menu_selector(MainMenu::emptyCallback));
-            printf("\tCouldn't find a callback\n");
         } else {//If there is a callback for this button//
             temp = MenuItemImage::create(imagePath, selectedImagePath, ref, callbacks[image]);
         }

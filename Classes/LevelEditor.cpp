@@ -160,7 +160,7 @@ bool LevelEditor::init(){
     
     NDKHelper::addSelector("LevelEditor", "finishQuit", CC_CALLBACK_2(LevelEditor::finishQuit, this), this);
     
-    std::string buttons[4] = {"Resize", "Velocity", "Move", "Title"};
+    std::string buttons[4] = {"Resize", "Move", "Velocity", "Title"};
     for(int x = 0; x < 3; x++){
         this->removeChild(elements[buttons[x]]);
         elements[buttons[x]]->removeFromParent();
@@ -460,6 +460,11 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
             touchStart = touch->getLocation();
             touchCurrent = touch->getLocation();
             bool hitTab = false;
+            if(elements["Velocity"]->isVisible() && elements["Velocity"]->getBoundingBox().containsPoint(touchStart)){
+                targetCallback();
+                hitTab = true;
+                return true;
+            }
             if(elements["Move"]->isVisible() && elements["Move"]->getBoundingBox().containsPoint(touchStart)){
                transformCallback();
                 touchDifference.x = currentSprite->getPosition().x - touchStart.x;
@@ -471,11 +476,6 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
                 resizeCallback();
                 touchDifference.x = touchStart.x - currentSprite->getBoundingBox().getMaxX();
                 touchDifference.y = touchStart.y - currentSprite->getBoundingBox().getMaxY();
-                hitTab = true;
-                return true;
-            }
-            if(elements["Velocity"]->isVisible() && elements["Velocity"]->getBoundingBox().containsPoint(touchStart)){
-                targetCallback();
                 hitTab = true;
                 return true;
             }
@@ -509,7 +509,6 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
                     Vec2 snappedScreen = preview->MapToScreen(snapped);
                     touchStart = snappedScreen;
                     currentSprite->setPosition(touchStart);
-                    printf("\n Current Sprite Pos: (%f, %f)\n", touchStart.x, touchStart.y);
                     currentSprite->setContentSize(Size(1,1));
                     currentSprite->setVisible(true);
                 }
@@ -524,7 +523,8 @@ void LevelEditor::Select(Entity* entity){
     if(hasSelected)
         Deselect();
     hasSelected = true;
-    currentSprite->setVisible(true);
+    if(entity->GetType() != SPAWNER && entity->GetType() != HOOK)
+        currentSprite->setVisible(true);
     selectedEntity = entity;
     Vec2 startPosition = preview->MapToScreen(selectedEntity->GetPosition());
     Size selectedEntitySize = Size(preview->GetScale() * entity->GetSize().x, preview->GetScale() * selectedEntity->GetSize().y);
@@ -559,6 +559,9 @@ void LevelEditor::Select(Entity* entity){
 }
 void LevelEditor::Deselect(bool keep){
     if(keep && selectedEntity != nullptr){
+        if(selectedEntity->GetType() == SPAWNER){
+            currentLevel->spawner->SetLaunchVelocity(selectedEntity->GetLaunchVelocity());
+        }
         preview->AddEntity(selectedEntity);
         preview->Update();
     }
@@ -579,6 +582,7 @@ void LevelEditor::Deselect(bool keep){
     isTransforming = false;
     isScaling = false;
     isTargeting = false;
+
     RemoveButtons(false);
 }
 void LevelEditor::UpdateSelected(){
@@ -864,7 +868,6 @@ void LevelEditor::ResetToolPos(){
 }
 Vec2 LevelEditor::CheckSnap(Vec2 touchMap){
     float snapRatio = 0.33;
-    printf("\nMap Pos Touch: (%f, %f)\n", touchMap.x, touchMap.y);
     if(fmod(touchMap.x,PTM_RATIO / 4.0) < (PTM_RATIO * 0.25 * snapRatio)){
         touchMap.x -= fmod(touchMap.x, PTM_RATIO / 4.0);
     }
@@ -890,7 +893,7 @@ void LevelEditor::Export(){
     currentLevel->Clear();
     if(hasSelected)
         Deselect();
-    for (std::map<int,Entity*>::iterator it=entities.begin(); it!=entities.end(); ++it){
+    for (std::map<int,Entity*>::iterator it=preview->entities.begin(); it!=preview->entities.end(); ++it){
         int entID = ((Entity*)it->second)->ID;
         currentLevel->AddEntity(preview->entities[entID]);
     }

@@ -110,8 +110,10 @@ Scene* Game::createScene() {
 }
 bool Game::onContactBegin(PhysicsContact& contact){
     int type = contact.getShapeB()->getBody()->getTag();
-    if(type == SPIKE_WALL)
+    if(type == SPIKE_WALL){
         user->Reset();
+        return false;
+    }
     if(type == GOAL){
         onWin();
         return false;
@@ -154,6 +156,8 @@ void Game::LoadLevel(Level* lvl){
         winPopUp->Add(this);
         winPopUpAdded = true;
     }
+    winPopUp->Close();
+    world->setSpeed(2.0);
 }
 void Game::setPhyWorld(PhysicsWorld* world2){
     world = world2;
@@ -308,7 +312,7 @@ void Game::winHighscoresSelectCallback(Ref*){
         auto scene = Highscores::createScene();
         Highscores::Instance->SetLevel(currentLevel);
         auto transition = TransitionFade::create(MainMenu::transitionTime, scene);
-        Director::getInstance()->replaceScene(transition);
+        Director::getInstance()->pushScene(transition);
     }
     else{
         Highscores::Instance->SetLevel(currentLevel);

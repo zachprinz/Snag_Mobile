@@ -163,7 +163,7 @@ void Highscores::goToPlay(){
         else{
             auto transition = TransitionFade::create(MainMenu::transitionTime, Game::myScene);
             Director::getInstance()->pushScene(transition);
-            Game::Instance->Reset(currentLevel);
+                Game::Instance->Reset(currentLevel);
         }
     }
 }

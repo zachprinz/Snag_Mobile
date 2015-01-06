@@ -36,7 +36,7 @@ bool LevelSelect::init()
         return false;
     }
     Instance = this;
-    
+    NUMBER_OF_LEVELS = 20;
     currentLevelSet = LEVELS_RISING;
     page = 0;
     
@@ -81,7 +81,7 @@ bool LevelSelect::init()
     this->removeChild(elements["NewLevel"]);
     elements["NewLevel"]->removeFromParent();
     
-    for(int x = 0; x < 4; x++){
+    for(int x = 0; x < NUMBER_OF_LEVELS; x++){
         LevelMenuItem* lvl = new LevelMenuItem(x, scrollview, ((float)innerWidth) / 2.0, elements["Inlay"]->getBoundingBox().size.height*3-pinnedPanel->getBoundingBox().size.height);
         lvl->SetTag(x);
         levels.push_back(lvl);
@@ -180,7 +180,6 @@ bool LevelSelect::init()
     return true;
 }
 bool LevelSelect::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
-    printf("Touch Began Level Select\n");
     touchStart = touch->getLocation();
     touchCurrent = touch->getLocation();
     if(elements["LevelPreviewBackground"]->getBoundingBox().containsPoint(touchStart)){
@@ -251,7 +250,6 @@ void LevelSelect::onTouchMoved(Touch* touch, Event* event){
     }
 };
 void LevelSelect::editCallback(Ref*){
-    printf("\n%s\n", selectedLevel->toString().c_str());
     if(selectedLevel != nullptr)
         goToLevelEditor();
 }
@@ -417,7 +415,7 @@ void LevelSelect::Refresh(){
     SetLevelSet(currentLevelSet);
 }
 void LevelSelect::LoadLevels(){
-    for(int x = 0; x < 4; x++){
+    for(int x = 0; x < NUMBER_OF_LEVELS; x++){
         levels[x]->SetEnabled(false);
     }
     switch(currentLevelSet){
@@ -443,6 +441,7 @@ void LevelSelect::FetchSocialLevels(){
 };
 void LevelSelect::FetchCustomLevels(){
     showLoading();
+    log("\nFetching");
     Game::SetUpLevels();
     Game::levels[LEVELS_CUSTOM].clear();
     sendMessageWithParams("fetchCustomLevels", Value());
@@ -483,7 +482,6 @@ void LevelSelect::fetchRisingCallback(Node* sender, Value data){
 };
 void LevelSelect::fetchCustomCallback(Node* sender, Value data){
     if (!data.isNull() && data.getType() == Value::Type::MAP) {
-        printf("Returned with a custom level!");
         ValueMap valueMap = data.asValueMap();
         Game::AddCustomLevel(Level::createWithValueMap(valueMap));
     }
@@ -493,10 +491,10 @@ void LevelSelect::doneFetching(Node* sender, Value data){
     loading->setVisible(false);
     loading->stopAllActions();
     if(Game::levels.size() > 0){
-        for(int x = page * 4; x < Game::levels[currentLevelSet].size() && x < ((page*4)+4); x++){
+        for(int x = page * NUMBER_OF_LEVELS; x < Game::levels[currentLevelSet].size() && x < ((page*NUMBER_OF_LEVELS)+NUMBER_OF_LEVELS); x++){
         	log("\tIterating through levels");
-            levels[x%4]->SetEnabled(true);
-            levels[x%4]->SetLevel(Game::levels[currentLevelSet][x], page);
+            levels[x%NUMBER_OF_LEVELS]->SetEnabled(true);
+            levels[x%NUMBER_OF_LEVELS]->SetLevel(Game::levels[currentLevelSet][x], page);
         }
         selectedLevel = levels[0]->level;
         SetPreview();
@@ -551,6 +549,7 @@ void LevelSelect::SetPreview(){
         	log("\t\tAdding Entity");
             preview->AddEntity(tempEnts[x]);
         }
+        preview->SetOrigin(Vec2(0,0));
         log("\t\tOut of Loop");
     }
 }

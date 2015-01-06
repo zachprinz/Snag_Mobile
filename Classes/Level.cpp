@@ -12,8 +12,10 @@
 #include <string.h>
 #include <iostream>
 
+#define SPAWNER 3
+
+
 Level* Level::createWithValueMap(ValueMap map){
-    printf("\Pre createWithValueMap()\n%s\n", map["data"].asString().c_str());
     Level* level = new Level(false);
     level->SetName(map["name"].asString());
     level->SetAuthor(map["author"].asString());
@@ -33,6 +35,8 @@ Level::Level(bool isNew){
 }
 void Level::AddEntity(Entity* e){
     ents.push_back(e);
+    if(e->GetType() == SPAWNER)
+        spawner = e;
 }
 std::vector<Entity*> Level::GetEntities(){
     if(hasMapObjects){
@@ -43,7 +47,6 @@ std::vector<Entity*> Level::GetEntities(){
 void Level::Save(){
     map["name"] = name;
     map["data"] = toString();
-    printf("\n%s\n", this->toString().c_str());
     Value parameters = Value(map);
     if(saved)
         sendMessageWithParams("saveLevel", parameters);
@@ -88,10 +91,11 @@ std::string Level::GetPath(){
     return path;
 }
 Vec2 Level::GetLaunchVelocity(){
-    return launchVelocity;
+    return spawner->GetLaunchVelocity();
+    
 }
 Vec2 Level::GetLaunchPosition(){
-    return launchPosition;
+    return spawner->GetPosition();
 }
 std::string Level::GetName(){
     if(!name.empty())
@@ -183,11 +187,13 @@ void Level::fromString(std::string xmlString){
             Vec2 tempVelocity(iterEnt->IntAttribute("xVelocity"), iterEnt->IntAttribute("yVelocity"));
             int tempType = iterEnt->IntAttribute("type");
             Entity* tempEnt = new Entity(tempPos,tempSize,tempVelocity,tempType);
+            if(tempType == SPAWNER){
+                spawner = tempEnt;
+            }
             tempSize = tempEnt->GetSize();
             AddEntity(tempEnt);
         } while(iterEnt->NextSiblingElement());
     }
     hasMapObjects = true;
     saved = true;
-    printf("\Mid createWithValueMap()\n%s\n", toString().c_str());
 };

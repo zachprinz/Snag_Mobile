@@ -47,6 +47,7 @@ public:
     void Clear();
     std::string toString();
     void fromString(std::string);
+    Entity* spawner;
 private:
     void CreateFromMapValues();
     bool hasMapObjects;
@@ -58,8 +59,6 @@ private:
     std::string author;
     std::string objectID;
     std::string highscoresID;
-    Vec2 launchVelocity;
-    Vec2 launchPosition;
     int entCount;
     bool saved;
 };

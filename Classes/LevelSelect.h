@@ -88,6 +88,7 @@ public:
     bool isDragging;
     void SetSelectCustomLevels();
 private:
+    int NUMBER_OF_LEVELS;
     Label* newLevelLabel;
     float scrollPercent;
     float scrollPressDistance;

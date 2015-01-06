@@ -22,7 +22,6 @@ public:
     static void AddFavoritedLevel(Level*);
     static void SetUpLevels();
     static bool areLevelsSetUp;
-    
     static Game* Instance;
     static cocos2d::Scene* createScene();
     static Scene* myScene;

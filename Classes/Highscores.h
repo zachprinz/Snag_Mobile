@@ -64,10 +64,8 @@ public:
     void goToPlay();
     
     void SetLevel(Level*);
-    
     Level* currentLevel;
 private:
-    
 };
 #endif 
 

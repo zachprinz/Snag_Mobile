@@ -29,6 +29,7 @@
 #import "RootViewController.h"
 #import <Parse/Parse.h>
 #import "Reachability.h"
+#import <ParseCrashReporting/ParseCrashReporting.h>
 
 @implementation AppController
 
@@ -75,6 +76,7 @@ static AppDelegate s_sharedApplication;
     [reachability startNotifier];
     
     [Parse enableLocalDatastore];
+    [ParseCrashReporting enable];
     [Parse setApplicationId:@"n9x5I3pj0cjOWUTMQ9SUJWxXY1JDjyhzuvpHFMta" clientKey:@"h2NEagfONn1W1sLQMMLDz8p1ZzXrSb3QK8mC03IY"];
     [PFAnalytics trackAppOpenedWithLaunchOptions:launchOptions];
     

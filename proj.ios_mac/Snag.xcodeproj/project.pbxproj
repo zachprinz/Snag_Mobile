@@ -21,6 +21,8 @@
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
+		3306083C1A5C662200796901 /* ParseCrashReporting.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3306083B1A5C662200796901 /* ParseCrashReporting.framework */; };
+		330608411A5C685D00796901 /* libstdc++.6.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 330608401A5C685D00796901 /* libstdc++.6.dylib */; };
 		33186C791988A7CF001B515C /* Entity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33186C561988A7CF001B515C /* Entity.cpp */; };
 		33186C7D1988A7CF001B515C /* Level.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33186C5E1988A7CF001B515C /* Level.cpp */; };
 		33186C7E1988A7CF001B515C /* LevelEditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33186C601988A7CF001B515C /* LevelEditor.cpp */; };
@@ -288,6 +290,8 @@
 		1D6058910D05DD3D006BFB54 /* Snag iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Snag iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		3306083B1A5C662200796901 /* ParseCrashReporting.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ParseCrashReporting.framework; sourceTree = "<group>"; };
+		330608401A5C685D00796901 /* libstdc++.6.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libstdc++.6.dylib"; path = "Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.1.sdk/usr/lib/libstdc++.6.dylib"; sourceTree = DEVELOPER_DIR; };
 		33186C561988A7CF001B515C /* Entity.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Entity.cpp; sourceTree = "<group>"; };
 		33186C571988A7CF001B515C /* Entity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Entity.h; sourceTree = "<group>"; };
 		33186C5E1988A7CF001B515C /* Level.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Level.cpp; sourceTree = "<group>"; };
@@ -437,6 +441,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				330608411A5C685D00796901 /* libstdc++.6.dylib in Frameworks */,
 				336B24F91A5B68A800EAD5AD /* GameController.framework in Frameworks */,
 				336B24F71A5B684100EAD5AD /* Accounts.framework in Frameworks */,
 				336B24F51A5B683B00EAD5AD /* Social.framework in Frameworks */,
@@ -468,6 +473,7 @@
 				D44C620C132DFF330009C878 /* OpenAL.framework in Frameworks */,
 				D44C620E132DFF430009C878 /* AVFoundation.framework in Frameworks */,
 				D44C6210132DFF4E0009C878 /* AudioToolbox.framework in Frameworks */,
+				3306083C1A5C662200796901 /* ParseCrashReporting.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -596,6 +602,8 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				330608401A5C685D00796901 /* libstdc++.6.dylib */,
+				3306083B1A5C662200796901 /* ParseCrashReporting.framework */,
 				336B24FC1A5B6A5F00EAD5AD /* FacebookSDK.framework */,
 				336B24F81A5B68A800EAD5AD /* GameController.framework */,
 				336B24F61A5B684100EAD5AD /* Accounts.framework */,
@@ -784,6 +792,7 @@
 				1D60588D0D05DD3D006BFB54 /* Resources */,
 				1D60588E0D05DD3D006BFB54 /* Sources */,
 				1D60588F0D05DD3D006BFB54 /* Frameworks */,
+				3306083F1A5C672400796901 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1000,6 +1009,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		3306083F1A5C672400796901 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export PATH=/usr/local/bin:$PATH\ncd /Users/zachprinz/parse\n\nparse symbols \"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		1D60588E0D05DD3D006BFB54 /* Sources */ = {

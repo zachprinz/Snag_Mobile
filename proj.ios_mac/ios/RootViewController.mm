@@ -221,7 +221,7 @@ static BOOL isConnected = false;
                         NSLog(@"\nFinished Creating a new Level.\n");
                         NSString *responce = @"responce";
                         NSDictionary *params = [[NSDictionary alloc] initWithObjectsAndKeys:responce, @"responce", nil];
-                        [IOSNDKHelper sendMessage:@"newLevelResponce" withParameters:params];
+                        //[IOSNDKHelper sendMessage:@"newLevelResponce" withParameters:params];
                     }];
                 } else {
                     NSLog(@"%@", error);
@@ -235,7 +235,7 @@ static BOOL isConnected = false;
                         NSLog(@"\nFinished Creating a new Level.\n");
                         NSString *responce = @"responce";
                         NSDictionary *params = [[NSDictionary alloc] initWithObjectsAndKeys:responce, @"responce", nil];
-                        [IOSNDKHelper sendMessage:@"newLevelResponce" withParameters:params];
+                        //[IOSNDKHelper sendMessage:@"newLevelResponce" withParameters:params];
                     }];
                 } else {
                     NSLog(@"%@", error);
@@ -328,31 +328,28 @@ static BOOL isConnected = false;
 - (void)fetchCustomLevels:(NSObject *)parametersObject
 {
     NSLog(@"\nLoading Custom Levels.\n");
-    //Search Offline//
-    /////////////////
-    PFQuery *customQuery2 = [PFQuery queryWithClassName:@"Level"];
-    [customQuery2 fromLocalDatastore];
-    [customQuery2 whereKey:@"author" equalTo:[PFUser currentUser].username];
-    [customQuery2 findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
-        if (!error) {
-            PFUser *user = [PFUser currentUser];
-            for(int x = 0; x < objects.count; x++){
-                [[objects objectAtIndex:x] pinInBackground];
-                PFObject* level = [objects objectAtIndex:x];
-                NSMutableDictionary* dict = [[NSMutableDictionary alloc] init];
-                NSArray* allKeys = [level allKeys];
-                for(NSString* key in allKeys){
-                    [dict setObject:[level objectForKey:key] forKey:key];
+    if(isConnected){
+        PFQuery *customQuery = [PFQuery queryWithClassName:@"Level"];
+        [customQuery whereKey:@"author" equalTo:[PFUser currentUser].username];
+        [customQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+            if (!error) {
+                PFUser *user = [PFUser currentUser];
+                for(int x = 0; x < objects.count; x++){
+                    [[objects objectAtIndex:x] pinInBackground];
+                    PFObject* level = [objects objectAtIndex:x];
+                    NSMutableDictionary* dict = [[NSMutableDictionary alloc] init];
+                    NSArray* allKeys = [level allKeys];
+                    for(NSString* key in allKeys){
+                        [dict setObject:[level objectForKey:key] forKey:key];
+                    }
+                    
                 }
-                dict[@"favorited"] = @"false";
-                [IOSNDKHelper sendMessage:@"fetchCustomCallback" withParameters:dict];
-            }
-            //Search Online//
-            /////////////////
-            if(isConnected){
-                PFQuery *customQuery = [PFQuery queryWithClassName:@"Level"];
-                [customQuery whereKey:@"author" equalTo:[PFUser currentUser].username];
-                [customQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+                //Search Offline//
+                //////////////////
+                PFQuery *customQuery2 = [PFQuery queryWithClassName:@"Level"];
+                [customQuery2 fromLocalDatastore];
+                [customQuery2 whereKey:@"author" equalTo:[PFUser currentUser].username];
+                [customQuery2 findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
                     if (!error) {
                         PFUser *user = [PFUser currentUser];
                         for(int x = 0; x < objects.count; x++){
@@ -366,13 +363,37 @@ static BOOL isConnected = false;
                             dict[@"favorited"] = @"false";
                             [IOSNDKHelper sendMessage:@"fetchCustomCallback" withParameters:dict];
                         }
+                        NSDictionary *found = [[NSDictionary alloc] initWithObjectsAndKeys:@"false", @"responce", nil];
+                        [IOSNDKHelper sendMessage:@"doneFetching" withParameters:found];
                     }
                 }];
             }
-            NSDictionary *found = [[NSDictionary alloc] initWithObjectsAndKeys:@"false", @"responce", nil];
-            [IOSNDKHelper sendMessage:@"doneFetching" withParameters:found];
-        }
-    }];
+        }];
+    } else {
+        //Search Offline//
+        //////////////////
+        PFQuery *customQuery2 = [PFQuery queryWithClassName:@"Level"];
+        [customQuery2 fromLocalDatastore];
+        [customQuery2 whereKey:@"author" equalTo:[PFUser currentUser].username];
+        [customQuery2 findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+            if (!error) {
+                PFUser *user = [PFUser currentUser];
+                for(int x = 0; x < objects.count; x++){
+                    [[objects objectAtIndex:x] pinInBackground];
+                    PFObject* level = [objects objectAtIndex:x];
+                    NSMutableDictionary* dict = [[NSMutableDictionary alloc] init];
+                    NSArray* allKeys = [level allKeys];
+                    for(NSString* key in allKeys){
+                        [dict setObject:[level objectForKey:key] forKey:key];
+                    }
+                    dict[@"favorited"] = @"false";
+                    [IOSNDKHelper sendMessage:@"fetchCustomCallback" withParameters:dict];
+                }
+                NSDictionary *found = [[NSDictionary alloc] initWithObjectsAndKeys:@"false", @"responce", nil];
+                [IOSNDKHelper sendMessage:@"doneFetching" withParameters:found];
+            }
+        }];
+    }
 }
 - (void)fetchRisingLevels:(NSObject *)parametersObject
 {

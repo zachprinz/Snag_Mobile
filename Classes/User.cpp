@@ -34,50 +34,6 @@ User::User() : Entity(Vec2(150,150), Vec2(0,0), Vec2(0,0), 5){
     }
     auto physMat = PhysicsMaterial(2,1,0);
     PhysicsBody* previousBody = nullptr;
-    /*for(int x = 0; x < 4; x++){
-        bodies.push_back(PhysicsBody::createCircle(10, physMat));
-        bodies[x]->setMass(0.0001);
-        bodies[x]->setGravityEnable(false);
-        bodies[x]->retain();
-        bodies[x]->setContactTestBitmask(false);
-        //bodies[x]->setCategoryBitmask(false);
-        //bodies[x]->setRotationEnable(false);
-        sprites.push_back(Sprite::create());
-        sprites[sprites.size()-1]->setPhysicsBody(bodies[bodies.size()-1]);
-        sprites[sprites.size()-1]->retain();
-        Vec2 userPos;
-        switch (x) {
-            case 0:
-                userPos = Vec2(-1,-1);
-                break;
-            case 1:
-                userPos = Vec2(1,-1);
-                break;
-            case 2:
-                userPos = Vec2(1,1);
-                break;
-            case 3:
-                userPos = Vec2(-1,1);
-                break;
-        }
-        sprites[x]->setPosition(body->getPosition().x + (userPos.x * 60), body->getPosition().y + (userPos.y *60));
-        //if(x == 0){
-        joints.push_back(PhysicsJointDistance::construct(bodies[x], body, Vec2(0.5,0.5), Vec2(0.5,0.5)));
-        joints[x]->setCollisionEnable(false);
-        //joints[x]->setDistance(100);//bodies[x]->getPosition().getDistance(body->getPosition()));
-        //}
-        if(previousBody != nullptr){
-            distanceJoints.push_back(PhysicsJointDistance::construct(previousBody, bodies[bodies.size()-1], Vec2(0.5,0.5), Vec2(0.5,0.5)));//,1,100));
-            //distanceJoints[distanceJoints.size()-1]->setRestLength(150);//previousBody->getPosition().getDistance(bodies[bodies.size()-1]->getPosition()));
-            //distanceJoints[distanceJoints.size()-1]->set
-        }
-        if(x == 3){
-            distanceJoints.push_back(PhysicsJointDistance::construct(bodies[0], bodies[bodies.size()-1], Vec2(0.5,0.5), Vec2(0.5,0.5)));//,1,100));
-            //distanceJoints[distanceJoints.size()-1]->setRestLength(150);//bodies[0]->getPosition().getDistance(bodies[bodies.size()-1]->getPosition()));
-        }
-        previousBody = bodies[x];
-    }*/
-    
     spriteUpdateCount = 0;
 }
 void User::SetUpPhysicsSprite(std::string texture, Vec2 scale){
@@ -156,8 +112,8 @@ void User::Reset(){
     Game::Instance->time = 0.0;
     Vec2 oLaunch = Game::Instance->currentLevel->GetLaunchPosition();
     Vec2 oVel = Game::Instance->currentLevel->GetLaunchVelocity();
-    sprite->setPosition(Vec2(oLaunch.x, 300+oLaunch.y));
-    body->setVelocity(Vec2(0.f, 0.f));//oVel.x, oVel.y));
+    sprite->setPosition(Vec2(oLaunch.x, oLaunch.y));
+    body->setVelocity(Vec2(oVel.x, oVel.y));
     for(int x = 0;x < sprites.size(); x++){
         Vec2 userPos;
         switch (x) {
@@ -179,7 +135,6 @@ void User::Reset(){
 }
 void User::CalculateScale(Vec2 userPosition, float boardScale){
     position = Vec2(sprite->getPosition().x, sprite->getPosition().y);
-    printf("\n User Velocity: %f, %f", body->getVelocity().x, body->getVelocity().y);
     if(isHooked){
         closest->SetLine(lineBaseScale,GetAngle(joint->getBodyA()->getPosition(), joint->getBodyB()->getPosition()));
     }

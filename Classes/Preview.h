@@ -44,7 +44,7 @@ public:
     void Clear();
     ClippingNode* clipNode;
     std::map<int,Entity*> entities;
-
+    void SetOrigin(Vec2);
 private:
     DrawNode* stencil;
     float originalMultitouchDistance;

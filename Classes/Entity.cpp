@@ -58,7 +58,7 @@ Entity::Entity(Vec2 pos, Vec2 size, Vec2 vel, int type){
         baseScale.x = this->size.x / sprite->getBoundingBox().size.width;
         baseScale.y = this->size.y / sprite->getBoundingBox().size.height;
     }
-    this->launchVelocity = Vec2(10.f,10.f);
+    this->launchVelocity = vel;
     sprite->setScale(baseScale.x, baseScale.y);
     if(type != USER)
         this->SetUpPhysicsSprite(textures[type], baseScale);
@@ -118,7 +118,14 @@ void Entity::Add(Game* game){
     }
 }
 void Entity::Remove(Game* game){
-    game->removeChild(sprite);
+    this->sprite->removeFromParent();
+    if(type == HOOK){
+        line->removeFromParent();
+    }
+    if(type == USER){
+        //game->layers[HOOK]->addChild(((User*)this)->line,1);
+    }
+    //game->removeChild(sprite);
 }
 Sprite* Entity::GetSprite(){
     return sprite;
@@ -130,11 +137,10 @@ void Entity::SetPosition(Vec2 pos){
     position = pos;
 }
 Vec2 Entity::GetLaunchVelocity(){
-    return Vec2(0.1f,0.1f);
     return launchVelocity;
 }
 void Entity::SetLaunchVelocity(Vec2 vl){
-    launchVelocity = Vec2(0.1f, 0.1f);//vl;
+    launchVelocity = vl;
 }
 int Entity::GetType(){
     return type;

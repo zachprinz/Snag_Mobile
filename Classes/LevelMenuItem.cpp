@@ -165,7 +165,6 @@ LevelMenuItem::LevelMenuItem(int position, Layer* layer, float center, float hei
     float yScale = name->getScaleY()* 0.75;
     xScale = ((float)floor((xScale) * 100))/100.f;
     yScale = ((float)floor((yScale) * 100))/100.f;
-    printf("\nName Scale: (%f, %f)\n", name->getScaleX(), name->getScaleY());
 
     
     clock = MainMenu::CreateButton("levelselect", "Clock.png");
@@ -251,7 +250,6 @@ void LevelMenuItem::SetLevel(Level* lvl, int page){
     myPath = lvl->GetPath();
     name->setString(myName);
     SetFavorited(lvl->GetIsFavorited());
-    printf("\nSet up a custom leve with %d favorites that %d favorited.", lvl->GetFavorites(), lvl->GetIsFavorited());
 }
 void LevelMenuItem::SetTag(int x){
     //favorited->setTag(x);
