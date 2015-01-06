@@ -153,11 +153,7 @@ Entity* Preview::CreateEntity(Vec2 startTouch2, Vec2 endTouch2, int type){
     Vec2 minCoord = startTouch;
     Vec2 maxCoord = endTouch;
     Vec2 size(maxCoord.x - minCoord.x, maxCoord.y - minCoord.y);
-    size.x *= 1.5;
-    size.y *= 1.5;
     Vec2 pos = minCoord;
-    pos.x *= 1.5;
-    pos.y *= 1.5;
     pos = Vec2(pos.x + (size.x / 2.0), pos.y + (size.y / 2.0));
     Entity* ent;
     switch(type){

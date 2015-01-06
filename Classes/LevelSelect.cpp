@@ -251,6 +251,7 @@ void LevelSelect::onTouchMoved(Touch* touch, Event* event){
     }
 };
 void LevelSelect::editCallback(Ref*){
+    printf("\n%s\n", selectedLevel->toString().c_str());
     if(selectedLevel != nullptr)
         goToLevelEditor();
 }

@@ -47,8 +47,8 @@ Entity::Entity(Vec2 pos, Vec2 size, Vec2 vel, int type){
     float baseScales[6] = {1,1,1,1,1,1};
     this->baseScale = Vec2(baseScales[type],baseScales[type]);
     this->type = type;
-    this->size = Vec2(size.x*.66,size.y*.66);
-    this->position = Vec2(pos.x*.66, pos.y*.66);
+    this->size = Vec2(size.x,size.y);
+    this->position = Vec2(pos.x, pos.y);
     sprite = Sprite::create(textures[type]);
     this->originalSize = Vec2(sprite->getBoundingBox().size.width, sprite->getBoundingBox().size.height);
     sprite->setAnchorPoint(Vec2(0.5,0.5));

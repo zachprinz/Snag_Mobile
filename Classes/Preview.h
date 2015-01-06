@@ -43,13 +43,13 @@ public:
     bool editor;
     void Clear();
     ClippingNode* clipNode;
+    std::map<int,Entity*> entities;
 
 private:
     DrawNode* stencil;
     float originalMultitouchDistance;
     float currentMultitouchDistance;
     void UpdateSprite(int);
-    std::map<int,Entity*> entities;
     std::map<int,Sprite*> sprites;
     Rect screenViewport;
     Vec2 screenViewOrigin;

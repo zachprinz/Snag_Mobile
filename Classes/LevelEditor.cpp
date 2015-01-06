@@ -888,9 +888,11 @@ void LevelEditor::UnselectTool(){
 void LevelEditor::Export(){
     currentLevel->SetName(name);
     currentLevel->Clear();
+    if(hasSelected)
+        Deselect();
     for (std::map<int,Entity*>::iterator it=entities.begin(); it!=entities.end(); ++it){
         int entID = ((Entity*)it->second)->ID;
-        currentLevel->AddEntity(entities[entID]);
+        currentLevel->AddEntity(preview->entities[entID]);
     }
     currentLevel->Save();
     unsavedChanges = false;

@@ -13,13 +13,14 @@
 #include <iostream>
 
 Level* Level::createWithValueMap(ValueMap map){
+    printf("\Pre createWithValueMap()\n%s\n", map["data"].asString().c_str());
     Level* level = new Level(false);
     level->SetName(map["name"].asString());
     level->SetAuthor(map["author"].asString());
-    //std::string dataStr = map["data"].asString();
     if(map.find("data") != map.end())
         level->fromString(map["data"].asString());
     level->SetMap(map);
+    //Broken Here
     return level;
 };
 
@@ -42,6 +43,7 @@ std::vector<Entity*> Level::GetEntities(){
 void Level::Save(){
     map["name"] = name;
     map["data"] = toString();
+    printf("\n%s\n", this->toString().c_str());
     Value parameters = Value(map);
     if(saved)
         sendMessageWithParams("saveLevel", parameters);
@@ -92,7 +94,9 @@ Vec2 Level::GetLaunchPosition(){
     return launchPosition;
 }
 std::string Level::GetName(){
-    return name;
+    if(!name.empty())
+        return name;
+    return "none";
 }
 std::string Level::GetAuthor(){
     return author;
@@ -134,17 +138,24 @@ void Level::SetMap(ValueMap map){
 std::string Level::toString(){
     tinyxml2::XMLDocument doc;
     tinyxml2::XMLElement* map = doc.NewElement("Map");
+    map->SetAttribute("name", this->GetName().c_str());
+    map->SetAttribute("author", this->GetAuthor().c_str());
+    std::vector<Entity*> tempEnts;
     for(int x = 0; x < ents.size(); x++){
-        tinyxml2::XMLElement* entity = doc.NewElement("entity");
-        entity->SetAttribute("type", ents[x]->GetType());
-        entity->SetAttribute("x", ents[x]->GetPosition().x);
-        entity->SetAttribute("y", ents[x]->GetPosition().y);
-        entity->SetAttribute("width", ents[x]->GetSize().x);
-        entity->SetAttribute("height", ents[x]->GetSize().y);
-        entity->SetAttribute("xVelocity", ents[x]->GetLaunchVelocity().x);
-        entity->SetAttribute("yVelocity", ents[x]->GetLaunchVelocity().y);
-        map->InsertFirstChild(entity);
+        if(ents[x] != NULL){
+            tinyxml2::XMLElement* entity = doc.NewElement("entity");
+            entity->SetAttribute("type", ents[x]->GetType());
+            entity->SetAttribute("x", ents[x]->GetPosition().x);
+            entity->SetAttribute("y", ents[x]->GetPosition().y);
+            entity->SetAttribute("width", ents[x]->GetSize().x);
+            entity->SetAttribute("height", ents[x]->GetSize().y);
+            entity->SetAttribute("xVelocity", ents[x]->GetLaunchVelocity().x);
+            entity->SetAttribute("yVelocity", ents[x]->GetLaunchVelocity().y);
+            map->InsertFirstChild(entity);
+            tempEnts.push_back(ents[x]);
+        }
     }
+    ents = tempEnts;
     doc.InsertFirstChild(map);
     std::string returnMap;
     tinyxml2::XMLPrinter printer;
@@ -152,7 +163,6 @@ std::string Level::toString(){
     return printer.CStr();
 };
 void Level::fromString(std::string xmlString){
-    printf(xmlString.c_str());
     Clear();
     tinyxml2::XMLDocument doc;
     doc.Parse(xmlString.c_str());
@@ -172,9 +182,12 @@ void Level::fromString(std::string xmlString){
             Vec2 tempSize(iterEnt->IntAttribute("width"), iterEnt->IntAttribute("height"));
             Vec2 tempVelocity(iterEnt->IntAttribute("xVelocity"), iterEnt->IntAttribute("yVelocity"));
             int tempType = iterEnt->IntAttribute("type");
-            AddEntity(new Entity(tempPos,tempSize,tempVelocity,tempType));
+            Entity* tempEnt = new Entity(tempPos,tempSize,tempVelocity,tempType);
+            tempSize = tempEnt->GetSize();
+            AddEntity(tempEnt);
         } while(iterEnt->NextSiblingElement());
     }
     hasMapObjects = true;
     saved = true;
+    printf("\Mid createWithValueMap()\n%s\n", toString().c_str());
 };
