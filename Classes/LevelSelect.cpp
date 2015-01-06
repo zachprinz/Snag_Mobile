@@ -299,8 +299,8 @@ void LevelSelect::uploadCallback(Ref*){
     if(currentLevelSet == LEVELS_CUSTOM && selectedLevel->GetStatus().compare("Public") == 0){
         elements["Upload"]->setVisible(false);
         elements["Upload"]->setEnabled(false);
-        elements["HighScores"]->setVisible(true);
-        elements["HighScores"]->setEnabled(true);
+        //elements["HighScores"]->setVisible(true);
+        //elements["HighScores"]->setEnabled(true);
     }
 }
 void LevelSelect::scrollRightCallback(Ref*){

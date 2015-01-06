@@ -28,6 +28,7 @@
 #import "AppDelegate.h"
 #import "RootViewController.h"
 #import <Parse/Parse.h>
+#import "Reachability.h"
 
 @implementation AppController
 
@@ -38,12 +39,6 @@
 static AppDelegate s_sharedApplication;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
-
-    [Parse setApplicationId:@"n9x5I3pj0cjOWUTMQ9SUJWxXY1JDjyhzuvpHFMta"
-                  clientKey:@"h2NEagfONn1W1sLQMMLDz8p1ZzXrSb3QK8mC03IY"];
-    
-    [PFAnalytics trackAppOpenedWithLaunchOptions:launchOptions];
-    
     // Override point for customization after application launch.
 
     // Add the view controller's view to the window and display.
@@ -65,6 +60,24 @@ static AppDelegate s_sharedApplication;
     _viewController.wantsFullScreenLayout = YES;
     _viewController.view = eaglView;
 
+    // Initialize Reachability
+    Reachability *reachability = [Reachability reachabilityWithHostname:@"www.google.com"];
+    
+    reachability.reachableBlock = ^(Reachability *reachability) {
+        NSLog(@"Network is reachable.");
+        [_viewController setConnected];
+    };
+    reachability.unreachableBlock = ^(Reachability *reachability) {
+        NSLog(@"Network is unreachable.");
+        [_viewController setUnConnected];
+    };
+    // Start Monitoring
+    [reachability startNotifier];
+    
+    [Parse enableLocalDatastore];
+    [Parse setApplicationId:@"n9x5I3pj0cjOWUTMQ9SUJWxXY1JDjyhzuvpHFMta" clientKey:@"h2NEagfONn1W1sLQMMLDz8p1ZzXrSb3QK8mC03IY"];
+    [PFAnalytics trackAppOpenedWithLaunchOptions:launchOptions];
+    
     // Set RootViewController to window
     if ( [[UIDevice currentDevice].systemVersion floatValue] < 6.0)
     {

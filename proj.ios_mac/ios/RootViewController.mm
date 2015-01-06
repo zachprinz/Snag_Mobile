@@ -29,6 +29,8 @@
 #import "IOSNDKHelper.h"
 #import <Parse/Parse.h>
 
+static BOOL isConnected = false;
+
 @implementation RootViewController
 
 /*
@@ -105,6 +107,16 @@
     return YES;
 }
 
+- (void) setConnected
+{
+    isConnected = YES;
+}
+
+- (void)setUnConnected
+{
+    isConnected = NO;
+}
+
 - (void)didReceiveMemoryWarning {
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
@@ -126,6 +138,8 @@
     if (currentUser){
         PFQuery *query = [PFUser query];
         [query whereKey:@"username" equalTo:currentUser.username];
+        if(!isConnected)
+            [query fromLocalDatastore];
         NSArray *user = [query findObjects];
         if ([user count] > 0) {
             NSDictionary *found = [[NSDictionary alloc] initWithObjectsAndKeys:@"true", @"responce", nil];
@@ -187,27 +201,48 @@
 
 - (void)newLevel:(NSObject *)parametersObject
 {
-    NSLog(@"\nNative Creating a new Level.\n");
-    PFObject *level = [PFObject objectWithClassName:@"Level"];
-    level[@"name"] = @"qq36q81q";
-    NSString* author = [PFUser currentUser].username;
-    level[@"author"] = author;
-    level[@"entcount"] = @"0";
-    level[@"status"] = @"Private";
-    level[@"favorites"] = @0;
-    [level saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-        if (succeeded) {
-            level[@"id"] = [level objectId];
+    NSDictionary *parameters = (NSDictionary *)parametersObject;
+    if(parameters != nil){
+        NSLog(@"\nNative Creating a new Level.\n");
+        PFObject *level = [PFObject objectWithClassName:@"Level"];
+        level[@"name"] = [parameters objectForKey:@"name"];
+        NSString* author = [PFUser currentUser].username;
+        level[@"author"] = author;
+        level[@"entcount"] = @"0";
+        level[@"status"] = @"Private";
+        level[@"favorites"] = @0;
+        level[@"data"] = [parameters objectForKey:@"data"];
+        if(isConnected){
             [level saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-                NSLog(@"\nFinished Creating a new Level.\n");
-                NSString *responce = @"responce";
-                NSDictionary *params = [[NSDictionary alloc] initWithObjectsAndKeys:responce, @"responce", nil];
-                [IOSNDKHelper sendMessage:@"newLevelResponce" withParameters:params];
+                if (succeeded) {
+                    level[@"id"] = [level objectId];
+                    [level saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                        [level pinInBackground];
+                        NSLog(@"\nFinished Creating a new Level.\n");
+                        NSString *responce = @"responce";
+                        NSDictionary *params = [[NSDictionary alloc] initWithObjectsAndKeys:responce, @"responce", nil];
+                        [IOSNDKHelper sendMessage:@"newLevelResponce" withParameters:params];
+                    }];
+                } else {
+                    NSLog(@"%@", error);
+                }
             }];
         } else {
-            NSLog(@"%@", error);
+            [level saveEventually:^(BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    level[@"id"] = [level objectId];
+                    [level saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                        NSLog(@"\nFinished Creating a new Level.\n");
+                        NSString *responce = @"responce";
+                        NSDictionary *params = [[NSDictionary alloc] initWithObjectsAndKeys:responce, @"responce", nil];
+                        [IOSNDKHelper sendMessage:@"newLevelResponce" withParameters:params];
+                    }];
+                } else {
+                    NSLog(@"%@", error);
+                }
+            }];
         }
-    }];
+    }
 }
 
 - (void)saveLevel:(NSObject *)parametersObject
@@ -216,42 +251,17 @@
     if(parameters != nil){
         NSString* levelID = (NSString *)[parameters objectForKey:@"id"];
         PFQuery *query = [PFQuery queryWithClassName:@"Level"];
+        if(!isConnected)
+            [query fromLocalDatastore];
         [query getObjectInBackgroundWithId:levelID block:^(PFObject *level, NSError *error) {
-            NSInteger count = [(NSString*)[parameters objectForKey:@"entcount"] integerValue];
             level[@"entcount"] = [parameters objectForKey:@"entcount"];
             level[@"name"] = [parameters objectForKey:@"name"];
             level[@"status"] = [parameters objectForKey:@"status"];
-            NSMutableArray* entities =[[NSMutableArray alloc]init];
-            for(int x = 1; x < count+1; x++){
-                [entities addObject:[parameters objectForKey:[NSString stringWithFormat:@"entity%litype",(long)x]]];
-                [entities addObject:[parameters objectForKey:[NSString stringWithFormat:@"entity%lix",(long)x]]];
-                [entities addObject:[parameters objectForKey:[NSString stringWithFormat:@"entity%liy",(long)x]]];
-                [entities addObject:[parameters objectForKey:[NSString stringWithFormat:@"entity%liwidth",(long)x]]];
-                [entities addObject:[parameters objectForKey:[NSString stringWithFormat:@"entity%liheight",(long)x]]];
-                [entities addObject:[parameters objectForKey:[NSString stringWithFormat:@"entity%livelocityX",(long)x]]];
-                [entities addObject:[parameters objectForKey:[NSString stringWithFormat:@"entity%livelocityY",(long)x]]];
-            }
-            if(count > 0)
-                level[@"entities"] = entities;
+            level[@"data"] = [parameters objectForKey:@"data"];
+            if(isConnected)
+                [level saveInBackground];
             else
-                level[@"entities"] = [NSNull null];
-            [level saveInBackground];
-        }];
-    }
-}
-
-- (void)saveLevelInfo:(NSObject *)parametersObject
-{
-    NSDictionary *parameters = (NSDictionary *)parametersObject;
-    if(parameters != nil){
-        NSString* levelID = (NSString *)[parameters objectForKey:@"id"];
-        PFQuery *query = [PFQuery queryWithClassName:@"Level"];
-        [query getObjectInBackgroundWithId:levelID block:^(PFObject *level, NSError *error) {
-            NSInteger count = [(NSString*)[parameters objectForKey:@"entcount"] integerValue];
-            level[@"entcount"] = [parameters objectForKey:@"entcount"];
-            level[@"name"] = [parameters objectForKey:@"name"];
-            level[@"status"] = [parameters objectForKey:@"status"];
-            [level saveInBackground];
+                [level saveEventually];
         }];
     }
 }
@@ -318,79 +328,85 @@
 - (void)fetchCustomLevels:(NSObject *)parametersObject
 {
     NSLog(@"\nLoading Custom Levels.\n");
-    PFQuery *customQuery = [PFQuery queryWithClassName:@"Level"];
-    [customQuery whereKey:@"author" equalTo:[PFUser currentUser].username];
-    [customQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+    //Search Offline//
+    /////////////////
+    PFQuery *customQuery2 = [PFQuery queryWithClassName:@"Level"];
+    [customQuery2 fromLocalDatastore];
+    [customQuery2 whereKey:@"author" equalTo:[PFUser currentUser].username];
+    [customQuery2 findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) {
             PFUser *user = [PFUser currentUser];
-            PFRelation *relation = [user relationForKey:@"favorites"];
-            [[relation query] findObjectsInBackgroundWithBlock:^(NSArray *favs, NSError *error) {
-                if (error) {
-                    // There was an error
-                } else {
-                    for(int x = 0; x < objects.count; x++){
-                        PFObject* level = [objects objectAtIndex:x];
-                        NSMutableDictionary* dict = [[NSMutableDictionary alloc] init];
-                        NSArray* allKeys = [level allKeys];
-                        for(NSString* key in allKeys){
-                            [dict setObject:[level objectForKey:key] forKey:key];
-                        }
-                        dict[@"favorited"] = @"false";
-                        for(PFObject* levelID in favs){
-                            NSString* levelID1 = (NSString *)[level objectForKey:@"id"];
-                            NSString* levelID2 = (NSString *)[levelID objectForKey:@"id"];
-                            if([levelID1 isEqualToString:levelID2]){
-                                NSLog(@"Found a favorited Level");
-                                dict[@"favorited"] = @"true";
-                                break;
-                            }
-                        }
-                        [IOSNDKHelper sendMessage:@"fetchCustomCallback" withParameters:dict];
-                    }
-                    NSDictionary *found = [[NSDictionary alloc] initWithObjectsAndKeys:@"false", @"responce", nil];
-                    [IOSNDKHelper sendMessage:@"doneFetching" withParameters:found];
+            for(int x = 0; x < objects.count; x++){
+                [[objects objectAtIndex:x] pinInBackground];
+                PFObject* level = [objects objectAtIndex:x];
+                NSMutableDictionary* dict = [[NSMutableDictionary alloc] init];
+                NSArray* allKeys = [level allKeys];
+                for(NSString* key in allKeys){
+                    [dict setObject:[level objectForKey:key] forKey:key];
                 }
-            }];
+                dict[@"favorited"] = @"false";
+                [IOSNDKHelper sendMessage:@"fetchCustomCallback" withParameters:dict];
+            }
+            //Search Online//
+            /////////////////
+            if(isConnected){
+                PFQuery *customQuery = [PFQuery queryWithClassName:@"Level"];
+                [customQuery whereKey:@"author" equalTo:[PFUser currentUser].username];
+                [customQuery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+                    if (!error) {
+                        PFUser *user = [PFUser currentUser];
+                        for(int x = 0; x < objects.count; x++){
+                            [[objects objectAtIndex:x] pinInBackground];
+                            PFObject* level = [objects objectAtIndex:x];
+                            NSMutableDictionary* dict = [[NSMutableDictionary alloc] init];
+                            NSArray* allKeys = [level allKeys];
+                            for(NSString* key in allKeys){
+                                [dict setObject:[level objectForKey:key] forKey:key];
+                            }
+                            dict[@"favorited"] = @"false";
+                            [IOSNDKHelper sendMessage:@"fetchCustomCallback" withParameters:dict];
+                        }
+                    }
+                }];
+            }
+            NSDictionary *found = [[NSDictionary alloc] initWithObjectsAndKeys:@"false", @"responce", nil];
+            [IOSNDKHelper sendMessage:@"doneFetching" withParameters:found];
         }
     }];
 }
 - (void)fetchRisingLevels:(NSObject *)parametersObject
 {
     PFQuery *query = [PFQuery queryWithClassName:@"Level"];
+    if(!isConnected)
+        [query fromLocalDatastore];
     [query whereKey:@"status" equalTo:@"Public"];
     [query addDescendingOrder:@"favorites"];
     query.limit = 12;
     [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
         if (!error) {
             PFUser *user = [PFUser currentUser];
-            PFRelation *relation = [user relationForKey:@"favorites"];
-            [[relation query] findObjectsInBackgroundWithBlock:^(NSArray *favs, NSError *error) {
-                if (error) {
-                    // There was an error
-                } else {
-                    for(int x = 0; x < objects.count; x++){
-                        PFObject* level = [objects objectAtIndex:x];
-                        NSMutableDictionary* dict = [[NSMutableDictionary alloc] init];
-                        NSArray* allKeys = [level allKeys];
-                        for(NSString* key in allKeys){
-                            [dict setObject:[level objectForKey:key] forKey:key];
+            for(int x = 0; x < objects.count; x++){
+                [[objects objectAtIndex:x] pinInBackground];
+                PFObject* level = [objects objectAtIndex:x];
+                NSMutableDictionary* dict = [[NSMutableDictionary alloc] init];
+                NSArray* allKeys = [level allKeys];
+                for(NSString* key in allKeys){
+                    [dict setObject:[level objectForKey:key] forKey:key];
+            }
+                dict[@"favorited"] = @"false";
+                /*for(PFObject* levelID in favs){
+                    NSString* levelID1 = (NSString *)[level objectForKey:@"id"];
+                    NSString* levelID2 = (NSString *)[levelID objectForKey:@"id"];
+                    if([levelID1 isEqualToString:levelID2]){
+                        NSLog(@"Found a favorited Level");
+                        dict[@"favorited"] = @"true";
+                        break;
                     }
-                        dict[@"favorited"] = @"false";
-                        for(PFObject* levelID in favs){
-                            NSString* levelID1 = (NSString *)[level objectForKey:@"id"];
-                            NSString* levelID2 = (NSString *)[levelID objectForKey:@"id"];
-                            if([levelID1 isEqualToString:levelID2]){
-                                NSLog(@"Found a favorited Level");
-                                dict[@"favorited"] = @"true";
-                                break;
-                            }
-                        }
-                        [IOSNDKHelper sendMessage:@"fetchRisingCallback" withParameters:dict];
-                    }
-                    NSDictionary *found = [[NSDictionary alloc] initWithObjectsAndKeys:@"false", @"responce", nil];
-                    [IOSNDKHelper sendMessage:@"doneFetching" withParameters:found];
-                }
-            }];
+                }*/
+                [IOSNDKHelper sendMessage:@"fetchRisingCallback" withParameters:dict];
+            }
+            NSDictionary *found = [[NSDictionary alloc] initWithObjectsAndKeys:@"false", @"responce", nil];
+            [IOSNDKHelper sendMessage:@"doneFetching" withParameters:found];
         }
     }];
 }
@@ -400,26 +416,29 @@
 }
 - (void)fetchFavoritedLevels:(NSObject *)parametersObject
 {
-    PFUser *user = [PFUser currentUser];
-    PFRelation *relation = [user relationForKey:@"favorites"];
-    [[relation query] findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
-        if (error) {
-            // There was an error
-        } else {
-            for(int x = 0; x < objects.count; x++){
-                PFObject* level = [objects objectAtIndex:x];
-                NSMutableDictionary* dict = [[NSMutableDictionary alloc] init];
-                NSArray* allKeys = [level allKeys];
-                for(NSString* key in allKeys){
-                    [dict setObject:[level objectForKey:key] forKey:key];
+    if(isConnected){
+        PFUser *user = [PFUser currentUser];
+        PFRelation *relation = [user relationForKey:@"favorites"];
+        [[relation query] findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+            if (error) {
+                // There was an error
+            } else {
+                for(int x = 0; x < objects.count; x++){
+                    [[objects objectAtIndex:x] pinInBackground];
+                    PFObject* level = [objects objectAtIndex:x];
+                    NSMutableDictionary* dict = [[NSMutableDictionary alloc] init];
+                    NSArray* allKeys = [level allKeys];
+                    for(NSString* key in allKeys){
+                        [dict setObject:[level objectForKey:key] forKey:key];
+                    }
+                    dict[@"favorited"] = @"true";
+                    [IOSNDKHelper sendMessage:@"fetchFavoritedCallback" withParameters:dict];
                 }
-                dict[@"favorited"] = @"true";
-                [IOSNDKHelper sendMessage:@"fetchFavoritedCallback" withParameters:dict];
+                NSDictionary *found = [[NSDictionary alloc] initWithObjectsAndKeys:@"false", @"responce", nil];
+                [IOSNDKHelper sendMessage:@"doneFetching" withParameters:found];
             }
-            NSDictionary *found = [[NSDictionary alloc] initWithObjectsAndKeys:@"false", @"responce", nil];
-            [IOSNDKHelper sendMessage:@"doneFetching" withParameters:found];
-        }
-    }];
+        }];
+    }
 }
 - (void)storeMessageLocally:(PFObject*)message { NSArray * allKeys = [message allKeys]; NSMutableDictionary * retDict = [[NSMutableDictionary alloc] init];
     for (NSString * key in allKeys) {

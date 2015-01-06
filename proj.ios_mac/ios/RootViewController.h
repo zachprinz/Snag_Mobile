@@ -24,11 +24,14 @@
  ****************************************************************************/
 
 #import <UIKit/UIKit.h>
+#import "Reachability.h"
 
 
 @interface RootViewController : UIViewController {
 
 }
 - (BOOL) prefersStatusBarHidden;
+- (void) setConnected;
+- (void) setUnConnected;
 
 @end

@@ -4,3 +4,9 @@ proj.android/obj/*
 proj.android/assets/*
 proj.linux/*
 cocos2d/*
+proj.ios_mac/Bolts.framework
+proj.ios_mac/FacebookSDK.framework
+proj.ios_mac/Parse.framework
+proj.ios_mac/ParseCrashReporting.framework
+proj.ios_mac/ParseUI.framework
+proj.ios_mac/ParseFacebookUtils.framework
