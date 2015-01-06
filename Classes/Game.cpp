@@ -326,12 +326,14 @@ void Game::winReplaySelectCallback(Ref*){
     resetButtonCallback(nullptr);
 };
 bool Game::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
-    user->Snag();
-    Vec2 touchPosition = touch->getLocation();
-    if(resetButton->getBoundingBox().containsPoint(touchPosition) || homeButton->getBoundingBox().containsPoint(touchPosition)){
-        return false;
+    if(!user->isHooked){
+        user->Snag();
+        Vec2 touchPosition = touch->getLocation();
+        if(resetButton->getBoundingBox().containsPoint(touchPosition) || homeButton->getBoundingBox().containsPoint(touchPosition)){
+            return false;
+        }
+        return true;
     }
-    return true;
 }
 void Game::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
     user->Release();

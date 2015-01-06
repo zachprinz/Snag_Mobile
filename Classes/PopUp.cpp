@@ -244,6 +244,9 @@ void PopUp::Close(){
         thirdButton->setEnabled(false);
     }
 }
+void PopUp::SetText(std::string name){
+    nameBox->setText(name.c_str());
+}
 void PopUp::Add(Layer* layer){
     layer->addChild(menu,1);
     layer->addChild(name,1);

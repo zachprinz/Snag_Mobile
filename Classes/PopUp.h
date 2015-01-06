@@ -12,6 +12,7 @@
 #include <iostream>
 #include "cocos2d.h"
 #include "MainMenu.h"
+#include <string.h>
 #if(CC_PLATFORM_ANDROID == CC_TARGET_PLATFORM)
 	#include "extensions/cocos-ext.h"
 #elif(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
@@ -47,6 +48,7 @@ public:
     void Remove(Layer*);
     bool visible;
     std::map<std::string, MenuItemImage*> elements;
+    void SetText(std::string);
 private:
 };
 

@@ -384,6 +384,7 @@ void LevelEditor::saveButtonCallback(Ref* ref){
         hookPopUp->Show();
     if(hasHook && hasSpawner){
         savePopUp->Show();
+        savePopUp->SetText(currentLevel->GetName());
         saveDialog = true;
     }
     //Taken from export, doesn't save to server but updates Level object.

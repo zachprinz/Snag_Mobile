@@ -103,6 +103,8 @@ std::string Level::GetName(){
     return "none";
 }
 std::string Level::GetAuthor(){
+    if(author.empty() && map.find("author") != map.end())
+        author = map["author"].asString();
     return author;
     //Todo, Include author info
 }

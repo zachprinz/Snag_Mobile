@@ -142,8 +142,11 @@ static BOOL isConnected = false;
             [query fromLocalDatastore];
         NSArray *user = [query findObjects];
         if ([user count] > 0) {
-            NSDictionary *found = [[NSDictionary alloc] initWithObjectsAndKeys:@"true", @"responce", nil];
-            [IOSNDKHelper sendMessage:@"userCheckCallback" withParameters:found];
+            NSString *success = @"true";
+            NSString *responce = @"true";
+            NSString *username = [PFUser currentUser].username;
+            NSDictionary *params = [[NSDictionary alloc] initWithObjectsAndKeys:success, @"success", responce, @"responce", username, @"username", nil];
+            [IOSNDKHelper sendMessage:@"userCheckCallback" withParameters:params];
         } else {
             NSDictionary *notFound = [[NSDictionary alloc] initWithObjectsAndKeys:@"false", @"responce", nil];
             [IOSNDKHelper sendMessage:@"userCheckCallback" withParameters:notFound];
@@ -188,7 +191,8 @@ static BOOL isConnected = false;
                 if (user) {
                     NSString *success = @"true";
                     NSString *responce = @"none";
-                    NSDictionary *params = [[NSDictionary alloc] initWithObjectsAndKeys:success, @"success", responce, @"responce", nil];
+                    NSString *username = [PFUser currentUser].username;
+                    NSDictionary *params = [[NSDictionary alloc] initWithObjectsAndKeys:success, @"success", responce, @"responce", @"username", username, nil];
                     [IOSNDKHelper sendMessage:@"logInCallback" withParameters:params];
                 } else {
                     NSString *responce = [error userInfo][@"error"];

@@ -250,7 +250,7 @@ void LevelSelect::onTouchMoved(Touch* touch, Event* event){
     }
 };
 void LevelSelect::editCallback(Ref*){
-    if(selectedLevel != nullptr)
+    if(selectedLevel != nullptr && selectedLevel->GetAuthor().compare(MainMenu::Instance->username) == 0)
         goToLevelEditor();
 }
 void LevelSelect::goToLevelEditor(){
@@ -367,20 +367,36 @@ void LevelSelect::playCallback(Ref* sender){
     }
 }
 void LevelSelect::customCallback(Ref*){
-    SetLevelSet(LEVELS_CUSTOM);
-    SetLevelSetButtons();
+    if(currentLevelSet == LEVELS_CUSTOM){
+        SetLevelSet(LEVELS_CUSTOM);
+    } else {
+        SetLevelSet(LEVELS_CUSTOM);
+        SetLevelSetButtons();
+    }
 }
 void LevelSelect::favoritedCallback(Ref*){
-    SetLevelSet(LEVELS_FAVORITED);
-    SetLevelSetButtons();
+    if(currentLevelSet == LEVELS_FAVORITED){
+        SetLevelSet(LEVELS_FAVORITED);
+    } else {
+        SetLevelSet(LEVELS_FAVORITED);
+        SetLevelSetButtons();
+    }
 }
 void LevelSelect::socialCallback(Ref*){
-    SetLevelSet(LEVELS_SOCIAL);
-    SetLevelSetButtons();
+    if(currentLevelSet == LEVELS_SOCIAL){
+        SetLevelSet(LEVELS_SOCIAL);
+    } else {
+        SetLevelSet(LEVELS_SOCIAL);
+        SetLevelSetButtons();
+    }
 }
 void LevelSelect::risingCallback(Ref*){
-    SetLevelSet(LEVELS_RISING);
-    SetLevelSetButtons();
+    if(currentLevelSet == LEVELS_RISING){
+        SetLevelSet(LEVELS_RISING);
+    } else {
+        SetLevelSet(LEVELS_RISING);
+        SetLevelSetButtons();
+    }
 }
 void LevelSelect::SetLevelSet(int set){
     page = 0;
@@ -519,6 +535,15 @@ void LevelSelect::SetPreview(){
         preview->Clear();
         hand->setVisible(true);
         log("\tCleared level set");
+        printf("\nCurrent User: %s\nLevel Owner: %s", MainMenu::Instance->username.c_str(), selectedLevel->GetAuthor().c_str());
+        if(selectedLevel->GetAuthor().compare(MainMenu::Instance->username) != 0){
+            elements["Edit"]->setVisible(false);
+            elements["Delete"]->setVisible(false);
+        }
+        if(selectedLevel->GetAuthor().compare(MainMenu::Instance->username) == 0){
+            elements["Edit"]->setVisible(true);
+            elements["Delete"]->setVisible(true);
+        }
         if(currentLevelSet == LEVELS_CUSTOM && selectedLevel->GetStatus().compare("Private") == 0){
             elements["Upload"]->setVisible(true);
             elements["Upload"]->setEnabled(true);

@@ -125,6 +125,7 @@ void MainMenu::userCheckCallback(Node* sender, Value data){
         ValueMap valueMap = data.asValueMap();
         std::string response = valueMap["responce"].asString();
         if(response.compare("true") == 0){
+            username = valueMap["username"].asString();
             printf("Found a user account for this device!");
             goToLevelSelect();
         }

@@ -62,6 +62,7 @@ public:
     
     void userCheckCallback(Node* sender, Value data);
     void checkForUser();
+    std::string username;
     void goToLogIn();
     void goToLevelSelect();
     static float transitionTime;

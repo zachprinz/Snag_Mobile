@@ -207,6 +207,8 @@ void LogInMenu::logInCallback(Node* sender, cocos2d::Value data){
         ValueMap valueMap = data.asValueMap();
         std::string success = valueMap["success"].asString();
         std::string responce = valueMap["responce"].asString();
+        MainMenu::Instance->username = valueMap["name"].asString();
+        printf("Logged in as: %s", MainMenu::Instance->username.c_str());
         if(success.compare("true") == 0){
             printf("Logged In Successfully!");
             goToLevelSelect();
