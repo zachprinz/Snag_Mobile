@@ -55,13 +55,15 @@ public:
     Sprite* line;
     void SetLine(float size, float angle);
     void SetLineOff();
+    bool operator < (const Entity& str) const {return (position.x < str.position.x);}
+    Point position;
+    float GetSum();
 protected:
     virtual void CalculateScale(Vec2 userPosition, float boardScale);
     Vec2 size;
     Vec2 baseScale;
     Vec2 launchVelocity;
     Sprite* sprite;
-    Point position;
     Vec2 imageSize;
     DrawNode* boundsDebug;
     PhysicsBody* body;

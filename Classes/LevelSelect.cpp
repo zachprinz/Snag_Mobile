@@ -29,7 +29,9 @@ Scene* LevelSelect::createScene() {
     scene->addChild(layer);
     return scene;
 }
-
+LevelSelect::~LevelSelect(){
+    return;
+}
 bool LevelSelect::init()
 {
     if(!Layer::init()){
@@ -42,7 +44,7 @@ bool LevelSelect::init()
     
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    
+    this->retain();
     std::map<std::string, SEL_MenuHandler> callbacks;
     callbacks["CustomImage"] = menu_selector(LevelSelect::customCallback);
     callbacks["RisingImage"] = menu_selector(LevelSelect::risingCallback);
@@ -70,6 +72,7 @@ bool LevelSelect::init()
     scrollview->setAnchorPoint(Point(0.5,0.5));
     scrollview->setDirection(ui::ScrollView::Direction::VERTICAL);
     scrollview->setInertiaScrollEnabled(true);
+    //scrollview->setBounceEnabled(true);
     float innerWidth = elements["Inlay"]->getBoundingBox().size.width * 1;
     float innerHeight = elements["Inlay"]->getBoundingBox().size.height * 3;
     scrollview->setInnerContainerSize(Size(innerWidth,innerHeight));
@@ -79,8 +82,8 @@ bool LevelSelect::init()
     pinnedPanel->setPosition(elements["Inlay"]->getBoundingBox().getMidX(), elements["Inlay"]->getBoundingBox().getMaxY());
     pinnedPanel->setAnchorPoint(Vec2(0.5,1));
     this->removeChild(elements["NewLevel"]);
+    elements["NewLevel"]->retain();
     elements["NewLevel"]->removeFromParent();
-    
     for(int x = 0; x < NUMBER_OF_LEVELS; x++){
         LevelMenuItem* lvl = new LevelMenuItem(x, scrollview, ((float)innerWidth) / 2.0, elements["Inlay"]->getBoundingBox().size.height*3-pinnedPanel->getBoundingBox().size.height);
         lvl->SetTag(x);
@@ -133,7 +136,7 @@ bool LevelSelect::init()
     }
     
     loading = elements["Loading"];
-    this->removeChild(loading);
+    loading->retain();
     loading->removeFromParent();
     this->addChild(loading,1);
     Vec2 loadingMidPosition(loading->getBoundingBox().getMidX(), loading->getBoundingBox().getMidY());
@@ -162,6 +165,7 @@ bool LevelSelect::init()
     preview = new Preview(Rect(elements["LevelPreviewBackground"]->getBoundingBox().getMinX() + 10,elements["LevelPreviewBackground"]->getBoundingBox().getMinY() + 10,elements["LevelPreviewBackground"]->getBoundingBox().size.width - 20,elements["LevelPreviewBackground"]->getBoundingBox().size.height-20), this, 0.3 * ((elements["LevelPreviewBackground"]->getBoundingBox().size.width / 612.0)));
     hand = elements["Hand"];
     this->removeChild(elements["Hand"]);
+    hand->retain();
     hand->removeFromParent();
     this->addChild(hand,1);
     
@@ -353,6 +357,11 @@ void LevelSelect::selectCallback(Ref* ref){
 }
 void LevelSelect::playCallback(Ref* sender){
     if(selectedLevel != NULL){
+        elements["SocialTab"]->stopAllActions();
+        elements["CustomTab"]->stopAllActions();
+        elements["RisingTab"]->stopAllActions();
+        elements["StarredTab"]->stopAllActions();
+        loading->stopAllActions();
         if(Game::myScene == NULL){
             auto scene = Game::createScene();
             auto transition = TransitionFade::create(MainMenu::transitionTime, Game::myScene);

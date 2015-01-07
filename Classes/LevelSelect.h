@@ -36,7 +36,7 @@ public:
     void menuCloseCallback(cocos2d::Ref* pSender);
     
     CREATE_FUNC(LevelSelect);
-    
+    ~LevelSelect();
     void editCallback(Ref*);
     void playCallback(Ref*);
     void highscoresCallback(Ref*);

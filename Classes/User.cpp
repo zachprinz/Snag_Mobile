@@ -38,7 +38,8 @@ User::User() : Entity(Vec2(150,150), Vec2(0,0), Vec2(0,0), 5){
 }
 void User::SetUpPhysicsSprite(std::string texture, Vec2 scale){
     auto physMat = PhysicsMaterial(2,1,0);
-    body = PhysicsBody::createCircle(sprite->getBoundingBox().size.width / (2.0),physMat);
+    float tempSpriteSize = sprite->getBoundingBox().size.width;
+    body = PhysicsBody::createCircle(tempSpriteSize / (2.0),physMat);
     body->setMass(10.0f);
     body->setDynamic(true);
     body->setTag(type);
@@ -114,6 +115,7 @@ void User::Reset(){
     Vec2 oVel = Game::Instance->currentLevel->GetLaunchVelocity();
     sprite->setPosition(Vec2(oLaunch.x, oLaunch.y));
     body->setVelocity(Vec2(oVel.x, oVel.y));
+    body->resetForces();
     for(int x = 0;x < sprites.size(); x++){
         Vec2 userPos;
         switch (x) {
@@ -136,7 +138,9 @@ void User::Reset(){
 void User::CalculateScale(Vec2 userPosition, float boardScale){
     position = Vec2(sprite->getPosition().x, sprite->getPosition().y);
     if(isHooked){
-        closest->SetLine(lineBaseScale,GetAngle(joint->getBodyA()->getPosition(), joint->getBodyB()->getPosition()));
+        float distance = position.getDistance(closest->GetPosition());
+
+        closest->SetLine(distance,GetAngle(joint->getBodyA()->getPosition(), joint->getBodyB()->getPosition()));
     }
 }
 void User::Bounce(const PhysicsContactData* bounceData){

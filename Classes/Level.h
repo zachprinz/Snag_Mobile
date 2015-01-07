@@ -48,6 +48,7 @@ public:
     std::string toString();
     void fromString(std::string);
     Entity* spawner;
+    std::string GetLastSaveXML();
 private:
     void CreateFromMapValues();
     bool hasMapObjects;

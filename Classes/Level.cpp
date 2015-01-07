@@ -11,6 +11,8 @@
 #include "User.h"
 #include <string.h>
 #include <iostream>
+#include <vector>
+#include <algorithm>
 
 #define SPAWNER 3
 
@@ -54,6 +56,12 @@ void Level::Save(){
         sendMessageWithParams("newLevel", parameters);
     saved = true;
 }
+std::string Level::GetLastSaveXML(){
+    if(map.find("data") != map.end()){
+        return map["data"].asString();
+    }
+    return "";
+}
 void Level::Add(Game* game){
     GetEntities();
     for(int x = 0; x < ents.size(); x++){
@@ -91,7 +99,8 @@ std::string Level::GetPath(){
     return path;
 }
 Vec2 Level::GetLaunchVelocity(){
-    return spawner->GetLaunchVelocity();
+    Vec2 launchVelocity = spawner->GetLaunchVelocity();
+    return launchVelocity;
     
 }
 Vec2 Level::GetLaunchPosition(){
@@ -141,7 +150,15 @@ void Level::SetMap(ValueMap map){
     if(entCount == 0)
         hasMapObjects = true;
 }
+bool compById(Entity* a, Entity* b)
+{
+    return a->GetSum() < b->GetSum();
+}
 std::string Level::toString(){
+    std::sort(ents.begin(), ents.begin() + ents.size(), compById);
+    for(int x = 0; x < ents.size(); x++){
+        printf("\nposition.x = %f\tGetPosition().x = %f", ents[x]->position.x, ents[x]->GetPosition().x);
+    }
     tinyxml2::XMLDocument doc;
     tinyxml2::XMLElement* map = doc.NewElement("Map");
     map->SetAttribute("name", this->GetName().c_str());
@@ -150,6 +167,7 @@ std::string Level::toString(){
     for(int x = 0; x < ents.size(); x++){
         if(ents[x] != NULL){
             tinyxml2::XMLElement* entity = doc.NewElement("entity");
+            //entity->SetAttribute("ID", ents[x]->ID);
             entity->SetAttribute("type", ents[x]->GetType());
             entity->SetAttribute("x", ents[x]->GetPosition().x);
             entity->SetAttribute("y", ents[x]->GetPosition().y);

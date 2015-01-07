@@ -74,7 +74,7 @@ Entity::Entity(Vec2 pos, Vec2 size, Vec2 vel, int type){
 void Entity::SetLine(float size, float angle){
     if(type == HOOK){
         line->setRotation(0);
-        line->setScale((size * 2)/100,5);
+        line->setScale((size)/100,5);
         line->setRotation(angle);
         line->setVisible(true);
     }
@@ -110,16 +110,21 @@ void Entity::CalculateScale(Vec2 userPosition, float boardScale){
 void Entity::Add(Game* game){
     sprite->setGlobalZOrder(0);
     game->layers[type]->addChild(sprite,1);
+    sprite->release();
     if(type == HOOK){
         game->layers[type]->addChild(line,1);
+        line->release();
     }
     if(type == USER){
-        game->layers[HOOK]->addChild(((User*)this)->line,1);
+        //game->layers[HOOK]->addChild(((User*)this)->line,1);
+        //line->release();
     }
 }
 void Entity::Remove(Game* game){
+    sprite->retain();
     this->sprite->removeFromParent();
     if(type == HOOK){
+        line->retain();
         line->removeFromParent();
     }
     if(type == USER){
@@ -153,4 +158,7 @@ void Entity::SetSize(Vec2 size){
 }
 Vec2 Entity::GetOriginalSize(){
     return originalSize;
+}
+float Entity::GetSum(){
+    return (position.x + position.y + launchVelocity.x + launchVelocity.y + size.x + size.y);
 }

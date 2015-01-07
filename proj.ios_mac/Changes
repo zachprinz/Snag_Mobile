@@ -1,0 +1,10 @@
+0.2.2
+    -Updated to Cocos2d-x 3.3 final.
+        -Fixed issues with EditBox and keyboard behavior.
+    -Users can no longer play through win pop up with two fingers.
+    -Level Editor compares the XML code from the current level version and the last saved version to detect changes.
+    -Fixed a bug where dieing by hitting a spikewall while snagged would slightly effect the post reset velocity/position.
+    -Fixed a bug that caused a crash when user created a new level and then tried to deselect without saving and reopening first.
+    -Fixed a bug that caused previews in Level Select and Level Editor to start with incorrect map view origins.
+    -After max zoom out has been reached the camera will shift upward to follow user.
+    -Tweaks to max and min camera zoom.

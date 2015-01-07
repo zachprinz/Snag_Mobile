@@ -19,15 +19,8 @@
 #include "LevelSelect.h"
 #include "../cocos2d/cocos/ui/UIScrollView.h"
 #include "ui/CocosGUI.h"
-//#if(CC_PLATFORM_ANDROID == CC_TARGET_PLATFORM)
-	//#include "extensions/cocos-ext.h"
-//#elif(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-//	#include "cocos-ext.h"
-//#endif
 
 USING_NS_CC;
-
-using namespace cocos2d::extension;
 
 class Highscores : public cocos2d::Layer
 {

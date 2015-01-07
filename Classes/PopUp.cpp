@@ -64,6 +64,7 @@ PopUp::PopUp(std::string title, std::string text, Ref* ref, SEL_MenuHandler call
     elements = MainMenu::LoadElementMap("popup", ref, callbacks, &menuItems, (cocos2d::Layer*)ref);
     elements["Shade"]->setGlobalZOrder(6);
     elements["Panel"]->setGlobalZOrder(7);
+    elements["Panel"]->setPosition(elements["Panel"]->getPosition().x, elements["Panel"]->getPosition().y * 1.1);
     
     acceptButton = MainMenu::CreateButton("popup", "Accept.png", ref, callback);
     acceptButton->setPosition(elements["Panel"]->getBoundingBox().getMidX() + (MainMenu::screenSize.x * 0.03), elements["Panel"]->getBoundingBox().getMinY() + (MainMenu::screenSize.y * 0.04));
@@ -86,11 +87,11 @@ PopUp::PopUp(std::string title, std::string text, Ref* ref, SEL_MenuHandler call
     labels[1]->setAnchorPoint(Vec2(0.5,0.5));
     
     Size editBoxSize = Size(elements["Panel"]->getBoundingBox().size.width * 0.7, elements["Panel"]->getBoundingBox().size.height * 0.22);
-    Scale9Sprite* nameBoxBG = Scale9Sprite::create("Slice_9_Inlay.png");
+    ui::Scale9Sprite* nameBoxBG = ui::Scale9Sprite::create("Slice_9_Inlay.png");
     nameBoxBG->setCapInsets(Rect(18,32,89,70));
     nameBoxBG->setContentSize(editBoxSize);
-    nameBox = EditBox::create(editBoxSize, nameBoxBG);
-    nameBox->setPosition(Point(MainMenu::screenSize.x / 2.0, elements["Panel"]->getBoundingBox().getMidY() - (MainMenu::screenSize.y * 0.07)));
+    nameBox = ui::EditBox::create(editBoxSize, nameBoxBG);
+    nameBox->setPosition(Point(MainMenu::screenSize.x / 2.0, elements["Panel"]->getBoundingBox().getMidY() + (MainMenu::screenSize.y * 0.1)));
     nameBox->setFontSize(75);
     nameBox->setMaxLength(18);
     nameBox->setPlaceHolder("level name");
@@ -101,7 +102,7 @@ PopUp::PopUp(std::string title, std::string text, Ref* ref, SEL_MenuHandler call
     nameBox->setGlobalZOrder(7);
     
     this->text = MainMenu::CreateLabel(text, 1);
-    this->text->setPosition(elements["Panel"]->getBoundingBox().getMidX(), elements["Panel"]->getBoundingBox().getMidY() + (MainMenu::screenSize.y * 0.1));
+    this->text->setPosition(elements["Panel"]->getBoundingBox().getMidX(), elements["Panel"]->getBoundingBox().getMidY() - (MainMenu::screenSize.y * 0.1));
     this->text->setAnchorPoint(Vec2(0.5,0.5));
     
     name = MainMenu::CreateLabel(title, 1);

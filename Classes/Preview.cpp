@@ -10,6 +10,8 @@
 #include "MainMenu.h"
 #include "cocos2d.h"
 #include "LevelEditor.h"
+#include <algorithm>
+#include <vector>
 
 Preview::Preview(Rect viewport, Layer* layer, float scale){
     this->layer = layer;
@@ -195,8 +197,8 @@ float Preview::GetScale(){
     return mapViewScale;
 }
 void Preview::SetOrigin(Vec2 newOrigin){
-    this->mapViewOrigin.x = newOrigin.x + 1.5*(screenViewSize.x / GetScale());
-    this->mapViewOrigin.y = newOrigin.y;// + screenViewSize.y  GetScale();
+    this->mapViewOrigin.x = newOrigin.x + (screenViewOrigin.x / GetScale());
+    this->mapViewOrigin.y = newOrigin.y + (screenViewOrigin.y / GetScale());
     Update();
 }
 void Preview::Reset(){

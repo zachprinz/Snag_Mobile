@@ -252,6 +252,8 @@ void LevelMenuItem::SetLevel(Level* lvl, int page){
     SetFavorited(lvl->GetIsFavorited());
 }
 void LevelMenuItem::SetTag(int x){
+    if(x == -1)
+        int THISONE = 0;
     //favorited->setTag(x);
     background->setTag(x);
     if(myName != "")

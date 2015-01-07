@@ -116,6 +116,7 @@ public:
     void Deselect(bool keep = true);
     bool hasSelected;
     void UpdateAxis();
+    std::string GetCurrentLevelXML();
     
     PopUp* savePopUp;
     PopUp* spawnerPopUp;

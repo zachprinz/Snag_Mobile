@@ -92,11 +92,11 @@ bool LogInMenu::init()
     this->addChild(menu, 1);
     
     Size editBoxSize = Size(elements["UsernamePanel"]->getBoundingBox().size.width * 0.5, elements["UsernamePanel"]->getBoundingBox().size.height * 0.75);
-    Scale9Sprite* passwordBoxBG = Scale9Sprite::create("Slice_9_Inlay.png");
+    ui::Scale9Sprite* passwordBoxBG = ui::Scale9Sprite::create("Slice_9_Inlay.png");
     passwordBoxBG->setCapInsets(Rect(18,32,89,70));
     passwordBoxBG->setContentSize(editBoxSize);
     passwordBoxBG->setAnchorPoint(Vec2(0.1,0));
-    passwordBox = EditBox::create(editBoxSize, passwordBoxBG);
+    passwordBox = ui::EditBox::create(editBoxSize, passwordBoxBG);
     passwordBox->setFontColor(Color3B::BLACK);
     passwordBox->setPlaceholderFontColor(Color3B::BLACK);
     passwordBox->setPosition(Point(elements["PasswordPanel"]->getBoundingBox().getMaxX() * 0.985, elements["PasswordPanel"]->getBoundingBox().getMidY()));
@@ -105,13 +105,13 @@ bool LogInMenu::init()
     passwordBox->setMaxLength(18);
     passwordBox->setPlaceHolder(" Password");
     passwordBox->setFontName("Marker Felt.ttf");
-    passwordBox->setInputFlag(EditBox::InputFlag::PASSWORD);
+    passwordBox->setInputFlag(ui::EditBox::InputFlag::PASSWORD);
     this->addChild(passwordBox,1);
     
-    Scale9Sprite* usernameBoxBG = Scale9Sprite::create("Slice_9_Inlay.png");
+    ui::Scale9Sprite* usernameBoxBG = ui::Scale9Sprite::create("Slice_9_Inlay.png");
     usernameBoxBG->setCapInsets(Rect(18,32,89,70));
     usernameBoxBG->setContentSize(editBoxSize);
-    usernameBox = EditBox::create(editBoxSize, usernameBoxBG);
+    usernameBox = ui::EditBox::create(editBoxSize, usernameBoxBG);
     usernameBox->setPosition(Point(elements["UsernamePanel"]->getBoundingBox().getMaxX() * 0.985, elements["UsernamePanel"]->getBoundingBox().getMidY()));
     usernameBox->setAnchorPoint(Vec2(1,0.5));
     usernameBox->setFontSize(90);
@@ -150,7 +150,7 @@ bool LogInMenu::init()
     this->addChild(usernameLabel, 1);
     
     //-- Set Up Newtork Stuff --//
-    //NDKHelper::addSelector("LogIn", "userCheckCallback", CC_CALLBACK_2(MainMenu::userCheckCallback, this), this);
+    NDKHelper::addSelector("LogIn", "logInCallback", CC_CALLBACK_2(LogInMenu::logInCallback, this), this);
     //--------------------------//
     
     return true;
@@ -207,7 +207,7 @@ void LogInMenu::logInCallback(Node* sender, cocos2d::Value data){
         ValueMap valueMap = data.asValueMap();
         std::string success = valueMap["success"].asString();
         std::string responce = valueMap["responce"].asString();
-        MainMenu::Instance->username = valueMap["name"].asString();
+        MainMenu::Instance->username = valueMap["username"].asString();
         printf("Logged in as: %s", MainMenu::Instance->username.c_str());
         if(success.compare("true") == 0){
             printf("Logged In Successfully!");

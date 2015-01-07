@@ -13,14 +13,11 @@
 #include "cocos2d.h"
 #include "MainMenu.h"
 #include <string.h>
-#if(CC_PLATFORM_ANDROID == CC_TARGET_PLATFORM)
-	#include "extensions/cocos-ext.h"
-#elif(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-	#include "cocos-ext.h"
-#endif
+#include "cocos2d.h"
+#include "extensions/cocos-ext.h"
+#include "ui/CocosGUI.h"
 
 using namespace cocos2d;
-using namespace cocos2d::extension;
 
 class PopUp{
 public:
@@ -37,7 +34,7 @@ public:
     cocos2d::Label* name;
     cocos2d::Label* text;
     std::vector<cocos2d::Label*> labels;
-    EditBox* nameBox;
+    ui::EditBox* nameBox;
     std::string myName;
     std::string myText;
     void Show();

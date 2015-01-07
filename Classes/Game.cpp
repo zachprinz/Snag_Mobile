@@ -59,59 +59,47 @@ void Game::update(float dt){
     if(!user->isHooked){
         world->setGravity(Vec2(0,-180));
     }
-    float oldScale = scale;
-        scale = visibleSize.height / (user->GetSprite()->getBoundingBox().getMidY() + (visibleSize.height / 5.0));
-    if(scale > 1.2)
-        scale = 1.2;
-    if(scale < 0.5)
+    scale = visibleSize.height / (user->GetSprite()->getBoundingBox().getMidY() + (visibleSize.height / 3.5));
+    float over = 0;
+    if(scale > 1)
+        scale = 1;
+    if(scale < 0.5){
         scale = 0.5;
-    float newScale;
-    float MAX_CHANGE = 0.001;
+        over = (user->GetSprite()->getBoundingBox().getMidY() + visibleSize.height/3.5) - 2.0*(visibleSize.height);
+    }
     float targetScale = scale;
-    if(abs(targetScale-oldScale) > MAX_CHANGE){
-        if(targetScale > oldScale){
-            newScale = oldScale + MAX_CHANGE;
-        }
-        else{
-            newScale = oldScale - MAX_CHANGE;
-        }
-    } else
-        newScale = targetScale;
-    //for(int x = 0; x < layers.size(); x++){
-    //    layers[x]->setScale(newScale);
-     //   layers[x]->setPosition(Vec2(0,0));
-    //}
-    user->update(newScale);
+    user->update(targetScale);
 
-    gameTexture->setScale(1.0);
     gameTexture->beginWithClear(0,0,0,0.0);
     for(int x = 0; x < layers.size(); x++){
-        layers[x]->setScale(0.5);//targetScale);
-        layers[x]->setPosition((visibleSize.width /2) - ((user->GetSprite()->getBoundingBox().getMidX())*0.5),0);
+        layers[x]->setScale(0.5);
+        layers[x]->setPosition((visibleSize.width /2) - ((user->GetSprite()->getBoundingBox().getMidX() * 0.5)),-0.5 * over);
         layers[x]->setVisible(true);
         layers[x]->visit();
     }
     gameTexture->end();
+
     for(int x = 0; x < layers.size(); x++){
         layers[x]->setVisible(false);
     }
+    //gameTexture->setScale(targetScale);
     gameSprite->setScale(targetScale);
-}
+};
 Scene* Game::myScene;
-
 Scene* Game::createScene() {
     auto scene = Scene::createWithPhysics();    
     auto layer = Game::create();
     layer->setPhyWorld(scene->getPhysicsWorld());
     myScene = scene;
-    myScene->retain();
+    //myScene->retain();
     scene->addChild(layer);
     return scene;
 }
 bool Game::onContactBegin(PhysicsContact& contact){
     int type = contact.getShapeB()->getBody()->getTag();
     if(type == SPIKE_WALL){
-        user->Reset();
+        //user->Reset();
+        user->GetSprite()->setPosition(Vec2(0,-1000));
         return false;
     }
     if(type == GOAL){
@@ -213,10 +201,10 @@ bool Game::init(){
     user = new User();
     user->Add(this);
     
-    gameTexture = RenderTexture::createWithPixels(visibleSize.width * 2.0, visibleSize.height*2.0,Texture2D::PixelFormat::RGBA8888, 0);
+    gameTexture = RenderTexture::create(2*visibleSize.width, 2*visibleSize.height,Texture2D::PixelFormat::RGBA8888, 0);
     gameTexture->setPosition(0,0);
     gameTexture->setKeepMatrix(true);
-    gameTexture->retain();
+    //gameTexture->retain();
     gameTexture->setVisible(false);
     this->addChild(gameTexture,1);
     
@@ -224,7 +212,7 @@ bool Game::init(){
     gameSprite->setPosition(visibleSize.width / 2.0,0);
     gameSprite->setAnchorPoint(Vec2(0.5,0));
     //gameSprite->setAnchorPoint(Vec2(0.5,0.5));
-    gameSprite->retain();
+    //gameSprite->retain();
     gameSprite->setFlippedY(true);
    // gameSprite->setRotation(180);
     this->addChild(gameSprite,1);
@@ -292,16 +280,9 @@ void Game::resetButtonCallback(Ref* ref){
     user->Reset();
 }
 void Game::homeButtonCallback(Ref* ref){
-    if(LevelSelect::myScene == NULL){
-        auto scene = LevelSelect::createScene();
-        Director::getInstance()->pushScene(scene);
-        LevelSelect::Instance->Refresh();
-    }
-    else{
         auto transition = TransitionFade::create(MainMenu::transitionTime, LevelSelect::myScene);
         Director::getInstance()->pushScene(transition);
         LevelSelect::Instance->Refresh();
-    }
 }
 void Game::winLevelSelectCallback(Ref*){
     winPopUp->Close();
@@ -326,7 +307,7 @@ void Game::winReplaySelectCallback(Ref*){
     resetButtonCallback(nullptr);
 };
 bool Game::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
-    if(!user->isHooked){
+    if(!user->isHooked && !winPopUp->visible){
         user->Snag();
         Vec2 touchPosition = touch->getLocation();
         if(resetButton->getBoundingBox().containsPoint(touchPosition) || homeButton->getBoundingBox().containsPoint(touchPosition)){

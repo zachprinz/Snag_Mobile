@@ -12,12 +12,11 @@
 #include <iostream>
 #include "cocos2d.h"
 #include <map>
-#if(CC_PLATFORM_ANDROID == CC_TARGET_PLATFORM)
-	#include "extensions/cocos-ext.h"
-#elif(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-	#include "cocos-ext.h"
-#endif
-using namespace cocos2d::extension;
+#include "cocos2d.h"
+#include "extensions/cocos-ext.h"
+#include "ui/CocosGUI.h"
+
+using namespace cocos2d;
 
 class LogInMenu : public cocos2d::Layer
 {
@@ -37,8 +36,8 @@ public:
     static cocos2d::Scene* myScene;
     static LogInMenu* Instance;
     
-    EditBox* usernameBox;
-    EditBox* passwordBox;
+    ui::EditBox* usernameBox;
+    ui::EditBox* passwordBox;
     
     void registerCallback(Node* sender, cocos2d::Value data);
     void logInCallback(Node* sender, cocos2d::Value data);

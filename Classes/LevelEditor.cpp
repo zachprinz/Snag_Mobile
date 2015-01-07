@@ -23,7 +23,7 @@ Scene* LevelEditor::createScene(){
     auto scene = Scene::create();
     auto layer = LevelEditor::create();
     myScene = scene;
-    myScene->retain();
+    //myScene->retain();
     scene->addChild(layer);
     return scene;
     Instance = layer;
@@ -349,7 +349,8 @@ void LevelEditor::EraseSelectCallback(Ref*){
     }
 };
 void LevelEditor::homeButtonCallback(Ref* ref){
-    if(unsavedChanges || currentLevel->GetName().compare("qq36q81q") == 0){
+    printf("\nCurrent XML: \n%s\nLast Save XML: \n%s", GetCurrentLevelXML().c_str(), currentLevel->GetLastSaveXML().c_str());
+    if(GetCurrentLevelXML().compare(currentLevel->GetLastSaveXML()) != 0){
         quitPopUp->Show();
     } else {
         goToHome();
@@ -497,6 +498,8 @@ bool LevelEditor::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
                 touchCurrent = touchStart;
                 Entity* tempEnt = (preview->CreateEntity(touchStart, touchStart, currentTool));
                 entities[tempEnt->ID] = tempEnt;
+                if(currentTool == SPAWNER)
+                    tempEnt->SetLaunchVelocity(Vec2(20,20));
                 preview->AddEntity(tempEnt);
                 UnselectTool();
                 return false;
@@ -560,10 +563,11 @@ void LevelEditor::Select(Entity* entity){
 }
 void LevelEditor::Deselect(bool keep){
     if(keep && selectedEntity != nullptr){
+        preview->AddEntity(selectedEntity);
+        currentLevel->AddEntity(selectedEntity);
         if(selectedEntity->GetType() == SPAWNER){
             currentLevel->spawner->SetLaunchVelocity(selectedEntity->GetLaunchVelocity());
         }
-        preview->AddEntity(selectedEntity);
         preview->Update();
     }
     printf("\nDESELECTED");
@@ -772,12 +776,14 @@ void LevelEditor::onTouchesEnded(const std::vector<cocos2d::Touch*> &touches, co
 };
 void LevelEditor::SetLevel(Level* lvl){
     Clear();
+    name = lvl->GetName();
     currentLevel = lvl;
     std::vector<Entity*> tempEnts = lvl->GetEntities();
     for(int x = 0; x < tempEnts.size(); x++){
         entities[tempEnts[x]->ID] = tempEnts[x];
         preview->AddEntity(tempEnts[x]);
     }
+    preview->SetOrigin(Vec2(-200,-200));
     preview->Update();
 }
 void LevelEditor::menuCloseCallback(Ref* pSender){
@@ -900,4 +906,15 @@ void LevelEditor::Export(){
     }
     currentLevel->Save();
     unsavedChanges = false;
+}
+std::string LevelEditor::GetCurrentLevelXML(){
+    currentLevel->SetName(name);
+    currentLevel->Clear();
+    if(hasSelected)
+        Deselect();
+    for (std::map<int,Entity*>::iterator it=preview->entities.begin(); it!=preview->entities.end(); ++it){
+        int entID = ((Entity*)it->second)->ID;
+        currentLevel->AddEntity(preview->entities[entID]);
+    }
+    return currentLevel->toString();
 }

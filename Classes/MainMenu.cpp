@@ -144,7 +144,7 @@ void MainMenu::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
 void MainMenu::goToLevelSelect(){
     if(LevelSelect::myScene == NULL){
         auto scene = LevelSelect::createScene();
-        auto toLevelSelectTransition = TransitionFade::create(MainMenu::transitionTime, LevelSelect::myScene);
+        auto toLevelSelectTransition = TransitionFade::create(MainMenu::transitionTime, scene);
         Director::getInstance()->pushScene(toLevelSelectTransition);
         LevelSelect::Instance->Refresh();
     }
@@ -168,7 +168,7 @@ MenuItemImage* MainMenu::CreateButton(std::string imagePath, Ref* ref, SEL_MenuH
     temp->setPosition(GetAdjustedPosition(pos, anchors, tempScale));
     temp->setScale(tempScale.x, tempScale.y);
     temp->setAnchorPoint(Point(0,1));
-    temp->retain();
+    //temp->retain();
     return temp;
 };
 MenuItemImage* MainMenu::CreateButton(std::string imagePath, Vec2 pos, Vec2 anchors){
@@ -349,7 +349,7 @@ std::map<std::string, MenuItemImage*> MainMenu::LoadElementMap(std::string xmldo
         temp->setPosition(position);
         temp->setScale(ar_scale, ar_scale);
         temp->setAnchorPoint(Point(0,1));
-        temp->retain();
+        //temp->retain();
         menuItems->pushBack(temp);
         elementMap[image] = temp;
         element = element->NextSiblingElement();

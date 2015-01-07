@@ -25,7 +25,7 @@
 
 #import "RootViewController.h"
 #import "cocos2d.h"
-#import "CCEAGLView.h"
+#import "platform/ios/CCEAGLView-ios.h"
 #import "IOSNDKHelper.h"
 #import <Parse/Parse.h>
 
@@ -35,13 +35,13 @@ static BOOL isConnected = false;
 
 /*
  // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
-        // Custom initialization
-    }
-    return self;
-}
-*/
+ - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+ if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
+ // Custom initialization
+ }
+ return self;
+ }
+ */
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
@@ -55,18 +55,18 @@ static BOOL isConnected = false;
 }
 
 /*
-// Implement loadView to create a view hierarchy programmatically, without using a nib.
-- (void)loadView {
-}
-*/
+ // Implement loadView to create a view hierarchy programmatically, without using a nib.
+ - (void)loadView {
+ }
+ */
 
 /*
-// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
-- (void)viewDidLoad {
-    [super viewDidLoad];
-}
-
-*/
+ // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+ - (void)viewDidLoad {
+ [super viewDidLoad];
+ }
+ 
+ */
 // Override to allow orientations other than the default portrait orientation.
 // This method is deprecated on ios6
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
@@ -86,13 +86,13 @@ static BOOL isConnected = false;
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
     [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
-
-    cocos2d::GLView *glview = cocos2d::Director::getInstance()->getOpenGLView();
-
+    
+    auto glview = cocos2d::Director::getInstance()->getOpenGLView();
+    
     if (glview)
     {
         CCEAGLView *eaglview = (CCEAGLView*) glview->getEAGLView();
-
+        
         if (eaglview)
         {
             CGSize s = CGSizeMake([eaglview getWidth], [eaglview getHeight]);
@@ -107,20 +107,10 @@ static BOOL isConnected = false;
     return YES;
 }
 
-- (void) setConnected
-{
-    isConnected = YES;
-}
-
-- (void)setUnConnected
-{
-    isConnected = NO;
-}
-
 - (void)didReceiveMemoryWarning {
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
-
+    
     // Release any cached data, images, etc that aren't in use.
 }
 
@@ -130,6 +120,21 @@ static BOOL isConnected = false;
     // e.g. self.myOutlet = nil;
 }
 
+
+- (void)dealloc {
+    [super dealloc];
+}
+
+
+- (void) setConnected
+{
+    isConnected = YES;
+}
+
+- (void)setUnConnected
+{
+    isConnected = NO;
+}
 /* Your method must have this NSObject* parameter */
 - (void)checkForUser:(NSObject *)parametersObject
 {
@@ -179,7 +184,7 @@ static BOOL isConnected = false;
         }];
     }
 }
-
+//Legs you log in even if you give bad information
 - (void)logIn:(NSObject *)parametersObject
 {
     NSDictionary *parameters = (NSDictionary *)parametersObject;
@@ -191,8 +196,8 @@ static BOOL isConnected = false;
                 if (user) {
                     NSString *success = @"true";
                     NSString *responce = @"none";
-                    NSString *username = [PFUser currentUser].username;
-                    NSDictionary *params = [[NSDictionary alloc] initWithObjectsAndKeys:success, @"success", responce, @"responce", @"username", username, nil];
+                    NSString *username = user.username;
+                    NSDictionary *params = [[NSDictionary alloc] initWithObjectsAndKeys:success, @"success", responce, @"responce", username, @"username", nil];
                     [IOSNDKHelper sendMessage:@"logInCallback" withParameters:params];
                 } else {
                     NSString *responce = [error userInfo][@"error"];
@@ -465,15 +470,5 @@ static BOOL isConnected = false;
         }];
     }
 }
-- (void)storeMessageLocally:(PFObject*)message { NSArray * allKeys = [message allKeys]; NSMutableDictionary * retDict = [[NSMutableDictionary alloc] init];
-    for (NSString * key in allKeys) {
-        [retDict setObject:[message objectForKey:key] forKey:key];
-    }
-}
-
-- (void)dealloc {
-    [super dealloc];
-}
-
 
 @end
