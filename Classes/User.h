@@ -41,6 +41,10 @@ public:
     std::vector<PhysicsJointDistance*> joints;
     PhysicsJointDistance* joint;
     std::vector<PhysicsJointDistance*> distanceJoints;
+    float GetAngle(Vec2 a, Vec2 b);
+    Entity* closest;
+    Sprite* focusPointSprite;
+    Vec2 GetClosestPosition();
 private:
     int tailCount;
     int spriteUpdateCount;
@@ -48,10 +52,8 @@ private:
     Vec2 backupVelocity;
     Vec2 closestPosition;
     Entity* hook;
-    Entity* closest;
     void updatePhysics(float dt);
     float lineBaseScale;
-    float GetAngle(Vec2 a, Vec2 b);
 };
 
 #endif /* defined(__Snag__User__) */

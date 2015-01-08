@@ -51,6 +51,17 @@ public:
     Level* currentLevel;
     User* user;
     std::vector<Layer*> layers;
+    ParticleBatchNode* particleBatchNode;
+    Vec2 focusPoint;
+    void UpdateFocusPoint();
+    bool lowShift;
+    float MAX_SHIFT;
+    float closing;
+    void ShiftHigh();
+    float startClosingDistance;
+    float startClosingMAX_SHIFT;
+    bool catching;
+    float previousTrail;
 private:
     Sprite* gameSprite;
     RenderTexture* gameTexture;

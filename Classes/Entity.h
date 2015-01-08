@@ -37,6 +37,7 @@ public:
     Entity(Vec2 pos, Vec2 size, Vec2 vel, int type);
     
     virtual void SetUpPhysicsSprite(std::string, Vec2);
+    virtual void SetUpParticles();
     virtual void update(Vec2 userPosition, float boardScale);
     virtual void Add(Game* a);
     virtual void Remove(Game* a);
@@ -58,6 +59,9 @@ public:
     bool operator < (const Entity& str) const {return (position.x < str.position.x);}
     Point position;
     float GetSum();
+    ParticleSystemQuad* emitter;
+    LayerColor* color;
+    bool hasParticleEffects;
 protected:
     virtual void CalculateScale(Vec2 userPosition, float boardScale);
     Vec2 size;

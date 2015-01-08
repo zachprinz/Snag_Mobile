@@ -16,8 +16,15 @@ int User::type;
 
 User::User() : Entity(Vec2(150,150), Vec2(0,0), Vec2(0,0), 5){
     SetUpPhysicsSprite("user.png", Vec2(1.0,1.0));
+    SetUpParticles();
+    emitter->setPositionType(ParticleSystem::PositionType::GROUPED);
+    emitter->setPosition(Vec2(0,0));
     isHooked = false;
     line = Sprite::create("game_line.png");
+    focusPointSprite = Sprite::create("user.png");
+    focusPointSprite->retain();
+    focusPointSprite->setScale(0.4,0.4);
+    focusPointSprite->setAnchorPoint(Vec2(0.5,0.5));
     line->retain();
     line->setAnchorPoint(Vec2(0.0,0.5));
     line->setVisible(false);
@@ -56,9 +63,6 @@ void User::Add(Game* layer){
     line->setGlobalZOrder(-1);
     layer->layers[HOOK]->addChild(line,1);
     layer->layers[5]->addChild(sprite,1);
-    //for(int x = 0; x < pastSprites.size(); x++){
-    //    layer->layers[5]->addChild(pastSprites[x],1);
-    //}
     for(int x = 0; x < sprites.size(); x++){
         layer->layers[5]->addChild(sprites[x]);
     }
@@ -80,6 +84,7 @@ void User::update(float boardScale){
     if(scale > 1.0)
         scale = 1.0;
     SetStretch(sprite, angle, scale);
+    focusPointSprite->setPosition(Game::Instance->focusPoint);
 }
 void User::SetStretch(Sprite* sprite, float angle, float magnitude){
     sprite->setRotation(0);
@@ -90,6 +95,7 @@ void User::SetStretch(Sprite* sprite, float angle, float magnitude){
 
 void User::Snag(){
     closest = Game::Instance->GetClosestHook(position);
+    closestPosition = closest->GetPosition();
     isHooked = true;
     joint = PhysicsJointDistance::construct(body, closest->GetSprite()->getPhysicsBody(), Vec2(0.5,0.5), Vec2(0.5,0.5));
     joint->setCollisionEnable(false);
@@ -134,6 +140,14 @@ void User::Reset(){
         }
         sprites[x]->setPosition(body->getPosition().x + (userPos.x * 60), body->getPosition().y + (userPos.y *60));
     }
+    Game::Instance->focusPoint = GetPosition();
+    Game::Instance->lowShift = false;
+    Game::Instance->catching = false;
+    Game::Instance->closing = false;
+    Game::Instance->startClosingDistance = 0;
+    Game::Instance->startClosingMAX_SHIFT = 30;
+    Game::Instance->previousTrail = 0;
+    Game::Instance->MAX_SHIFT = 30;
 }
 void User::CalculateScale(Vec2 userPosition, float boardScale){
     position = Vec2(sprite->getPosition().x, sprite->getPosition().y);
@@ -152,6 +166,13 @@ void User::SetBackupVelocity(){
 }
 Point User::GetPhysicalPosition(){
     return Vec2(sprite->getPosition().x, sprite->getPosition().y);
+}
+Vec2 User::GetClosestPosition(){
+    if(closest != nullptr){
+        if(isHooked)
+            return closestPosition;
+        return GetPosition();
+    }
 }
 float User::GetAngle(Vec2 a, Vec2 b){
     float o = a.x - b.x;
