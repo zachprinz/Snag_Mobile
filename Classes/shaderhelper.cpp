@@ -4,13 +4,6 @@
 
 namespace {
 
-#include "shaders/white.fsh"
-
-//#include "shaders/fullWhite.fsh"
-
-const char* grassShader =
-#include "shaders/grass.fsh"
-
 } // namespace
 
 namespace avalon {
@@ -31,25 +24,8 @@ GLProgram* loadShader(const GLchar* vertexShader, const GLchar* fragmentShader)
         shader->updateUniforms();
         shader->use();
     }
-
     return shader;
 }
-/*
-GLProgram* getFullWhiteShader()
-{
-    return loadShader(cocos2d::ccPositionTextureColor_noMVP_vert, fullWhiteShader);
-}
-
-GLProgram* getWhiteShader()
-{
-    return loadShader(cocos2d::ccPositionTextureColor_noMVP_vert, whiteShader);
-}
-*/
-GLProgram* getGrassShader()
-{
-    return loadShader(cocos2d::ccPositionTextureColor_noMVP_vert, grassShader);
-}
-
 GLProgram* getDefaultShader()
 {
     return GLProgramCache::getInstance()->getGLProgram(cocos2d::GLProgram::SHADER_NAME_POSITION_TEXTURE_COLOR_NO_MVP);

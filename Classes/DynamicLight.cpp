@@ -1,13 +1,17 @@
 #include <DynamicLight.h>
 #include <shaderhelper.h>
 #include <color.h>
+#include "Game.h"
 
 using namespace cocos2d;
 using namespace avalon::utils::color;
 
 namespace  {
     
-    const char* vertexShader = cocos2d::ccPositionTextureColor_noMVP_vert;
+//    const GLchar* vertexShader =
+//#include "shaders/Vert.vsh"//cocos2d::ccPositionTextureColor_noMVP_vert;
+const GLchar* vertexShader =
+#include "shaders/pass.vsh"
     
     const GLchar* shadowMapFragmentShader =
 #include "shaders/shadowMap.fsh"
@@ -36,10 +40,12 @@ namespace  {
                 if (!Node::init()) {
                     return false;
                 }
-                
+                printf("\nLoading Shadow Map Shader");
                 shadowMapShader = avalon::graphics::loadShader(vertexShader, shadowMapFragmentShader);
+                printf("\n\tFinished\nLoading Shadow Render Shader\n");
                 shadowRenderShader = avalon::graphics::loadShader(vertexShader, shadowRenderFragmentShader);
-                
+                printf("\tFinished\n");
+                lightSize = 256;
                 initOcclusionMap();
                 initShadowMap1D();
                 initFinalShadowMap();
@@ -55,6 +61,16 @@ namespace  {
                 
                 occlusionMap = RenderTexture::create(lightSize, lightSize);
                 occlusionMap->retain();
+            }
+            
+            void DynamicLight::setOcclusionMap(RenderTexture* text){
+                CC_SAFE_RELEASE(occlusionMap);
+                occlusionMap = text;
+                occlusionMap->retain();
+            }
+            
+            RenderTexture* DynamicLight::getOcclusionMap(){
+                return occlusionMap;
             }
             
             void DynamicLight::initShadowMap1D()
@@ -201,7 +217,7 @@ namespace  {
             
             void DynamicLight::createOcclusionMap()
             {
-                if (!shadowCasters) {
+                /*if (!shadowCasters) {
                     occlusionMap->beginWithClear(0.0 ,0.0, 0.0, 0.0);
                     occlusionMap->end();
                     return;
@@ -221,7 +237,9 @@ namespace  {
                 occlusionMap->end();
                 
                 shadowCasters->setAnchorPoint(p1);
-                shadowCasters->setPosition(p2);
+                shadowCasters->setPosition(p2);*/
+                Game::Instance->CreateOcclusionMap(occlusionMap);
+                bakedMapIsValid = false;
             }
             
             void DynamicLight::createShadowMap(cocos2d::Renderer *renderer, const cocos2d::Mat4 &transform, bool transformUpdated)
