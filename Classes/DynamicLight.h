@@ -8,7 +8,6 @@ namespace avalon {
         class DynamicLight : public cocos2d::Node
         {
         private:
-            bool bakedMapIsValid = false;
             bool softShadows = true;
             bool additive = true;
             float upScale = 1.0;
@@ -35,6 +34,8 @@ namespace avalon {
             void createShadowMap(cocos2d::Renderer *renderer, const cocos2d::Mat4 &transform, bool transformUpdated);
             void updateShadowMap(cocos2d::Renderer *renderer, const cocos2d::Mat4 &transform, bool transformUpdated);
         public:
+            bool bakedMapIsValid = false;
+
             cocos2d::Vec2 drawPosition;
             cocos2d::Vec2 lightPosition;
             int updateFrequency = 0;

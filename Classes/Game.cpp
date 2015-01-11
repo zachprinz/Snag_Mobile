@@ -60,7 +60,9 @@ void Game::update(float dt){
         world->setGravity(Vec2(0,-180));
     }
     UpdateFocusPoint();
+    focusPoint = Vec2(84,168);
     scale = visibleSize.height / (user->GetPosition().y + (visibleSize.height / 3.5));
+    scale = 1;
     float over = 0;
     if(scale > 1)
         scale = 1;
@@ -74,35 +76,35 @@ void Game::update(float dt){
         gameTextures[x]->beginWithClear(0,0,0,0.0);
         layers[x]->setScale(0.5);
         layers[x]->setPosition(((visibleSize.width /2) - ((focusPoint.x * 0.5))),-0.5 * over);
-        printf("Pos: (%f, %f)\n", layers[x]->getPosition().x, layers[x]->getPosition().y);
+        //printf("Pos: (%f, %f)\n", layers[x]->getPosition().x, layers[x]->getPosition().y);
         layers[x]->setVisible(true);
         layers[x]->visit();
         gameTextures[x]->end();
         layers[x]->setVisible(false);
         gameSprites[x]->setScale(targetScale);
     }
-
-
-
-    finalGameTexture->setVirtualViewport(Vec2(0,0), Rect(0,0,visibleSize.width, visibleSize.height), Rect(0,0,visibleSize.width , visibleSize.height ));
+    //finalGameTexture->setVirtualViewport(Vec2(0,0), Rect(0,0,visibleSize.width, visibleSize.height), Rect(0,0,visibleSize.width , visibleSize.height ));
     finalGameTexture->beginWithClear(0,0,0,0);
     for(int x = 0; x < layers.size(); x++){
-        if(x < layers.size() - 2){
+        if(x < layers.size() - 1){
             gameSprites[x]->setVisible(true);
-            gameSprites[x]->visit();
+            //gameSprites[x]->cocos2d::Node::draw();
         }
     }
     finalGameTexture->end();
     
-    light->lightPosition = user->GetPosition();
-    Vec2 tempLightPos = toOnscreenPosition(light->lightPosition);
+    light->lightPosition = Vec2(84,300);
+    light->bakedMapIsValid = false;
     light->drawPosition = toOnscreenPosition(light->lightPosition);
-    light->setPosition(light->drawPosition);
-    
+    light->setPosition(Vec2(light->drawPosition.x, light->drawPosition.y));
+
+    //light->lightPosition = user->GetPosition();
+    //light->drawPosition = toOnscreenPosition(light->lightPosition);
+    //light->setPosition(light->drawPosition);
+    /*
     occlusion->setVirtualViewport(Vec2((tempLightPos.x - (light->lightSize / 2.0))* 0.53 * (float(light->lightSize) / 600.0), (tempLightPos.y -  (light->lightSize / 2.0))*.95*(float(light->lightSize) / 600.0)), Rect(0,0,light->lightSize,light->lightSize), Rect(0,0,visibleSize.width, visibleSize.height));
     occlusion->setAnchorPoint(Vec2(0,0));
-    occlusion->beginWithClear(0,0,0,0);
-    
+    occlusion->beginWithClear(255,0,0,255);
     finalGameSprite->visit();
     occlusion->end();
     finalGameSprite->setPosition(Vec2(0,0));
@@ -111,13 +113,24 @@ void Game::update(float dt){
     occlusionSprite->setPosition(light->drawPosition);
     //occlusionSprite->setTextureRect(Rect((light->lightSize - (light->lightSize * scale))/2.0,(light->lightSize - (light->lightSize * scale))/2.0,light->lightSize * scale, light->lightSize * scale));
     
+    float halfLightSize = (light->lightSize / 2.0);
+    float scaleCoef = (float(light->lightSize) / 600.0);
+    occlusion->setVirtualViewport(Vec2((light->drawPosition.x - halfLightSize) * 0.53 * scaleCoef, (light->drawPosition.y - halfLightSize) * 0.95 * scaleCoef),
+                                     Rect(0,0,light->lightSize,light->lightSize),
+                                     Rect(0,0,visibleSize.width, visibleSize.height));
+    occlusion->beginWithClear(0,255,0,255);
+    finalGameSprite->visit();
+    occlusion->end();
+    occlusionSprite->setPosition(Vec2(0,0));//light->drawPosition);
+    occlusionSprite->setVisible(true);*/
+    
     for(int x = 0; x < gameSprites.size(); x++){
-        gameSprites[x]->setVisible(false);
+        //gameSprites[x]->setVisible(false);
         if(x >= gameSprites.size() - 2){
             gameSprites[x]->setVisible(true);
         }
     }
-    //occlusion->end();
+    finalGameSprite->setVisible(true);
 };
 Vec2 Game::toOnscreenPosition(Vec2 pos){
     Vec2 differenceToFocusPoint(focusPoint.x - pos.x, pos.y);
@@ -126,15 +139,38 @@ Vec2 Game::toOnscreenPosition(Vec2 pos){
     return Vec2((visibleSize.width/2.0)-differenceToFocusPoint.x, differenceToFocusPoint.y);
 };
 void Game::CreateOcclusionMap(RenderTexture* occlusionMap){
-    /*occlusionMap->beginWithClear(0,255,0,255);
-    occlusionSprite->setVisible(true);
-    occlusionSprite->visit();
-    occlusionSprite->setVisible(false);
-    occlusionMap->end();*/
-    occlusion->setPosition(Vec2(0,0));
-    occlusionMap = occlusion;
+    //light->lightPosition = toOnscreenPosition(Vec2(84,168));
+    //light->drawPosition = light->lightPosition;
+    //light->setPosition(Vec2(0,0));//light->drawPosition);
+    float halfLightSize = (light->lightSize / 2.0);
+    float scaleCoef = (float(light->lightSize) / 600.0);
+    Vec2 lightPos = toOnscreenPosition(light->lightPosition);
+    //occlusionMap->setVirtualViewport(Vec2((light->drawPosition.x * 2 - 0) * .53 * 1, (light->drawPosition.y + light->lightPosition.y - 0) * 0.95 * 1),
+    float startX = ((visibleSize.width * .5) - (focusPoint.x - 84) - halfLightSize)* .53 * scaleCoef;
+    occlusionMap->setVirtualViewport(Vec2(startX, (light->lightPosition.y - halfLightSize) * .95 * scaleCoef * scale),
+                                     Rect(0,0,light->lightSize,light->lightSize),
+                                     Rect(0,0,visibleSize.width , visibleSize.height));
+    occlusionMap->beginWithClear(0,0,0,0);
+    //finalGameSprite->setFlippedX(true);
+    finalGameSprite->setVisible(true);
+    finalGameSprite->setPosition(Vec2(0,0));
+    for(int x = 0;x < layers.size(); x++){
+            Vec2 pos = gameSprites[x]->getPosition();
+            gameSprites[x]->setPosition(Vec2(0,0));
+            gameSprites[x]->setScale(1);
+            gameSprites[x]->setVisible(true);
+            gameSprites[x]->cocos2d::Node::draw();
+            gameSprites[x]->setVisible(false);
+            gameSprites[x]->setScale(Game::Instance->scale);
+            gameSprites[x]->setPosition(pos);
+    }
+    //finalGameSprite->visit();
+    occlusionMap->end();
+    finalGameSprite->setVisible(false);
+    //finalGameSprite->setPosition(Vec2(light->drawPosition.x * -1, light->drawPosition.y * 1));
     occlusionSprite->setTexture(occlusionMap->getSprite()->getTexture());
-    occlusionSprite->setVisible(false);
+    occlusionSprite->setPosition(toOnscreenPosition(light->lightPosition));
+    occlusionSprite->setVisible(true);
 }
 Vec2 GetTween(Vec2 a, Vec2 b, float percent){
     return Vec2((a.x*(1-percent) + b.x*percent), (a.y*(1-percent) + b.y*percent));
@@ -298,12 +334,12 @@ void Game::LoadLevel(Level* lvl){
         winPopUpAdded = true;
     }
     winPopUp->Close();
-    world->setSpeed(2.0);
+    world->setSpeed(1.0);
 }
 void Game::setPhyWorld(PhysicsWorld* world2){
     world = world2;
     world->setGravity(Vec2(0,-270));
-    world->setSpeed(2.0);
+    world->setSpeed(1.0);
     //world->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
     for(int x = 0; x < user->joints.size(); x++){
         world->addJoint(user->joints[x]);
@@ -358,14 +394,14 @@ bool Game::init(){
     for(int x = 0; x < 7; x++){
         RenderTexture* tempText = RenderTexture::create(2*visibleSize.width, 2*visibleSize.height,Texture2D::PixelFormat::RGBA8888, 0);
         gameTextures.push_back(tempText);
-        gameTextures[x]->setPosition(0,0);
+        gameTextures[x]->setPosition(Vec2(0,0));
         gameTextures[x]->setKeepMatrix(true);
         gameTextures[x]->setVisible(false);
         gameTextures[x]->retain();
         Sprite* tempSprite = Sprite::createWithTexture(gameTextures[x]->getSprite()->getTexture());
         tempSprite->retain();
         gameSprites.push_back(tempSprite);
-        gameSprites[x]->setPosition(Vec2(visibleSize.width / 2.0,0));
+        gameSprites[x]->setPosition(Vec2(visibleSize.width/ 2.0,0));
         gameSprites[x]->setAnchorPoint(Vec2(0.5,0));
         gameSprites[x]->setFlippedY(true);
         this->addChild(gameSprites[x],1);
@@ -378,8 +414,11 @@ bool Game::init(){
     finalGameSprite->setPosition(Vec2(0,0));
     finalGameSprite->setAnchorPoint(Vec2(0,0));
     finalGameSprite->setFlippedY(true);
-    this->addChild(finalGameSprite,1);
+    finalGameSprite->retain();
+    //this->addChild(finalGameSprite,1);
     
+    Vec2 pointsSize = Director::getInstance()->getWinSize();
+    printf("\nSize In Points: (%f, %f)\nSize In Pixels (%f, %f)", pointsSize.x, pointsSize.y, visibleSize.width, visibleSize.height);
     light = avalon::graphics::DynamicLight::create();
     light->setColor(ccc4(0,255,255,255));
     light->setAccuracy(2.0);
@@ -390,15 +429,15 @@ bool Game::init(){
     
     occlusion = RenderTexture::create(light->lightSize,light->lightSize);
     occlusion->retain();
-    occlusion->setPosition(0,0);
+    //occlusion->setPosition(0,0);
     occlusion->setKeepMatrix(true);
     occlusion->setVisible(true);
     occlusionSprite = Sprite::createWithTexture(occlusion->getSprite()->getTexture());
     occlusionSprite->setPosition(visibleSize.width / 2.0, visibleSize.height / 2.0);
     occlusionSprite->setAnchorPoint(Vec2(0.5,0.5));
     occlusionSprite->setFlippedY(true);
+    occlusionSprite->setVisible(true);
     this->addChild(occlusionSprite,10);
-
 
     //gameSprites[6]->addChild(light, 1);
     
@@ -491,7 +530,7 @@ void Game::winHighscoresSelectCallback(Ref*){
 };
 void Game::winReplaySelectCallback(Ref*){
     winPopUp->Close();
-    world->setSpeed(2.0);
+    world->setSpeed(1.0);
     resetButtonCallback(nullptr);
 };
 bool Game::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){

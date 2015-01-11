@@ -45,7 +45,7 @@ const GLchar* vertexShader =
                 printf("\n\tFinished\nLoading Shadow Render Shader\n");
                 shadowRenderShader = avalon::graphics::loadShader(vertexShader, shadowRenderFragmentShader);
                 printf("\tFinished\n");
-                lightSize = 256;
+                lightSize = 700;
                 initOcclusionMap();
                 initShadowMap1D();
                 initFinalShadowMap();
@@ -60,6 +60,7 @@ const GLchar* vertexShader =
                 CC_SAFE_RELEASE(occlusionMap);
                 
                 occlusionMap = RenderTexture::create(lightSize, lightSize);
+                occlusionMap->setKeepMatrix(true);
                 occlusionMap->retain();
             }
             
@@ -80,6 +81,7 @@ const GLchar* vertexShader =
                 // seems like 16 pixel is the minimum height of a texture (on ios)
                 shadowMap1D = RenderTexture::create(lightSize, 16);
                 shadowMap1D->retain();
+                //shadowMap1D->getSprite()->setFlippedY(true);
             }
             
             void DynamicLight::initFinalShadowMap()
@@ -115,6 +117,7 @@ const GLchar* vertexShader =
             void DynamicLight::updateShadowMap(cocos2d::Renderer *renderer, const cocos2d::Mat4 &transform, bool transformUpdated)
             {
                 createOcclusionMap();
+                //Game::Instance->occlusionSprite->setGLProgram(shadowMapShader);
                 createShadowMap(renderer, transform, transformUpdated);
             }
             
@@ -149,7 +152,7 @@ const GLchar* vertexShader =
                     
                     bakedShadowMap->beginWithClear(0.0, 0.0, 0.0, 0.0);
                     finalShadowMap->setAnchorPoint({0.5, 0.5});
-                    finalShadowMap->setPosition({0, 0});
+                    finalShadowMap->setPosition({drawPosition.x * -1, drawPosition.y});
                     finalShadowMap->visit(renderer, transform, flags);
                     bakedShadowMap->end();
                     bakedShadowMap->setPosition({0, 0});
@@ -239,14 +242,14 @@ const GLchar* vertexShader =
                 shadowCasters->setAnchorPoint(p1);
                 shadowCasters->setPosition(p2);*/
                 Game::Instance->CreateOcclusionMap(occlusionMap);
-                bakedMapIsValid = false;
+                //bakedMapIsValid = false;
             }
             
             void DynamicLight::createShadowMap(cocos2d::Renderer *renderer, const cocos2d::Mat4 &transform, bool transformUpdated)
             {
                 // Build a 1D shadow map from occlude FBO
                 occlusionMap->getSprite()->setGLProgram(shadowMapShader);
-                shadowMap1D->beginWithClear(0.0, 0.0, 0.0, 0.0);
+                shadowMap1D->beginWithClear(255, 255, 255, 255);
                 occlusionMap->setAnchorPoint({0.5, 0.5});
                 occlusionMap->setPosition({static_cast<float>(lightSize / 2.0), static_cast<float>(lightSize / 2.0)});
                 occlusionMap->visit(renderer, transform, transformUpdated);

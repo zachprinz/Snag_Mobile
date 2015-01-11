@@ -68,9 +68,9 @@ public:
     Vec2 toOnscreenPosition(Vec2);
     RenderTexture* finalGameTexture;
     Sprite* finalGameSprite;
-private:
-    Sprite* occlusionSprite;
     RenderTexture* occlusion;
+    Sprite* occlusionSprite;
+private:
     std::vector<Sprite*> gameSprites;
     std::vector<RenderTexture*> gameTextures;
     MenuItemImage* resetButton;
