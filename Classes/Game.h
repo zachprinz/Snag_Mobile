@@ -70,6 +70,7 @@ public:
     Sprite* finalGameSprite;
     RenderTexture* occlusion;
     Sprite* occlusionSprite;
+    Vec2 offset;
 private:
     std::vector<Sprite*> gameSprites;
     std::vector<RenderTexture*> gameTextures;

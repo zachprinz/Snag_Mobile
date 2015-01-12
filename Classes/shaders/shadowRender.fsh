@@ -64,6 +64,7 @@ void main(void) {                                                   \n\
     //multiply the summed amount by our distance, which             \n\
     //gives us a radial falloff                                     \n\
     //then multiply by vertex (light) color                         \n\
+    vec4 myColor = texture2D(u_texture, v_texCoord);\n\
     gl_FragColor = v_color * vec4(lit * smoothstep(1.0, 0.0, r));   \n\
 }                                                                   \n\
 ";

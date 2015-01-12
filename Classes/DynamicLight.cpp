@@ -10,7 +10,7 @@ namespace  {
     
 //    const GLchar* vertexShader =
 //#include "shaders/Vert.vsh"//cocos2d::ccPositionTextureColor_noMVP_vert;
-const GLchar* vertexShader =
+    const GLchar* vertexShader =
 #include "shaders/pass.vsh"
     
     const GLchar* shadowMapFragmentShader =
@@ -45,7 +45,7 @@ const GLchar* vertexShader =
                 printf("\n\tFinished\nLoading Shadow Render Shader\n");
                 shadowRenderShader = avalon::graphics::loadShader(vertexShader, shadowRenderFragmentShader);
                 printf("\tFinished\n");
-                lightSize = 700;
+                lightSize = 256;
                 initOcclusionMap();
                 initShadowMap1D();
                 initFinalShadowMap();
@@ -117,7 +117,6 @@ const GLchar* vertexShader =
             void DynamicLight::updateShadowMap(cocos2d::Renderer *renderer, const cocos2d::Mat4 &transform, bool transformUpdated)
             {
                 createOcclusionMap();
-                //Game::Instance->occlusionSprite->setGLProgram(shadowMapShader);
                 createShadowMap(renderer, transform, transformUpdated);
             }
             
@@ -150,7 +149,7 @@ const GLchar* vertexShader =
                     finalShadowMap->getSprite()->setPosition({0, 0});
                     finalShadowMap->setScaleY(-1);
                     
-                    bakedShadowMap->beginWithClear(0.0, 0.0, 0.0, 0.0);
+                    bakedShadowMap->beginWithClear(0.0, 0.0, 0, 0);
                     finalShadowMap->setAnchorPoint({0.5, 0.5});
                     finalShadowMap->setPosition({drawPosition.x * -1, drawPosition.y});
                     finalShadowMap->visit(renderer, transform, flags);
@@ -161,10 +160,9 @@ const GLchar* vertexShader =
                         bakedShadowMap->getSprite()->setBlendFunc({GL_SRC_ALPHA, GL_ONE});
                     }
                 }
-                
                 bakedShadowMap->visit(renderer, transform, flags);
                 
-                if (debugDrawEnabled) {
+                if (false) {
                     debugDraw(renderer, transform, flags);
                 }
             }
@@ -220,36 +218,14 @@ const GLchar* vertexShader =
             
             void DynamicLight::createOcclusionMap()
             {
-                /*if (!shadowCasters) {
-                    occlusionMap->beginWithClear(0.0 ,0.0, 0.0, 0.0);
-                    occlusionMap->end();
-                    return;
-                }
-                
-                Point p1 = shadowCasters->getAnchorPoint();
-                Point p2 = shadowCasters->getPosition();
-                
-                auto x = -getPositionX() + lightSize / 2 + shadowCasters->getPositionX();
-                auto y = -getPositionY() + lightSize / 2 + shadowCasters->getPositionY();
-                
-                // Render light region to occluder FBO
-                occlusionMap->beginWithClear(0.0, 0.0, 0.0, 0.0);
-                shadowCasters->setAnchorPoint({0, 0});
-                shadowCasters->setPosition({x, y});
-                shadowCasters->visit();
-                occlusionMap->end();
-                
-                shadowCasters->setAnchorPoint(p1);
-                shadowCasters->setPosition(p2);*/
                 Game::Instance->CreateOcclusionMap(occlusionMap);
-                //bakedMapIsValid = false;
             }
             
             void DynamicLight::createShadowMap(cocos2d::Renderer *renderer, const cocos2d::Mat4 &transform, bool transformUpdated)
             {
                 // Build a 1D shadow map from occlude FBO
                 occlusionMap->getSprite()->setGLProgram(shadowMapShader);
-                shadowMap1D->beginWithClear(255, 255, 255, 255);
+                shadowMap1D->beginWithClear(255, 0, 0, 255);
                 occlusionMap->setAnchorPoint({0.5, 0.5});
                 occlusionMap->setPosition({static_cast<float>(lightSize / 2.0), static_cast<float>(lightSize / 2.0)});
                 occlusionMap->visit(renderer, transform, transformUpdated);
