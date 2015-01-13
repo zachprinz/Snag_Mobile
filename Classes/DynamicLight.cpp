@@ -45,7 +45,7 @@ namespace  {
                 printf("\n\tFinished\nLoading Shadow Render Shader\n");
                 shadowRenderShader = avalon::graphics::loadShader(vertexShader, shadowRenderFragmentShader);
                 printf("\tFinished\n");
-                lightSize = 256;
+                lightSize = 800;
                 initOcclusionMap();
                 initShadowMap1D();
                 initFinalShadowMap();
@@ -225,7 +225,7 @@ namespace  {
             {
                 // Build a 1D shadow map from occlude FBO
                 occlusionMap->getSprite()->setGLProgram(shadowMapShader);
-                shadowMap1D->beginWithClear(255, 0, 0, 255);
+                shadowMap1D->beginWithClear(0, 0, 0, 0);
                 occlusionMap->setAnchorPoint({0.5, 0.5});
                 occlusionMap->setPosition({static_cast<float>(lightSize / 2.0), static_cast<float>(lightSize / 2.0)});
                 occlusionMap->visit(renderer, transform, transformUpdated);

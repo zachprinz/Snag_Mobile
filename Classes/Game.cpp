@@ -60,6 +60,7 @@ void Game::update(float dt){
         world->setGravity(Vec2(0,-180));
     }
     UpdateFocusPoint();
+    focusPoint = Vec2(500,500);
     scale = visibleSize.height / (user->GetPosition().y + (visibleSize.height / 3.5));
     float over = 0;
     if(scale > 1)
@@ -72,14 +73,59 @@ void Game::update(float dt){
     user->update(targetScale);
     for(int x = 0; x < layers.size(); x++){
         layers[x]->setScale(targetScale);
-        layers[x]->setPosition(((visibleSize.width /2) - ((focusPoint.x * targetScale))),-0.5 * over);
+        ogPositions.push_back(Vec2(((visibleSize.width /2) - (focusPoint.x * targetScale)),-0.5 * over));
+        layers[x]->setPosition(ogPositions[x]);
         layers[x]->setVisible(true);
     }
     light->lightPosition = Vec2(84,300);
     light->bakedMapIsValid = false;
     light->drawPosition = toOnscreenPosition(light->lightPosition);
     light->setPosition(Vec2(light->drawPosition.x, light->drawPosition.y));
+    
+    occlusion->setVirtualViewport(Vec2(0,0),//light->drawPosition.x * -1, light->drawPosition.y * -1),
+                                  Rect(0,0,light->lightSize,light->lightSize),
+                                  Rect(0,0,layers[0]->getContentSize().width , layers[0]->getContentSize().height));
+    occlusion->beginWithClear(0,0,0,0);
+    for(int x = 0; x < layers.size(); x++){
+        layers[x]->setPosition(Vec2((-1 * light->drawPosition.x) + (light->lightSize / 2.0) + light->lightPosition.x * scale, -1 * light->drawPosition.y + light->lightSize / 2.0));
+        layers[x]->visit();
+    }
+    occlusion->end();
+    Director::getInstance()->getRenderer()->render();
+    for(int x = 0; x < layers.size(); x++){
+        layers[x]->setPosition(ogPositions[x].x, ogPositions[x].y);
+    }
+    ogPositions.clear();
+    //Going to go around in a circle and raycast on the physics world.
+    float theta = 0;
+    _drawnode->clear();
+    Vec2 userCenter = Vec2(user->GetSprite()->getBoundingBox().getMidX(), user->GetSprite()->getBoundingBox().getMidY());
+    while(theta < 180){
+        Vec2 d(300 * cosf(theta * 2), 300 * sinf(theta * 2));
+        Vec2 point2 = user->GetPosition() + d;
+        Vec2 points[180];
+        int num = 0;
+        PhysicsRayCastCallbackFunc func = [&points, &num](PhysicsWorld& world, const PhysicsRayCastInfo& info, void* data)->bool
+        {
+            if (num < 180)
+            {
+                points[num++] = info.contact;
+            }
+            return false;
+        };
+        myScene->getPhysicsWorld()->rayCast(func, userCenter, point2, nullptr);
+        for (int i = 0; i < num; ++i)
+        {
+            _drawnode->drawSegment(userCenter, points[i], 1, Color4F::RED);
+            _drawnode->drawDot(points[i], 3, Color4F(1.0f, 1.0f, 1.0f, 1.0f));
+        }
+        theta += 1.5f * (float)M_PI / 180.0f;
+    }
 };
+bool Game::raycastCallback(PhysicsWorld& world, const PhysicsRayCastInfo& info, void* data){
+    int thisint = 0;
+    return false;
+}
 Vec2 Game::toOnscreenPosition(Vec2 pos){
     Vec2 differenceToFocusPoint(focusPoint.x - pos.x, pos.y);
     differenceToFocusPoint.x *= scale;
@@ -87,17 +133,15 @@ Vec2 Game::toOnscreenPosition(Vec2 pos){
     return Vec2((visibleSize.width/2.0)-differenceToFocusPoint.x, differenceToFocusPoint.y);
 };
 void Game::CreateOcclusionMap(RenderTexture* occlusionMap){
-    occlusionMap->beginWithClear(255,0,0,255);
-    for(int x = 0; x < layers.size(); x++){
-        if(x < layers.size() - 1){
-            //layers[x]->visit();
-        }
-    }
+    Vec2 lightPos = toOnscreenPosition(light->lightPosition);
+    occlusionMap->beginWithClear(0,0,0,0);
+    occlusionSprite->setPosition(Vec2(light->lightSize/2.0,light->lightSize/2.0));
+    occlusionSprite->visit();
     occlusionMap->end();
-    printf("\noffset: (%f, %f)",offset.x, offset.y);
-    occlusionSprite->setTexture(occlusionMap->getSprite()->getTexture());
+    occlusionSprite->setTexture(occlusion->getSprite()->getTexture());
     occlusionSprite->setPosition(toOnscreenPosition(light->lightPosition));
     occlusionSprite->setVisible(false);
+    //Director::getInstance()->getRenderer()->render();
 }
 Vec2 GetTween(Vec2 a, Vec2 b, float percent){
     return Vec2((a.x*(1-percent) + b.x*percent), (a.y*(1-percent) + b.y*percent));
@@ -203,7 +247,7 @@ Scene* Game::createScene() {
     auto layer = Game::create();
     layer->setPhyWorld(scene->getPhysicsWorld());
     myScene = scene;
-    //myScene->retain();
+    myScene->retain();
     scene->addChild(layer);
     return scene;
 }
@@ -267,7 +311,7 @@ void Game::setPhyWorld(PhysicsWorld* world2){
     world = world2;
     world->setGravity(Vec2(0,-270));
     world->setSpeed(2.0);
-    //world->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+    world->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
     for(int x = 0; x < user->joints.size(); x++){
         world->addJoint(user->joints[x]);
     }
@@ -318,7 +362,7 @@ bool Game::init(){
     layers[5]->addChild(particleBatchNode,1);
     user = new User();
     user->Add(this);
-    offset = Vec2(0,0);
+    offset = Vec2(-30,-50);
     
     light = avalon::graphics::DynamicLight::create();
     light->setColor(ccc4(0,255,255,255));
@@ -328,11 +372,18 @@ bool Game::init(){
     light->setAdditive(false);
     this->addChild(light, 10);
     
-    auto tempOc = RenderTexture::create(light->lightSize,light->lightSize);
-    occlusionSprite = Sprite::createWithTexture(tempOc->getSprite()->getTexture());
+    occlusion = RenderTexture::create(light->lightSize,light->lightSize);
+    occlusion->retain();
+    //occlusion->setPosition(0,0);
+    occlusion->setKeepMatrix(true);
+    occlusion->setVisible(true);
+    occlusionSprite = Sprite::createWithTexture(occlusion->getSprite()->getTexture());
     occlusionSprite->setAnchorPoint(Vec2(0.5,0.5));
     occlusionSprite->setFlippedY(true);
     this->addChild(occlusionSprite,10);
+    
+    _drawnode = DrawNode::create();
+    this->addChild(_drawnode,1);
     
     timeLabel = MainMenu::CreateLabel("0:00", 2);
     timeLabel->setPosition(visibleSize.width / 2.0 - (80 * MainMenu::screenScale.x), visibleSize.height);
