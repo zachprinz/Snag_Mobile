@@ -39,9 +39,20 @@ User::User() : Entity(Vec2(150,150), Vec2(0,0), Vec2(0,0), 5){
         pastSprites[x]->setVisible(true);
         pastSprites[x]->setOpacity(240);
     }
+    
+    light = SpotLight::create(Vec3(0.f, -1.0f, 0.0f), Vec3(100.0f, 100.0f, 0.0f),Color3B::WHITE, 0.0, 10, 1000.0f) ;
+    
     auto physMat = PhysicsMaterial(2,1,0);
     PhysicsBody* previousBody = nullptr;
     spriteUpdateCount = 0;
+    printf("Getting Model\n");
+    sphere = Sprite3D::create("crate.c3b");
+    sphere->setScaleZ(0.5);
+    sphere->retain();
+    sphere->setTexture("crate_color_user.png");
+    sprite->setTexture("crate_color_user.png");
+    sphere->setVisible(false);
+    //sphere->setTexture(sprite->getTexture());
 }
 void User::SetUpPhysicsSprite(std::string texture, Vec2 scale){
     auto physMat = PhysicsMaterial(2,1,0);
@@ -53,6 +64,7 @@ void User::SetUpPhysicsSprite(std::string texture, Vec2 scale){
     sprite->setPhysicsBody(body);
     sprite->setPosition(position.x,position.y);
     sprite->setAnchorPoint(Vec2(0.5,0.5));
+    sprite->setScaleZ(0.25);
     sprite->setTag(type);
     body->setVelocityLimit(500);
     body->setContactTestBitmask(true);
@@ -61,11 +73,13 @@ void User::SetUpPhysicsSprite(std::string texture, Vec2 scale){
 void User::Add(Game* layer){
     sprite->setGlobalZOrder(0);
     line->setGlobalZOrder(-1);
-    layer->layers[HOOK]->addChild(line,1);
-    layer->layers[5]->addChild(sprite,1);
-    for(int x = 0; x < sprites.size(); x++){
-        layer->layers[5]->addChild(sprites[x]);
-    }
+    layer->addChild(light,1);
+    //layer->addChild(line,1);
+    layer->addChild(sprite,1);
+    //for(int x = 0; x < sprites.size(); x++){
+    //    layer->addChild(sprites[x]);
+    //}
+    //layer->layers[0]->addChild(sphere,1);
 }
 void User::update(float boardScale){
     if(position.y < -400)
@@ -85,12 +99,14 @@ void User::update(float boardScale){
         scale = 1.0;
     SetStretch(sprite, angle, scale);
     focusPointSprite->setPosition(Game::Instance->focusPoint);
+    sphere->setPosition(sprite->getPosition());
+    light->setPosition3D(sprite->getPosition3D());
 }
-void User::SetStretch(Sprite* sprite, float angle, float magnitude){
-    sprite->setRotation(0);
-    sprite->setScaleY(magnitude);
-    sprite->setScaleX(1/magnitude);
-    sprite->setRotation(angle);
+void User::SetStretch(Sprite3D* sprite, float angle, float magnitude){
+    //sprite->setRotation(0);
+    //sprite->setScaleY(magnitude);
+    //sprite->setScaleX(1/magnitude);
+    //sprite->setRotation(angle);
 }
 
 void User::Snag(){

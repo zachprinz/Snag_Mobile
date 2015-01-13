@@ -74,6 +74,8 @@ public:
     std::vector<Vec2> ogPositions;
     bool raycastCallback(PhysicsWorld& world, const PhysicsRayCastInfo& info, void* data);
     DrawNode* _drawnode;
+    Camera* camera;
+    Layer* uiLayer;
 private:
     std::vector<Sprite*> gameSprites;
     std::vector<RenderTexture*> gameTextures;

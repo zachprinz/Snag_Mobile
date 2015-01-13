@@ -45,7 +45,7 @@ public:
     
     Vec2 GetSize();
     void SetSize(Vec2);
-    Sprite* GetSprite();
+    Sprite3D* GetSprite();
     Point GetPosition();
     Vec2 GetLaunchVelocity();
     void SetLaunchVelocity(Vec2);
@@ -67,7 +67,7 @@ protected:
     Vec2 size;
     Vec2 baseScale;
     Vec2 launchVelocity;
-    Sprite* sprite;
+    Sprite3D* sprite;
     Vec2 imageSize;
     DrawNode* boundsDebug;
     PhysicsBody* body;

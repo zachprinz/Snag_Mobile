@@ -43,26 +43,34 @@ int Entity::count = 0;
 
 Entity::Entity(Vec2 pos, Vec2 size, Vec2 vel, int type){
     ID = count++;
-    std::string textures[6] = {"wall.png", "spikewall.png", "game_hook.png", "spawner.png", "goal.png", "user.png"};
-    float baseScales[6] = {1,1,1,1,1,1};
+    std::string models[6] = {"crate.c3b", "crate.c3b", "crate.c3b", "crate.c3b", "crate.c3b", "crate.c3b"};
+    std::string textures[6] = {"crate_color_wall.png", "crate_color_spikewall.png", "crate_color_hook.png", "crate_color_spawner.png", "crate_color_goal.png", "crate_color_user.png"};
+    float baseScales[6] = {1,1,0.2,0.2,1,0.2};
     this->baseScale = Vec2(baseScales[type],baseScales[type]);
     this->type = type;
-    this->size = Vec2(size.x,size.y);
+    this->size = size;
     this->position = Vec2(pos.x, pos.y);
-    sprite = Sprite::create(textures[type]);
+    sprite = Sprite3D::create(models[type]);
     this->originalSize = Vec2(sprite->getBoundingBox().size.width, sprite->getBoundingBox().size.height);
-    sprite->setAnchorPoint(Vec2(0.5,0.5));
+    sprite->setContentSize(Size(0,0));//size.x,size.y));
+    sprite->setAnchorPoint(Vec2(0,0));
+
+    sprite->ignoreAnchorPointForPosition(false);
+    sprite->setTexture(textures[type]);
     sprite->retain();
-    sprite->setGlobalZOrder(0);
+    sprite->setGlobalZOrder(-10);
     if(this->size.x != 0 && this->size.y != 0){
         baseScale.x = this->size.x / sprite->getBoundingBox().size.width;
         baseScale.y = this->size.y / sprite->getBoundingBox().size.height;
     }
     this->launchVelocity = vel;
     sprite->setScale(baseScale.x, baseScale.y);
+    if(type == USER){
+        sprite->setScaleZ(0.25);
+    }
     if(type != USER)
         this->SetUpPhysicsSprite(textures[type], baseScale);
-    sprite->setPosition(position);
+    sprite->setPosition3D(Vec3(position.x, position.y, 10));
     if(type == HOOK){
         line = Sprite::create("game_line.png");
         line->retain();
@@ -201,7 +209,7 @@ void Entity::SetUpPhysicsSprite(std::string texture, Vec2 scale){
     body->setTag(type);
     sprite->setPhysicsBody(body);
     sprite->setTag(type);
-    sprite->setAnchorPoint(Vec2(0.5,0.5));
+    sprite->setAnchorPoint(Vec2(0,0));
     if(type == SPAWNER || type == HOOK){
         body->setContactTestBitmask(false);
         body->setCategoryBitmask(false);
@@ -218,13 +226,13 @@ void Entity::CalculateScale(Vec2 userPosition, float boardScale){
 }
 void Entity::Add(Game* game){
     sprite->setGlobalZOrder(0);
-    game->layers[type]->addChild(sprite,1);
+    game->addChild(sprite,-1);
     sprite->release();
     if(type == GOAL || type == SPAWNER || type == HOOK){
         game->particleBatchNode->addChild(emitter);
     }
     if(type == HOOK){
-        game->layers[type]->addChild(line,1);
+        game->addChild(line,-1);
         line->release();
     }
     if(type == USER){
@@ -247,14 +255,14 @@ void Entity::Remove(Game* game){
     }
     //game->removeChild(sprite);
 }
-Sprite* Entity::GetSprite(){
+Sprite3D* Entity::GetSprite(){
     return sprite;
 }
 Point Entity::GetPosition(){
-    return position;
+    return position;//Vec2(sprite->getBoundingBox().getMidX(), sprite->getBoundingBox().getMidY());
 }
 void Entity::SetPosition(Vec2 pos){
-    position = pos;
+    position =  pos;
 }
 Vec2 Entity::GetLaunchVelocity(){
     return launchVelocity;
