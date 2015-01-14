@@ -46,7 +46,6 @@ public:
     bool visible;
     std::map<std::string, MenuItemImage*> elements;
     void SetText(std::string);
-    bool game;
 private:
 };
 

@@ -35,7 +35,7 @@ public:
     bool isHooked;
     Sprite* line;
     std::vector<Sprite*> pastSprites;
-    void SetStretch(Sprite3D*, float angle, float magnitude);
+    void SetStretch(Sprite*, float angle, float magnitude);
     std::vector<PhysicsBody*> bodies;
     std::vector<Sprite*> sprites;
     std::vector<PhysicsJointDistance*> joints;
@@ -45,8 +45,6 @@ public:
     Entity* closest;
     Sprite* focusPointSprite;
     Vec2 GetClosestPosition();
-    Sprite3D* sphere;
-    SpotLight* light;
 private:
     int tailCount;
     int spriteUpdateCount;

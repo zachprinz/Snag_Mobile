@@ -55,8 +55,7 @@ PopUp::PopUp(std::string title, std::string text, Ref* ref, SEL_MenuHandler call
     menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0,1));
     menu->setPosition(0,0);
-    game = false;
-
+    
     Close();
 }
 PopUp::PopUp(std::string title, std::string text, Ref* ref, SEL_MenuHandler callback, SEL_MenuHandler callback2, bool taylor_is_such_a_good_person){
@@ -113,8 +112,7 @@ PopUp::PopUp(std::string title, std::string text, Ref* ref, SEL_MenuHandler call
     menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0,1));
     menu->setPosition(0,0);
-    game = false;
-
+    
     Close();
 }
 
@@ -148,7 +146,7 @@ PopUp::PopUp(std::string title, std::string text, Ref* ref, SEL_MenuHandler call
     menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0,1));
     menu->setPosition(0,0);
-    game = false;
+    
     Close();
 }
 PopUp::PopUp(std::string title, std::string text, Ref* ref, SEL_MenuHandler callback, SEL_MenuHandler callback2, SEL_MenuHandler callback3, int x){
@@ -205,7 +203,7 @@ PopUp::PopUp(std::string title, std::string text, Ref* ref, SEL_MenuHandler call
     menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0,1));
     menu->setPosition(0,0);
-    game = true;
+    
     Close();
 }
 void PopUp::Show(){
@@ -251,27 +249,14 @@ void PopUp::SetText(std::string name){
     nameBox->setText(name.c_str());
 }
 void PopUp::Add(Layer* layer){
-    if(game){
-        layer->addChild(menu,1);
-        layer->addChild(name,1);
-        layer->addChild(text,1);
-        if(nameBox != nullptr){
-            layer->addChild(nameBox,1);
-        }
-        for(int x = 0; x < labels.size(); x++){
-            layer->addChild(labels[x]);
-        }
+    layer->addChild(menu,1);
+    layer->addChild(name,1);
+    layer->addChild(text,1);
+    if(nameBox != nullptr){
+        layer->addChild(nameBox,1);
     }
-    else {
-        layer->addChild(menu,1);
-        layer->addChild(name,1);
-        layer->addChild(text,1);
-        if(nameBox != nullptr){
-            layer->addChild(nameBox,1);
-        }
-        for(int x = 0; x < labels.size(); x++){
-            layer->addChild(labels[x]);
-        }
+    for(int x = 0; x < labels.size(); x++){
+        layer->addChild(labels[x]);
     }
 }
 void PopUp::Remove(Layer* layer){

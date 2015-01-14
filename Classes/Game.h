@@ -8,7 +8,7 @@
 
 #include "cocos2d.h"
 #include "User.h"
-#include "DynamicLight.h"
+#include "shaderhelper.h"
 
 class Entity;
 class Level;
@@ -63,22 +63,15 @@ public:
     float startClosingMAX_SHIFT;
     bool catching;
     float previousTrail;
-    void CreateOcclusionMap(RenderTexture*);
-    avalon::graphics::DynamicLight* light;
-    Vec2 toOnscreenPosition(Vec2);
-    RenderTexture* finalGameTexture;
-    Sprite* finalGameSprite;
-    RenderTexture* occlusion;
-    Sprite* occlusionSprite;
-    Vec2 offset;
-    std::vector<Vec2> ogPositions;
-    bool raycastCallback(PhysicsWorld& world, const PhysicsRayCastInfo& info, void* data);
-    DrawNode* _drawnode;
-    Camera* camera;
-    Layer* uiLayer;
+    GLProgram* _program;
+    GLProgramState* _state;
+    void UpdateUniforms();
+    void UpdateShader();
 private:
-    std::vector<Sprite*> gameSprites;
-    std::vector<RenderTexture*> gameTextures;
+    RenderTexture* postShaderGameTexture;
+    Sprite* postShaderGameSprite;
+    Sprite* gameSprite;
+    RenderTexture* gameTexture;
     MenuItemImage* resetButton;
     MenuItemImage* homeButton;
     bool winPopUpAdded;

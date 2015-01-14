@@ -9,6 +9,10 @@
 #include "PopUp.h"
 #include "Highscores.h"
 
+const GLchar* shader =
+#include "shaders/white.fsh"
+const GLchar* pass =
+#include "shaders/pass.vsh"
 #define WALL 0
 #define SPIKE_WALL 1
 #define HOOK 2
@@ -68,22 +72,45 @@ void Game::update(float dt){
         scale = 0.5;
         over = (user->GetPosition().y + visibleSize.height/3.5) - 2.0*(visibleSize.height);
     }
-    camera->setPosition3D(Vec3(focusPoint.x, focusPoint.y, 600 * (1.0/scale)));//
-    //camera->setPosition3D(Vec3(focusPoint.x - (visibleSize.width / 2.0), focusPoint.y - (visibleSize.height / 2.0), 600 * (1.0/scale)));
-    //camera->lookAt(Vec3(0,0,0), Vec3(focusPoint.x, focusPoint.y,0));
     float targetScale = scale;
     user->update(targetScale);
+    
+    gameTexture->beginWithClear(0,0,0,0);
     for(int x = 0; x < layers.size(); x++){
-        layers[x]->setScale(1);
+        layers[x]->setScale(0.5);
+        layers[x]->setPosition((visibleSize.width /2) - ((focusPoint.x * 0.5)),0.5 * over);
         layers[x]->setVisible(true);
+        layers[x]->visit();
+    }
+    gameTexture->end();
+    gameSprite->setScale(targetScale);
+    for(int x = 0;x < layers.size();x++){
+        layers[x]->setVisible(false);
     }
 };
-Vec2 Game::toOnscreenPosition(Vec2 pos){
-    Vec2 differenceToFocusPoint(focusPoint.x - pos.x, pos.y);
-    differenceToFocusPoint.x *= scale;
-    differenceToFocusPoint.y *= scale;
-    return Vec2((visibleSize.width/2.0)-differenceToFocusPoint.x, differenceToFocusPoint.y);
-};
+void Game::UpdateUniforms(){
+    _program->use();
+    GLint res = _program->getUniformLocationForName("blur");
+    _program->setUniformLocationWith1f(res, 3);
+    
+    glUniform1i(glGetUniformLocation(_program->getProgram(), "u_texture2"), 1);
+    
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, gameTexture->getSprite()->getTexture()->getName());
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, gameTexture->getSprite()->getTexture()->getName());
+
+    UpdateShader();
+}
+void Game::UpdateShader(){
+    gameSprite->setVisible(true);
+    gameTexture->getSprite()->setGLProgram(_program);
+    postShaderGameTexture->beginWithClear(0.0, 0.0, 0.0, 0.0);
+    gameSprite->visit();
+    postShaderGameTexture->end();
+    gameSprite->setVisible(false);
+    postShaderGameSprite->setVisible(true);
+}
 Vec2 GetTween(Vec2 a, Vec2 b, float percent){
     return Vec2((a.x*(1-percent) + b.x*percent), (a.y*(1-percent) + b.y*percent));
 }
@@ -188,7 +215,7 @@ Scene* Game::createScene() {
     auto layer = Game::create();
     layer->setPhyWorld(scene->getPhysicsWorld());
     myScene = scene;
-    myScene->retain();
+    //myScene->retain();
     scene->addChild(layer);
     return scene;
 }
@@ -242,7 +269,7 @@ void Game::LoadLevel(Level* lvl){
     currentLevel = lvl;
     currentLevel->Add(this);
     if(winPopUpAdded == false){
-        winPopUp->Add(uiLayer);
+        winPopUp->Add(this);
         winPopUpAdded = true;
     }
     winPopUp->Close();
@@ -284,31 +311,54 @@ bool Game::init(){
     
     currentLevel = NULL;
     cocos2d::Vector<MenuItem*> menuItems;
-
     
-    for(int x = 0; x < 6; x++){
+    auto background = Sprite::create("background.png");
+    background->setPosition(0,0);
+    background->setAnchorPoint(Vec2(0,0));
+    background->setScale(visibleSize.width / background->getBoundingBox().size.width, visibleSize.height / background->getBoundingBox().size.height);
+    background->setGlobalZOrder(-2);
+    this->addChild(background);
+    
+    for(int x = 0; x < 7; x++){
         Layer* tempLayer = Layer::create();
         tempLayer->setAnchorPoint(Vec2(0.0,0));
         tempLayer->setPosition(0,0);
         layers.push_back(tempLayer);
-        this->addChild(tempLayer,1);
+        this->addChild(tempLayer);
     }
+    
     particleBatchNode = ParticleBatchNode::createWithTexture(Director::getInstance()->getTextureCache()->addImage("Images/particle.png"));
-    layers[0]->addChild(particleBatchNode,1);
+    layers[6]->addChild(particleBatchNode);
     user = new User();
     user->Add(this);
-    offset = Vec2(-30,-50);
-    
-    //camera = Camera::createOrthographic(visibleSize.width, visibleSize.height, 1, 2000);
-    camera = Camera::createPerspective(60, (GLfloat) visibleSize.width / visibleSize.height, 1, 2000);
-    camera->setPosition3D(Vec3(0,0,300));
-    camera->lookAt(Vec3(0,0,0), Vec3(0,1,0));
-    
+
     timeLabel = MainMenu::CreateLabel("0:00", 2);
     timeLabel->setPosition(visibleSize.width / 2.0 - (80 * MainMenu::screenScale.x), visibleSize.height);
     timeLabel->setColor(Color3B::BLACK);
     timeLabel->setAnchorPoint(Point(0.0,1.0));
     timeLabel->setGlobalZOrder(3);
+    this->addChild(timeLabel,1);
+    
+    gameTexture = RenderTexture::create(visibleSize.width * 2, visibleSize.height * 2);
+    gameTexture->setKeepMatrix(true);
+    gameTexture->retain();
+    gameSprite = Sprite::createWithTexture(gameTexture->getSprite()->getTexture());
+    gameSprite->setPosition(Vec2(visibleSize.width / 2.0, 0));
+    gameSprite->setAnchorPoint(Vec2(0.5,0));
+    gameSprite->setFlippedY(true);
+    this->addChild(gameSprite,1);
+    
+    postShaderGameTexture = RenderTexture::create(visibleSize.width, visibleSize.height);
+    postShaderGameTexture->setKeepMatrix(true);
+    postShaderGameTexture->retain();
+    postShaderGameSprite = Sprite::createWithTexture(gameTexture->getSprite()->getTexture());
+    postShaderGameSprite->setPosition(Vec2(visibleSize.width / 2.0, 0));
+    postShaderGameSprite->setAnchorPoint(Vec2(0.5,0));
+    postShaderGameSprite->setFlippedY(true);
+    this->addChild(postShaderGameSprite,1);
+    postShaderGameSprite->setVisible(false);
+    
+    _program = avalon::graphics::loadShader(pass, shader);
     
     resetButton = MainMenu::CreateButton("game", "Refresh.png", this, menu_selector(Game::resetButtonCallback));
     resetButton->setPosition(.017*visibleSize.width, visibleSize.height - 0.025*visibleSize.height);
@@ -325,37 +375,7 @@ bool Game::init(){
     Menu* menu = Menu::createWithArray(menuItems);
     menu->setAnchorPoint(Point(0.0,0.0));
     menu->setPosition(0,0);
-    
-    
-    auto background = Sprite::create("background.png");
-    background->setPosition(0,0);
-    background->setAnchorPoint(Vec2(0,0));
-    background->setScale(visibleSize.width / background->getBoundingBox().size.width, visibleSize.height / background->getBoundingBox().size.height);
-    background->setGlobalZOrder(-2);
-    camera->addChild(background,-1);
-    
-    uiLayer = Layer::create();
-    uiLayer->setPositionZ(-Director::getInstance()->getZEye() / 4);
-    uiLayer->ignoreAnchorPointForPosition(false);
-    uiLayer->setGlobalZOrder(3000);
-    uiLayer->setScale(0.25);
-    uiLayer->addChild(menu);
-    uiLayer->addChild(timeLabel,111);
-    
-    //auto spotLight = SpotLight::create(Vec3(0.f, -1.0f, 0.0f), Vec3(100.0f, 100.0f, 0.0f),Color3B::BLUE, 0.0, 10, 800.0f) ;
-    //addChild(spotLight);
-    
-    auto light = AmbientLight::create (Color3B::WHITE);
-    light->setIntensity(0.25);
-    addChild(light);
-    
-    //auto light = DirectionLight::create(Vec3(0.f, 0.f, -1.0f), Color3B::WHITE);
-    //addChild (light);
-    
-    camera->addChild(uiLayer,1000);
-    
-    addChild(camera,1);
-    
+    this->addChild(menu, 1);
     scale = 1.0;
     winPopUp = new PopUp("You Win!", "What Next?", this, menu_selector(Game::winLevelSelectCallback), menu_selector(Game::winHighscoresSelectCallback), menu_selector(Game::winReplaySelectCallback), 8);
     winPopUpAdded = false;
@@ -426,15 +446,6 @@ void Game::winReplaySelectCallback(Ref*){
     resetButtonCallback(nullptr);
 };
 bool Game::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
-    /*if(touch->getLocation().x > visibleSize.width *0.75)
-        offset.x+= 5;
-    if(touch->getLocation().x < visibleSize.width / 4.0)
-        offset.x -= 5;
-    if(touch->getLocation().y > visibleSize.height * 0.75)
-        offset.y += 5;
-    if(touch->getLocation().y < visibleSize.height / 4.0)
-        offset.y -=5;
-    return true;*/
     if(!user->isHooked && !winPopUp->visible){
         user->Snag();
         lowShift = true;
