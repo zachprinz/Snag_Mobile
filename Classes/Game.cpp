@@ -9,10 +9,6 @@
 #include "PopUp.h"
 #include "Highscores.h"
 
-const GLchar* shader =
-#include "shaders/white.fsh"
-const GLchar* pass =
-#include "shaders/pass.vsh"
 #define WALL 0
 #define SPIKE_WALL 1
 #define HOOK 2
@@ -78,7 +74,7 @@ void Game::update(float dt){
     gameTexture->beginWithClear(0,0,0,0);
     for(int x = 0; x < layers.size(); x++){
         layers[x]->setScale(0.5);
-        layers[x]->setPosition((visibleSize.width /2) - ((focusPoint.x * 0.5)),0.5 * over);
+        layers[x]->setPosition((visibleSize.width /2) - ((focusPoint.x * 0.5)),-0.5 * over);
         layers[x]->setVisible(true);
         layers[x]->visit();
     }
@@ -88,29 +84,6 @@ void Game::update(float dt){
         layers[x]->setVisible(false);
     }
 };
-void Game::UpdateUniforms(){
-    _program->use();
-    GLint res = _program->getUniformLocationForName("blur");
-    _program->setUniformLocationWith1f(res, 3);
-    
-    glUniform1i(glGetUniformLocation(_program->getProgram(), "u_texture2"), 1);
-    
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, gameTexture->getSprite()->getTexture()->getName());
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, gameTexture->getSprite()->getTexture()->getName());
-
-    UpdateShader();
-}
-void Game::UpdateShader(){
-    gameSprite->setVisible(true);
-    gameTexture->getSprite()->setGLProgram(_program);
-    postShaderGameTexture->beginWithClear(0.0, 0.0, 0.0, 0.0);
-    gameSprite->visit();
-    postShaderGameTexture->end();
-    gameSprite->setVisible(false);
-    postShaderGameSprite->setVisible(true);
-}
 Vec2 GetTween(Vec2 a, Vec2 b, float percent){
     return Vec2((a.x*(1-percent) + b.x*percent), (a.y*(1-percent) + b.y*percent));
 }
@@ -118,25 +91,52 @@ Vec2 GetDifference(Vec2 a, Vec2 b){
     return Vec2(b.x-a.x,b.y-a.y);
 }
 void Game::UpdateFocusPoint(){
-    //MAX_SHIFT = 30;
-    if(lowShift){
-        if(MAX_SHIFT > 15)
-            MAX_SHIFT = 15;//-= 0.5;
-        user->focusPointSprite->setColor(Color3B(0,255,0));
-    } else {
-        user->focusPointSprite->setColor(Color3B(255,0,0));
-    }
-    Vec2 targetFocusPoint = Vec2(user->GetSprite()->getBoundingBox().getMidX(), user->GetSprite()->getBoundingBox().getMidY());
+    targetFocusPoint = Vec2(user->GetSprite()->getBoundingBox().getMidX(), user->GetSprite()->getBoundingBox().getMidY());
+    _drawnode->clear();
+
     if(!user->isHooked){
         closing = false;
         float velocityPercent = 0.5 * 1.25;
         targetFocusPoint.x += user->GetSprite()->getPhysicsBody()->getVelocity().x * velocityPercent;
         targetFocusPoint.y += user->GetSprite()->getPhysicsBody()->getVelocity().y * velocityPercent;
         float tempDistance = 0;
+        Vec2 userCenter = Vec2(user->GetSprite()->getBoundingBox().getMidX(), user->GetSprite()->getBoundingBox().getMidY());
+        Vec2 velocityPoint = targetFocusPoint;
+        Vec2 targetPointVector = velocityPoint - userCenter;
+        targetPointVector.normalize();
+        Vec2 startPos = userCenter + targetPointVector * (user->GetSprite()->getBoundingBox().size.width / 2.0) * 1.1;
+        Vec2 contact = targetFocusPoint;
+        PhysicsShape* body;
+        Entity* contactEnt = nullptr;
+        bool bouncingVertical = true;
+        func = [&contact](PhysicsWorld& world, const PhysicsRayCastInfo& info, void* data)->bool
+        {
+            contact = info.contact;
+            printf("In Cast");
+            //body = info.shape;
+            return false;
+        };
+        world->rayCast(func, startPos, targetFocusPoint, nullptr);
         for(int x = 0; x < currentLevel->ents.size(); x++){
+            PhysicsShape* tempShape = currentLevel->ents[x]->GetSprite()->getPhysicsBody()->getShapes().at(0);
+            if(tempShape == body){
+                contactEnt = currentLevel->ents[x];
+            }
+        }
+        _drawnode->drawSegment(startPos, targetFocusPoint, 1, Color4F::RED);
+        _drawnode->drawDot(contact, 9, Color4F(1.0f, 1.0f, 1.0f, 1.0f));
+        if(contactEnt != nullptr){
+            Rect bBox = contactEnt->GetSprite()->getBoundingBox();
+            if(fabs(contact.x - bBox.getMinX()) < 1 || fabs(contact.x - bBox.getMaxX()) < 1)
+                bouncingVertical = false;
+            else{
+                int someShit = 1;
+            }
+        }
+        
+        /*for(int x = 0; x < currentLevel->ents.size(); x++){
             if(currentLevel->ents[x]->GetType() == WALL){
                 bool runClosing = false;
-                bool recordDist = false;
                 while(currentLevel->ents[x]->GetSprite()->getBoundingBox().containsPoint(targetFocusPoint) && velocityPercent != 0){
                     velocityPercent -= 0.0125 * 1.25;
                     targetFocusPoint = Vec2(user->GetSprite()->getBoundingBox().getMidX(), user->GetSprite()->getBoundingBox().getMidY());
@@ -146,68 +146,52 @@ void Game::UpdateFocusPoint(){
                 }
                 if(runClosing){
                     if(!closing){
-                        recordDist = true;
                         closing = true;
-                        user->focusPointSprite->setColor(Color3B(0,255,0));
                     }
                     velocityPercent -= 0.0125 * 1.25 * 2;
                     targetFocusPoint = Vec2(user->GetSprite()->getBoundingBox().getMidX(), user->GetSprite()->getBoundingBox().getMidY());
                     targetFocusPoint.x += user->GetSprite()->getPhysicsBody()->getVelocity().x * velocityPercent;
                     targetFocusPoint.y += user->GetSprite()->getPhysicsBody()->getVelocity().y * velocityPercent;
+                    
                 }
                 tempDistance = Vec2(targetFocusPoint.x - user->GetPosition().x, targetFocusPoint.y - user->GetPosition().y).length();
-                if(recordDist){
-                    startClosingDistance = tempDistance;
-                    startClosingMAX_SHIFT = MAX_SHIFT;
-                }
             }
-        }
-        if(closing){
-            MAX_SHIFT =(startClosingMAX_SHIFT*(tempDistance / startClosingDistance));
-        }
+        }*/
     } else {
         targetFocusPoint = GetTween(targetFocusPoint, user->GetClosestPosition(),0.5f);
-        MAX_SHIFT += 0.5;
     }
-    Vec2 angleTemp1(targetFocusPoint.x - focusPoint.x, targetFocusPoint.y - focusPoint.y);
-    Vec2 angleTemp2(user->GetPosition().x - focusPoint.x, user->GetPosition().y - focusPoint.y);
-    if(lowShift && !user->isHooked && angleTemp1.getAngle(angleTemp2) < 0.125){
-        lowShift = false;
-    }
-    float distance = targetFocusPoint.distance(focusPoint);
-    if(distance > MAX_SHIFT){
-        Vec2 normalizedDifference = GetDifference(focusPoint, targetFocusPoint);
-        Vec2 prevTrailVec = normalizedDifference;
-        normalizedDifference.normalize();
-        focusPoint.x += MAX_SHIFT * normalizedDifference.x;
-        focusPoint.y += MAX_SHIFT * normalizedDifference.y;
-        if(!catching){
-            catching = true;
-        }
-        if(catching){
-            float currentTrail = prevTrailVec.length();
-            if(currentTrail > previousTrail){
-                MAX_SHIFT += 0.35 * (currentTrail/previousTrail);
-            } else {
-                MAX_SHIFT -= 0.35 * (currentTrail/previousTrail);
-            }
-            if(currentTrail > 800){
-                catching = false;
-                closing = false;
-                lowShift = false;
-                focusPoint = targetFocusPoint;
-                return;
-            }
-            previousTrail = currentTrail;
-        }
-    } else {
+    if(focusPoint.getDistance(targetFocusPoint) < 15.f + MAX_CHANGE){
+        previousTargetChange = targetFocusPoint - focusPoint;
         focusPoint = targetFocusPoint;
-        lowShift = false;
-        catching = false;
+        MAX_CHANGE = 10;
+        return;
+    } else {
+        if(focusPoint.getDistance(targetFocusPoint) >75.f)
+            MAX_CHANGE += 0.2;
     }
+    Vec2 angleTemp1(focusPoint.x - user->GetPosition().x, focusPoint.y - user->GetPosition().y);
+    Vec2 angleTemp2(targetFocusPoint.x - user->GetPosition().x, targetFocusPoint.y - user->GetPosition().y);
+    float anglePercent = 1.f - (fmod(User::GetAngle(angleTemp1, angleTemp2), 180.f) / 180.f);
+    float MAX_COMP_CHANGE = MAX_CHANGE * anglePercent * ((visibleSize.width * visibleSize.height)/(1704.f*960.f));
+    Vec2 targetChange = targetFocusPoint - focusPoint;
+    Vec2 targetVelChange = targetChange - previousTargetChange;
+    float xRatio = fabs(MAX_COMP_CHANGE / targetVelChange.x);
+    float yRatio = fabs(MAX_COMP_CHANGE / targetVelChange.y);
+    float minRatio = 1;
+    if(xRatio < yRatio)
+        minRatio = xRatio;
+    else
+        minRatio = yRatio;
+    if(minRatio < 1.0){
+        targetVelChange.x *= minRatio;
+        targetVelChange.y *= minRatio;
+    }
+    Vec2 finalChange = Vec2(targetVelChange.x + previousTargetChange.x * (1-anglePercent), targetVelChange.y + previousTargetChange.y * (1-anglePercent));
+    previousTargetChange = finalChange;
+    focusPoint = Vec2(focusPoint.x + finalChange.x, focusPoint.y + finalChange.y);
 }
-void Game::ShiftHigh(){
-    lowShift = false;
+void Game::ShiftLow(){
+    MAX_CHANGE = 4.5;
 }
 Scene* Game::myScene;
 Scene* Game::createScene() {
@@ -215,7 +199,7 @@ Scene* Game::createScene() {
     auto layer = Game::create();
     layer->setPhyWorld(scene->getPhysicsWorld());
     myScene = scene;
-    //myScene->retain();
+    myScene->retain();
     scene->addChild(layer);
     return scene;
 }
@@ -232,9 +216,9 @@ bool Game::onContactBegin(PhysicsContact& contact){
     }
     if(type == WALL){
         closing = false;
-        user->focusPointSprite->setColor(Color3B(255,0,0));
+        //user->focusPointSprite->setColor(Color3B(255,0,0));
+        //ShiftLow();
         user->Bounce(contact.getContactData());
-        lowShift = true;
     }
     return true;
 }
@@ -273,13 +257,13 @@ void Game::LoadLevel(Level* lvl){
         winPopUpAdded = true;
     }
     winPopUp->Close();
-    world->setSpeed(2.0);
+    world->setSpeed(1.0);
 }
 void Game::setPhyWorld(PhysicsWorld* world2){
     world = world2;
     world->setGravity(Vec2(0,-270));
-    world->setSpeed(2.0);
-    //world->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+    world->setSpeed(1.0);
+    world->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
     for(int x = 0; x < user->joints.size(); x++){
         world->addJoint(user->joints[x]);
     }
@@ -327,11 +311,14 @@ bool Game::init(){
         this->addChild(tempLayer);
     }
     
+
+    
     particleBatchNode = ParticleBatchNode::createWithTexture(Director::getInstance()->getTextureCache()->addImage("Images/particle.png"));
     layers[6]->addChild(particleBatchNode);
     user = new User();
     user->Add(this);
-
+    _drawnode = DrawNode::create();
+    layers[5]->addChild(_drawnode,3);
     timeLabel = MainMenu::CreateLabel("0:00", 2);
     timeLabel->setPosition(visibleSize.width / 2.0 - (80 * MainMenu::screenScale.x), visibleSize.height);
     timeLabel->setColor(Color3B::BLACK);
@@ -347,19 +334,7 @@ bool Game::init(){
     gameSprite->setAnchorPoint(Vec2(0.5,0));
     gameSprite->setFlippedY(true);
     this->addChild(gameSprite,1);
-    
-    postShaderGameTexture = RenderTexture::create(visibleSize.width, visibleSize.height);
-    postShaderGameTexture->setKeepMatrix(true);
-    postShaderGameTexture->retain();
-    postShaderGameSprite = Sprite::createWithTexture(gameTexture->getSprite()->getTexture());
-    postShaderGameSprite->setPosition(Vec2(visibleSize.width / 2.0, 0));
-    postShaderGameSprite->setAnchorPoint(Vec2(0.5,0));
-    postShaderGameSprite->setFlippedY(true);
-    this->addChild(postShaderGameSprite,1);
-    postShaderGameSprite->setVisible(false);
-    
-    _program = avalon::graphics::loadShader(pass, shader);
-    
+        
     resetButton = MainMenu::CreateButton("game", "Refresh.png", this, menu_selector(Game::resetButtonCallback));
     resetButton->setPosition(.017*visibleSize.width, visibleSize.height - 0.025*visibleSize.height);
     resetButton->setAnchorPoint(Vec2(0.0,1.0));
@@ -379,8 +354,9 @@ bool Game::init(){
     scale = 1.0;
     winPopUp = new PopUp("You Win!", "What Next?", this, menu_selector(Game::winLevelSelectCallback), menu_selector(Game::winHighscoresSelectCallback), menu_selector(Game::winReplaySelectCallback), 8);
     winPopUpAdded = false;
-    MAX_SHIFT = 30;
-    
+    MAX_SHIFT = 30/ ((visibleSize.width * visibleSize.height)/(1704.f*960.f));
+    previousTargetChange = Vec2(0,0);
+
     
     return true;
 }
@@ -442,13 +418,13 @@ void Game::winHighscoresSelectCallback(Ref*){
 };
 void Game::winReplaySelectCallback(Ref*){
     winPopUp->Close();
-    world->setSpeed(2.0);
+    world->setSpeed(1.0);
     resetButtonCallback(nullptr);
 };
 bool Game::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
     if(!user->isHooked && !winPopUp->visible){
         user->Snag();
-        lowShift = true;
+        ShiftLow();
         Vec2 touchPosition = touch->getLocation();
         if(resetButton->getBoundingBox().containsPoint(touchPosition) || homeButton->getBoundingBox().containsPoint(touchPosition)){
             return false;
@@ -458,5 +434,94 @@ bool Game::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event){
 }
 void Game::onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event){
     user->Release();
-    lowShift = true;
+    ShiftLow();
 }
+/*void Game::UpdateFocusPoint(){
+    //MAX_SHIFT = 30;
+    if(lowShift){
+        if(MAX_SHIFT > 15)
+            MAX_SHIFT = 15;// * ((visibleSize.width * visibleSize.height)/(1704.f*960.f));//-= 0.5;
+        user->focusPointSprite->setColor(Color3B(0,255,0));
+    } else {
+        user->focusPointSprite->setColor(Color3B(255,0,0));
+    }
+    Vec2 targetFocusPoint = Vec2(user->GetSprite()->getBoundingBox().getMidX(), user->GetSprite()->getBoundingBox().getMidY());
+    if(!user->isHooked){
+        closing = false;
+        float velocityPercent = 0.5 * 1.25;
+        targetFocusPoint.x += user->GetSprite()->getPhysicsBody()->getVelocity().x * velocityPercent;
+        targetFocusPoint.y += user->GetSprite()->getPhysicsBody()->getVelocity().y * velocityPercent;
+        float tempDistance = 0;
+        for(int x = 0; x < currentLevel->ents.size(); x++){
+            if(currentLevel->ents[x]->GetType() == WALL){
+                bool runClosing = false;
+                bool recordDist = false;
+                while(currentLevel->ents[x]->GetSprite()->getBoundingBox().containsPoint(targetFocusPoint) && velocityPercent != 0){
+                    velocityPercent -= 0.0125 * 1.25;
+                    targetFocusPoint = Vec2(user->GetSprite()->getBoundingBox().getMidX(), user->GetSprite()->getBoundingBox().getMidY());
+                    targetFocusPoint.x += user->GetSprite()->getPhysicsBody()->getVelocity().x * velocityPercent;
+                    targetFocusPoint.y += user->GetSprite()->getPhysicsBody()->getVelocity().y * velocityPercent;
+                    runClosing = true;
+                }
+                if(runClosing){
+                    if(!closing){
+                        recordDist = true;
+                        closing = true;
+                        user->focusPointSprite->setColor(Color3B(0,255,0));
+                    }
+                    velocityPercent -= 0.0125 * 1.25 * 2;
+                    targetFocusPoint = Vec2(user->GetSprite()->getBoundingBox().getMidX(), user->GetSprite()->getBoundingBox().getMidY());
+                    targetFocusPoint.x += user->GetSprite()->getPhysicsBody()->getVelocity().x * velocityPercent;
+                    targetFocusPoint.y += user->GetSprite()->getPhysicsBody()->getVelocity().y * velocityPercent;
+                }
+                tempDistance = Vec2(targetFocusPoint.x - user->GetPosition().x, targetFocusPoint.y - user->GetPosition().y).length();
+                if(recordDist){
+                    startClosingDistance = tempDistance;
+                    startClosingMAX_SHIFT = MAX_SHIFT;
+                }
+            }
+        }
+        if(closing){
+            MAX_SHIFT =(startClosingMAX_SHIFT*(tempDistance / startClosingDistance));
+        }
+    } else {
+        targetFocusPoint = targetFocusPoint;//GetTween(targetFocusPoint, user->GetClosestPosition(),0.5f);
+        MAX_SHIFT += 0.5 * ((visibleSize.width * visibleSize.height)/(1704.f*960.f));
+    }
+    Vec2 angleTemp1(targetFocusPoint.x - focusPoint.x, targetFocusPoint.y - focusPoint.y);
+    Vec2 angleTemp2(user->GetPosition().x - focusPoint.x, user->GetPosition().y - focusPoint.y);
+    if(lowShift && !user->isHooked && angleTemp1.getAngle(angleTemp2) < 0.125){
+        lowShift = false;
+    }
+    float distance = targetFocusPoint.distance(focusPoint);
+    if(distance > MAX_SHIFT){
+        Vec2 normalizedDifference = GetDifference(focusPoint, targetFocusPoint);
+        Vec2 prevTrailVec = normalizedDifference;
+        normalizedDifference.normalize();
+        focusPoint.x += MAX_SHIFT * normalizedDifference.x;
+        focusPoint.y += MAX_SHIFT * normalizedDifference.y;
+        if(!catching){
+            catching = true;
+        }
+        if(catching){
+            float currentTrail = prevTrailVec.length();
+            if(currentTrail > previousTrail){
+                MAX_SHIFT += 0.5 * (currentTrail/previousTrail) * ((visibleSize.width * visibleSize.height)/(1704.f*960.f));
+            }// else {
+            //    MAX_SHIFT -= 0.5 * (currentTrail/previousTrail)* ((visibleSize.width * visibleSize.height)/(1704.f*960.f));
+            //}
+            if(currentTrail > 800 && false){
+                catching = false;
+                closing = false;
+                lowShift = false;
+                focusPoint = targetFocusPoint;
+                return;
+            }
+            previousTrail = currentTrail;
+        }
+    } else {
+        focusPoint = targetFocusPoint;
+        lowShift = false;
+        catching = false;
+    }
+}*/

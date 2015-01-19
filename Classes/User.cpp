@@ -25,6 +25,11 @@ User::User() : Entity(Vec2(150,150), Vec2(0,0), Vec2(0,0), 5){
     focusPointSprite->retain();
     focusPointSprite->setScale(0.4,0.4);
     focusPointSprite->setAnchorPoint(Vec2(0.5,0.5));
+    targetFocusPointSprite = Sprite::create("user.png");
+    targetFocusPointSprite->retain();
+    targetFocusPointSprite->setScale(0.4,0.4);
+    targetFocusPointSprite->setAnchorPoint(Vec2(0.5,0.5));
+    targetFocusPointSprite->setColor(Color3B(0,0,0));
     line->retain();
     line->setAnchorPoint(Vec2(0.0,0.5));
     line->setVisible(false);
@@ -66,6 +71,8 @@ void User::Add(Game* layer){
     for(int x = 0; x < sprites.size(); x++){
         layer->layers[5]->addChild(sprites[x]);
     }
+    layer->layers[5]->addChild(focusPointSprite,1);
+    layer->layers[5]->addChild(targetFocusPointSprite,1);
 }
 void User::update(float boardScale){
     if(position.y < -400)
@@ -85,6 +92,7 @@ void User::update(float boardScale){
         scale = 1.0;
     SetStretch(sprite, angle, scale);
     focusPointSprite->setPosition(Game::Instance->focusPoint);
+    targetFocusPointSprite->setPosition(Game::Instance->targetFocusPoint);
 }
 void User::SetStretch(Sprite* sprite, float angle, float magnitude){
     sprite->setRotation(0);
@@ -140,8 +148,8 @@ void User::Reset(){
         }
         sprites[x]->setPosition(body->getPosition().x + (userPos.x * 60), body->getPosition().y + (userPos.y *60));
     }
-    Game::Instance->focusPoint = GetPosition();
-    Game::Instance->lowShift = false;
+    Game::Instance->focusPoint = Vec2(oLaunch.x, oLaunch.y);
+    Game::Instance->previousTargetChange = Vec2(0,0);
     Game::Instance->catching = false;
     Game::Instance->closing = false;
     Game::Instance->startClosingDistance = 0;
@@ -173,6 +181,7 @@ Vec2 User::GetClosestPosition(){
             return closestPosition;
         return GetPosition();
     }
+    return Vec2(0,0);
 }
 float User::GetAngle(Vec2 a, Vec2 b){
     float o = a.x - b.x;

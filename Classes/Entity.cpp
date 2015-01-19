@@ -204,9 +204,6 @@ void Entity::SetUpPhysicsSprite(std::string texture, Vec2 scale){
     if(type == SPAWNER || type == HOOK){
         body->setContactTestBitmask(false);
         body->setCategoryBitmask(false);
-    } else {
-        body->setContactTestBitmask(true);
-        body->setCategoryBitmask(true);
     }
 }
 void Entity::update(Vec2 userPosition, float boardScale){

@@ -55,21 +55,20 @@ public:
     ParticleBatchNode* particleBatchNode;
     Vec2 focusPoint;
     void UpdateFocusPoint();
-    bool lowShift;
     float MAX_SHIFT;
     float closing;
     void ShiftHigh();
+    void ShiftLow();
     float startClosingDistance;
     float startClosingMAX_SHIFT;
     bool catching;
     float previousTrail;
-    GLProgram* _program;
-    GLProgramState* _state;
-    void UpdateUniforms();
-    void UpdateShader();
+    Vec2 previousTargetChange;
+    Vec2 targetFocusPoint;
+    float MAX_CHANGE;
+    DrawNode* _drawnode;
+    PhysicsRayCastCallbackFunc func;
 private:
-    RenderTexture* postShaderGameTexture;
-    Sprite* postShaderGameSprite;
     Sprite* gameSprite;
     RenderTexture* gameTexture;
     MenuItemImage* resetButton;
