@@ -1,11 +1,3 @@
-//
-//  Level.h
-//  Snag
-//
-//  Created by Zachary Prinzbach on 7/7/14.
-//
-//
-
 #ifndef __Snag__Level__
 #define __Snag__Level__
 
@@ -22,38 +14,38 @@ public:
 
     Level(bool isNew);
     
-    void AddEntity(Entity*);
-    void Add(Game* game);
-    void Remove(Game* game);
-
-    void SetName(std::string);
-    void SetAuthor(std::string);
-    void SetObjectID(std::string);
-    void SetHighscoresID(std::string);
-    std::string GetName();
-    std::string GetPath();
-    std::string GetAuthor();
+    void addEntity(Entity*);
+    void add(Game* game);
+    void remove(Game* game);
+    Entity* getEntity(int ID);
+    void setName(std::string);
+    void setAuthor(std::string);
+    void setObjectID(std::string);
+    void setHighscoresID(std::string);
+    std::string getName();
+    std::string getPath();
+    std::string getAuthor();
     ValueMap getValueMap();
-    std::vector<Entity*> ents;
-    void Save();
+    void save();
     void makePublic();
-    std::string GetStatus();
-    std::string GetID();
-    int GetFavorites();
-    bool GetIsFavorited();
-    Vec2 GetLaunchVelocity();
-    Vec2 GetLaunchPosition();
-    std::vector<Entity*> GetEntities();
-    void Clear();
+    std::string getStatus();
+    std::string getID();
+    int getFavorites();
+    bool getIsFavorited();
+    Vec2 getLaunchVelocity();
+    Vec2 getLaunchPosition();
+    std::vector<Entity*> getEntities();
+    void clear();
     std::string toString();
     void fromString(std::string);
     Entity* spawner;
-    std::string GetLastSaveXML();
+    std::string getLastSaveXML();
 private:
-    void CreateFromMapValues();
+    std::vector<Entity*> ents;
+    void createFromMapValues();
     bool hasMapObjects;
-    void AddMapValue(Entity*);
-    void SetMap(ValueMap);
+    void addMapValue(Entity*);
+    void setMap(ValueMap);
     ValueMap map;
     std::string path;
     std::string name;

@@ -1,11 +1,3 @@
-//
-//  Preview.h
-//  Snag
-//
-//  Created by Zachary Prinzbach on 8/13/14.
-//
-//
-
 #ifndef __Snag__Preview__
 #define __Snag__Preview__
 

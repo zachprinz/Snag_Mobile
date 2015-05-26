@@ -1,114 +1,155 @@
-//
-//  Entity.cpp
-//  Snag
-//
-//  Created by Zachary Prinzbach on 6/28/14.
-//
-//
-
 #include "Entity.h"
 #include "MainMenu.h"
 #include "Game.h"
+#include "PlayScreen.h"
+#include "Utils.h"
+#include <String>
 
 USING_NS_CC;
 
-#define WALL 0
-#define SPIKE_WALL 1
-#define HOOK 2
-#define SPAWNER 3
-#define GOAL 4
-#define USER 5
-
 Entity* Entity::createWall(Vec2 pos, Vec2 size){
-    Entity* ent = new Entity(pos,size,Vec2(0,0),WALL);
+    Entity* ent = new Entity(pos,size,Vec2(0,0), "wall.png", true);
+    ent->setTag(WALL);
     return ent;
 }
 Entity* Entity::createSpikeWall(Vec2 pos, Vec2 size){
-    Entity* ent = new Entity(pos,size,Vec2(0,0),SPIKE_WALL);
+    Entity* ent = new Entity(pos,size,Vec2(0,0), "spikewall.png", true);
+    ent->setTag(SPIKE_WALL);
     return ent;
 }
 Entity* Entity::createGoal(Vec2 pos, Vec2 size){
-    Entity* ent = new Entity(pos,size,Vec2(0,0),GOAL);
+    Entity* ent = new Entity(pos,size,Vec2(0,0), "goal.png", true);
+    ent->setTag(GOAL);
+    ent->createEmitter();
+    ParticleSystemQuad* emitter = ent->getEmitter();
+    emitter->setLife(0.8f);
+    emitter->setLifeVar(0.1f);
+    emitter->setEmitterMode(ParticleSystem::Mode::GRAVITY);
+    emitter->setGravity(Vec2(0,0));
+    emitter->setRadialAccel(0);
+    emitter->setRadialAccelVar(0);
+    emitter->setSpeed(30);
+    emitter->setSpeedVar(0);
+    emitter->setStartColor(Color4F(Color4B(0, 255, 0, 255)));
+    emitter->setEndColor(Color4F(Color4B(0,255,0,11)));
+    emitter->setEndColorVar(Color4F(Color4B(0,0,0,50)));
+    emitter->setStartSize(25.0f);
+    emitter->setStartSizeVar(5.0f);
+    emitter->setEndSize(10);
+    emitter->setEndSizeVar(5);
+    emitter->setEmissionRate(0.001 * size.x * size.y);
+    ent->setEmitter(emitter);
     return ent;
 }
 Entity* Entity::createHook(Vec2 pos){
-    Entity* ent = new Entity(pos, Vec2(0,0), Vec2(0,0), HOOK);
+    Entity* ent = new Entity(pos, Vec2(0,0), Vec2(0,0), "game_hook.png", false);
+    ent->setTag(HOOK);
+    float width = ent->getSize().x;
+    ParticleSystemQuad* emitter = ent->getEmitter();
+    emitter->setLife(1.f);
+    emitter->setLifeVar(0.2f);
+    emitter->setEmitterMode(ParticleSystem::Mode::RADIUS);
+    emitter->setStartRadius(width * 0.85);
+    emitter->setStartRadiusVar(0);
+    emitter->setEndRadius(width * 1.2);
+    emitter->setEndRadiusVar(0);
+    emitter->setRotatePerSecond(0);
+    emitter->setRotatePerSecondVar(360);
+    emitter->setStartColor(Color4F(Color4B(255, 0, 0, 255)));
+    emitter->setEndColor(Color4F(Color4B(255,0,0,50)));
+    emitter->setEndColorVar(Color4F(Color4B(0,0,0,50)));
+    emitter->setStartSize(20.0f);
+    emitter->setStartSizeVar(2.0f);
+    emitter->setEndSize(10);
+    emitter->setEndSizeVar(2);
+    emitter->setEmissionRate(0.035 * width * width); //Square so (W*H == W*W)
+    ent->setEmitter(emitter);
     return ent;
 }
 Entity* Entity::createSpawner(Vec2 pos, Vec2 vel){
-    Entity* ent = new Entity(pos, Vec2(0,0), vel, SPAWNER);
+    Entity* ent = new Entity(pos, Vec2(0,0), vel, "spawner.png", false);
+    ent->setTag(SPAWNER);
+    float width = ent->getSize().x;
+    ParticleSystemQuad* emitter = ent->getEmitter();
+    emitter->setAngle(getAngle(Vec2(0,0),Vec2(vel.x * -1, vel.y)));
+    emitter->setAngleVar(0);
+    emitter->setLife(0.5f);
+    emitter->setLifeVar(0.1f);
+    emitter->setEmitterMode(ParticleSystem::Mode::GRAVITY);
+    emitter->setGravity(Vec2(-1*vel.x, -1*vel.y));
+    emitter->setRadialAccel(0);
+    emitter->setRadialAccelVar(0);
+    emitter->setSpeed(0.6*0.01*(vel.x*vel.x + vel.y*vel.y));
+    emitter->setSpeedVar(0.6*0.005*(vel.x*vel.x + vel.y*vel.y));
+    emitter->setStartColor(Color4F(Color4B(255, 255, 0, 255)));
+    emitter->setEndColor(Color4F(Color4B(255,255,0,255)));
+    emitter->setEndColorVar(Color4F(Color4B(0,0,0,0)));
+    emitter->setStartSize(25.0f);
+    emitter->setStartSizeVar(5.0f);
+    emitter->setEndSize(0);
+    emitter->setEndSizeVar(5);
+    emitter->setEmissionRate(0.02 * width * width); //Square so (W*H == W*W)
+    emitter->setPosVar(Vec2(0.25 * width, 0.25 * width));
+    ent->setEmitter(emitter);
     return ent;
 }
+
 int Entity::count = 0;
 
-Entity::Entity(Vec2 pos, Vec2 size, Vec2 vel, int type){
+Entity::Entity(Vec2 position, Vec2 size, Vec2 launchVelocity, std::string texture, bool collision){
     ID = count++;
-    std::string textures[6] = {"wall.png", "spikewall.png", "game_hook.png", "spawner.png", "goal.png", "user.png"};
-    float baseScales[6] = {1,1,1,1,1,1};
-    this->baseScale = Vec2(baseScales[type],baseScales[type]);
-    this->type = type;
-    this->size = Vec2(size.x,size.y);
-    this->position = Vec2(pos.x, pos.y);
-    sprite = Sprite::create(textures[type]);
-    this->originalSize = Vec2(sprite->getBoundingBox().size.width, sprite->getBoundingBox().size.height);
+    
+    this->size = size;
+    this->launchVelocity = launchVelocity;
+    
+    sprite = Sprite::create(texture);
     sprite->setAnchorPoint(Vec2(0.5,0.5));
     sprite->retain();
     sprite->setGlobalZOrder(0);
-    if(this->size.x != 0 && this->size.y != 0){
-        baseScale.x = this->size.x / sprite->getBoundingBox().size.width;
-        baseScale.y = this->size.y / sprite->getBoundingBox().size.height;
-    }
-    this->launchVelocity = vel;
-    sprite->setScale(baseScale.x, baseScale.y);
-    if(type != USER)
-        this->SetUpPhysicsSprite(textures[type], baseScale);
     sprite->setPosition(position);
-    if(type == HOOK){
-        line = Sprite::create("game_line.png");
-        line->retain();
-        line->setAnchorPoint(Vec2(0.0,0.5));
-        line->setVisible(false);
-        line->setPosition(this->position.x,this->position.y);
-        hasParticleEffects = true;
+
+    if(this->size.x != 0 && this->size.y != 0){
+        float baseScale_x = this->size.x / sprite->getBoundingBox().size.width;
+        float baseScale_y = this->size.y / sprite->getBoundingBox().size.height;
+        sprite->setScale(baseScale_x, baseScale_y);
     }
-    if(type == HOOK || type == GOAL || type == SPAWNER){
-        SetUpParticles();
-    }
+    
+    setUpPhysicsSprite(collision);
+    emitter = NULL;
 }
-float GetAngle(Vec2 a, Vec2 b){
-    float o = a.x - b.x;
-    float adj = a.y - b.y;
-    if(a.x == b.x){
-        if(a.y > b.y)
-            return 90;
-        else
-            return 270;
+
+void Entity::setUpPhysicsSprite(bool collision){
+    body = PhysicsBody::createBox(Size(sprite->getBoundingBox().size), PhysicsMaterial(0.1,1,0));
+    body->setMass(PHYSICS_INFINITY);
+    body->setDynamic(false);
+    body->setContactTestBitmask(false);
+    body->setCategoryBitmask(false);
+    if(collision){
+        body->setContactTestBitmask(true);
+        body->setCategoryBitmask(true);
     }
-    if(a.y == b.y){
-        if(a.x > b.x)
-            return 0;
-        else
-            return 180;
-    }
-    float angle = atan(o/adj) * 57.29;
-    if(adj < 0){ //Left two
-        if(adj > 0) // bottom left
-            angle = (90-angle) + 180;
-        if(adj < 0) // top left
-            angle = 90 + angle;
-    }
-    else{ // Right two
-        if(adj > 0) // bottom right
-            angle += 270;
-        if(adj < 0) // top right
-            angle = (90 - angle);
-    }
-    return angle;
+    sprite->setPhysicsBody(body);
 }
-void Entity::SetUpParticles(){
+
+void Entity::add(){
+    sprite->setGlobalZOrder(0);
+    PlayScreen::Instance->addSprite(sprite);
+    sprite->release();
+    if(getEmitter() != NULL)
+        PlayScreen::Instance->addEmitter(emitter);
+}
+
+void Entity::remove(){
+    sprite->retain();
+    sprite->removeFromParent();
+    if(getEmitter() != NULL)
+        PlayScreen::Instance->removeEmitter(getEmitter());
+}
+
+void Entity::createEmitter(){
     emitter = ParticleSystemQuad::create();
     for(int x = 0; x < 10; x++)
-    emitter->addParticle();
+        emitter->addParticle();
     emitter->retain();
     emitter->setTexture(Director::getInstance()->getTextureCache()->addImage("Images/particle.png"));
     emitter->setBlendAdditive(false);
@@ -116,161 +157,53 @@ void Entity::SetUpParticles(){
     emitter->setAngle(0);
     emitter->setAngleVar(360);
     emitter->setPosVar(Vec2(0.5*sprite->getBoundingBox().size.width, 0.5*sprite->getBoundingBox().size.height));
-    if(type == HOOK){
-        emitter->setLife(1.f);
-        emitter->setLifeVar(0.2f);
-        emitter->setEmitterMode(ParticleSystem::Mode::RADIUS);
-        emitter->setStartRadius(sprite->getBoundingBox().size.width * .85);
-        emitter->setStartRadiusVar(sprite->getBoundingBox().size.width * 0.0);
-        emitter->setEndRadius(sprite->getBoundingBox().size.width * 1.2);
-        emitter->setEndRadiusVar(sprite->getBoundingBox().size.width * 0.0);
-        emitter->setRotatePerSecond(0);
-        emitter->setRotatePerSecondVar(360);
-        emitter->setStartColor(Color4F(Color4B(255, 0, 0, 255)));
-        emitter->setEndColor(Color4F(Color4B(255,0,0,50)));
-        emitter->setEndColorVar(Color4F(Color4B(0,0,0,50)));
-        emitter->setStartSize(20.0f);
-        emitter->setStartSizeVar(2.0f);
-        emitter->setEndSize(10);
-        emitter->setEndSizeVar(2);
-        emitter->setEmissionRate(0.035 * sprite->getBoundingBox().size.width * sprite->getBoundingBox().size.height);
-    }
-    if(type == GOAL){
-        emitter->setLife(0.8f);
-        emitter->setLifeVar(0.1f);
-        emitter->setEmitterMode(ParticleSystem::Mode::GRAVITY);
-        emitter->setGravity(Vec2(0,0));
-        emitter->setRadialAccel(0);
-        emitter->setRadialAccelVar(0);
-        emitter->setSpeed(30);
-        emitter->setSpeedVar(0);
-        emitter->setStartColor(Color4F(Color4B(0, 255, 0, 255)));
-        emitter->setEndColor(Color4F(Color4B(0,255,0,11)));
-        emitter->setEndColorVar(Color4F(Color4B(0,0,0,50)));
-        emitter->setStartSize(25.0f);
-        emitter->setStartSizeVar(5.0f);
-        emitter->setEndSize(10);
-        emitter->setEndSizeVar(5);
-        emitter->setEmissionRate(0.001 * sprite->getBoundingBox().size.width * sprite->getBoundingBox().size.height);
-    }
-    if(type == SPAWNER){
-        emitter->setAngle(GetAngle(Vec2(0,0),Vec2(launchVelocity.x * -1, launchVelocity.y)));
-        emitter->setAngleVar(0);
-        emitter->setLife(0.5f);
-        emitter->setLifeVar(0.1f);
-        emitter->setEmitterMode(ParticleSystem::Mode::GRAVITY);
-        emitter->setGravity(Vec2(-1*launchVelocity.x, -1*launchVelocity.y));
-        emitter->setRadialAccel(0);
-        emitter->setRadialAccelVar(0);
-        emitter->setSpeed(0.6*0.01*(launchVelocity.x*launchVelocity.x + launchVelocity.y*launchVelocity.y));
-        emitter->setSpeedVar(0.6*0.005*(launchVelocity.x*launchVelocity.x + launchVelocity.y*launchVelocity.y));
-        emitter->setStartColor(Color4F(Color4B(255, 255, 0, 255)));
-        emitter->setEndColor(Color4F(Color4B(255,255,0,255)));
-        emitter->setEndColorVar(Color4F(Color4B(0,0,0,0)));
-        emitter->setStartSize(25.0f);
-        emitter->setStartSizeVar(5.0f);
-        emitter->setEndSize(0);
-        emitter->setEndSizeVar(5);
-        emitter->setEmissionRate(0.02 * sprite->getBoundingBox().size.width * sprite->getBoundingBox().size.height);
-        emitter->setPosVar(Vec2(0.25*sprite->getBoundingBox().size.width, 0.25*sprite->getBoundingBox().size.height));
-    }
+}
+
+void Entity::setEmitter(ParticleSystemQuad* emit){
+    emitter = emit;
     emitter->setEndColor(Color4F(Color4B(0, 0, 0, 0)));
     emitter->setStartColorVar(Color4F(Color4B(0,0,0,0)));
     emitter->setPosition(Vec2(sprite->getBoundingBox().getMidX(), sprite->getBoundingBox().getMidY()));
     emitter->setPositionType(ParticleSystem::PositionType::RELATIVE);
 }
-void Entity::SetLine(float size, float angle){
-    if(type == HOOK){
-        line->setRotation(0);
-        line->setScale((size)/100,5);
-        line->setRotation(angle);
-        line->setVisible(true);
-    }
-}
-void Entity::SetLineOff(){
-    if(type == HOOK){
-        line->setVisible(false);
-    }
-}
-void Entity::SetUpPhysicsSprite(std::string texture, Vec2 scale){
-    auto physMat = PhysicsMaterial(0.1,1,0);
-    body = PhysicsBody::createBox(Size(sprite->getBoundingBox().size.width, sprite->getBoundingBox().size.height),physMat);
-    body->setMass(PHYSICS_INFINITY);
-    body->setDynamic(false);
-    body->setTag(type);
-    sprite->setPhysicsBody(body);
-    sprite->setTag(type);
-    sprite->setAnchorPoint(Vec2(0.5,0.5));
-    if(type == SPAWNER || type == HOOK){
-        body->setContactTestBitmask(false);
-        body->setCategoryBitmask(false);
-    }
-}
-void Entity::update(Vec2 userPosition, float boardScale){
-    //emitter->setPosVar(Vec2(sprite->getBoundingBox().size.width * (1/boardScale), (1/boardScale) * sprite->getBoundingBox().size.height));
-}
-void Entity::CalculateScale(Vec2 userPosition, float boardScale){
 
+ParticleSystemQuad* Entity::getEmitter(){
+    return emitter;
 }
-void Entity::Add(Game* game){
-    sprite->setGlobalZOrder(0);
-    game->layers[type]->addChild(sprite,1);
-    sprite->release();
-    if(type == GOAL || type == SPAWNER || type == HOOK){
-        game->particleBatchNode->addChild(emitter);
-    }
-    if(type == HOOK){
-        game->layers[type]->addChild(line,1);
-        line->release();
-    }
-    if(type == USER){
-        //game->layers[HOOK]->addChild(((User*)this)->line,1);
-        //line->release();
-    }
+
+Point Entity::getPosition(){
+    return sprite->getPosition();
 }
-void Entity::Remove(Game* game){
-    sprite->retain();
-    this->sprite->removeFromParent();
-    if(type == HOOK){
-        line->retain();
-        line->removeFromParent();
-    }
-    if(type == GOAL || type == SPAWNER || type == HOOK){
-        game->particleBatchNode->removeChild(emitter, false);
-    }
-    if(type == USER){
-        //game->layers[HOOK]->addChild(((User*)this)->line,1);
-    }
-    //game->removeChild(sprite);
+void Entity::setPosition(Vec2 pos){
+    sprite->setPosition(pos);
 }
-Sprite* Entity::GetSprite(){
-    return sprite;
-}
-Point Entity::GetPosition(){
-    return position;
-}
-void Entity::SetPosition(Vec2 pos){
-    position = pos;
-}
-Vec2 Entity::GetLaunchVelocity(){
+Vec2 Entity::getLaunchVelocity(){
     return launchVelocity;
 }
-void Entity::SetLaunchVelocity(Vec2 vl){
+void Entity::setLaunchVelocity(Vec2 vl){
     launchVelocity = vl;
-    emitter->setAngle(GetAngle(Vec2(0,0),Vec2(launchVelocity.x * -1, launchVelocity.y)));
+    if(getEmitter() != NULL)
+        emitter->setAngle(getAngle(Vec2(0,0),Vec2(launchVelocity.x * -1, launchVelocity.y)));
 }
-int Entity::GetType(){
-    return type;
-}
-Vec2 Entity::GetSize(){
+Vec2 Entity::getSize(){
     return size;
 }
-void Entity::SetSize(Vec2 size){
+void Entity::setSize(Vec2 size){
     this->size = size;
 }
-Vec2 Entity::GetOriginalSize(){
-    return originalSize;
+int Entity::getID(){
+    return ID;
 }
-float Entity::GetSum(){
-    return (position.x + position.y + launchVelocity.x + launchVelocity.y + size.x + size.y);
+Rect Entity::getBoundingBox(){
+    return sprite->getBoundingBox();
+}
+void Entity::setTag(int type){
+    int tag = (type & TYPE_MASK) | ((getID() << 3));
+    this->tag = tag;
+    body->setTag(tag);
+    sprite->setTag(tag);
+}
+int Entity::getTag(){ return tag; }
+PhysicsBody* Entity::getPhysicsBody(){
+    return body;
 }

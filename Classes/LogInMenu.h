@@ -1,11 +1,3 @@
-//
-//  LogInMenu.h
-//  Snag
-//
-//  Created by Zachary Prinzbach on 8/7/14.
-//
-//
-
 #ifndef __Snag__LogInMenu__
 #define __Snag__LogInMenu__
 

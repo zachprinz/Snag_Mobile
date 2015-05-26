@@ -1,11 +1,3 @@
-//
-//  LevelMenuItem.h
-//  Snag
-//
-//  Created by Zachary Prinzbach on 7/3/14.
-//
-//
-
 #ifndef __Snag__LevelMenuItem__
 #define __Snag__LevelMenuItem__
 

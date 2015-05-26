@@ -1,11 +1,3 @@
-//
-//  Entity.h
-//  Snag
-//
-//  Created by Zachary Prinzbach on 6/28/14.
-//
-//
-
 #ifndef __Snag__Entity__
 #define __Snag__Entity__
 
@@ -17,62 +9,58 @@
 #define SPAWNER 3
 #define GOAL 4
 #define USER 5
-
+#define LINE 1000
 
 #include <iostream>
 #include "cocos2d.h"
 
 USING_NS_CC;
 
-class Game;
+int ID_MASK   = ~7;
+int TYPE_MASK = 7;
+int TAG_TO_ID  (int tag) { return  (tag & ID_MASK)>>3; }
+int TAG_TO_TYPE(int tag) { return  (tag & TYPE_MASK); }
+
 class Entity{
-public:    
-    static Entity* createWall(Vec2, Vec2);
-    static Entity* createSpikeWall(Vec2, Vec2);
-    static Entity* createGoal(Vec2, Vec2);
-    static Entity* createHook(Vec2);
-    static Entity* createSpawner(Vec2, Vec2);
-    static int count;
+    protected:
+        Entity(Vec2 pos, Vec2 size, Vec2 vel, std::string texture, bool collision);
+        virtual void setUpPhysicsSprite(bool collision);
+        Sprite*      sprite;
+        PhysicsBody* body;
     
-    Entity(Vec2 pos, Vec2 size, Vec2 vel, int type);
+    public:
+        static Entity* createWall(Vec2, Vec2);
+        static Entity* createSpikeWall(Vec2, Vec2);
+        static Entity* createGoal(Vec2, Vec2);
+        static Entity* createHook(Vec2);
+        static Entity* createSpawner(Vec2, Vec2);
+        static int count;
     
-    virtual void SetUpPhysicsSprite(std::string, Vec2);
-    virtual void SetUpParticles();
-    virtual void update(Vec2 userPosition, float boardScale);
-    virtual void Add(Game* a);
-    virtual void Remove(Game* a);
-    void draw();
+        virtual void add();
+        virtual void remove();
+        
+        Vec2  getSize();
+        void  setSize(Vec2);
+        Point getPosition();
+        void  setPosition(Vec2);
+        Vec2  getLaunchVelocity();
+        void  setLaunchVelocity(Vec2);
+        int   getID();
+        int   getTag();
+        void  setTag(int);
+        Rect  getBoundingBox();
+        PhysicsBody* getPhysicsBody();
     
-    Vec2 GetSize();
-    void SetSize(Vec2);
-    Sprite* GetSprite();
-    Point GetPosition();
-    Vec2 GetLaunchVelocity();
-    void SetLaunchVelocity(Vec2);
-    int GetType();
-    Vec2 GetOriginalSize();
-    void SetPosition(Vec2);
-    int ID;
-    Sprite* line;
-    void SetLine(float size, float angle);
-    void SetLineOff();
-    bool operator < (const Entity& str) const {return (position.x < str.position.x);}
-    Point position;
-    float GetSum();
-    ParticleSystemQuad* emitter;
-    LayerColor* color;
-    bool hasParticleEffects;
-protected:
-    virtual void CalculateScale(Vec2 userPosition, float boardScale);
-    Vec2 size;
-    Vec2 baseScale;
-    Vec2 launchVelocity;
-    Sprite* sprite;
-    Vec2 imageSize;
-    DrawNode* boundsDebug;
-    PhysicsBody* body;
-    Vec2 originalSize;
-    int type;
+        ParticleSystemQuad* getEmitter();
+        void                setEmitter(ParticleSystemQuad*);
+        void             createEmitter();
+    
+    private:
+        int ID;
+        int tag;
+        Vec2 size;
+        Vec2 launchVelocity;
+        ParticleSystemQuad* emitter;
 };
 
 #endif /* defined(__Snag__Entity__) */

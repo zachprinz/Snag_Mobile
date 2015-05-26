@@ -1,11 +1,3 @@
-//
-//  Highscores.cpp
-//  Snag
-//
-//  Created by Zachary Prinzbach on 9/12/14.
-//
-//
-
 #include "Highscores.h"
 #include "Game.h"
 #include "MainMenu.h"

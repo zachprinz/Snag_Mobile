@@ -1,11 +1,3 @@
-//
-//  LevelInfo.cpp
-//  Snag
-//
-//  Created by Zachary Prinzbach on 7/7/14.
-//
-//
-
 #include "LevelInfo.h"
 #include "LevelInfo.h"
 #include "Game.h"

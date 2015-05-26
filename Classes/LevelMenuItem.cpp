@@ -1,11 +1,3 @@
-//
-//  LevelMenuItem.cpp
-//  Snag
-//
-//  Created by Zachary Prinzbach on 7/3/14.
-//
-//
-
 #include "LevelMenuItem.h"
 #include "LevelSelect.h"
 #include "MainMenu.h"

@@ -1,11 +1,3 @@
-//
-//  User.h
-//  Snag
-//
-//  Created by Zachary Prinzbach on 6/28/14.
-//
-//
-
 #ifndef __Snag__User__
 #define __Snag__User__
 
@@ -13,48 +5,53 @@
 #include "cocos2d.h"
 #include "Entity.h"
 
-
 USING_NS_CC;
 
 class User : public Entity{
-public:
-    static int type;
-    User();
-    virtual void SetUpPhysicsSprite(std::string, Vec2);
-    virtual void Add(Game*);
     
-    void Snag();
-    void Release(bool add = true);
-    void update(float dt);
+public:
+    User();
+    virtual void setUpPhysicsSprite(bool collision);
+    
+    virtual void add();
+    virtual void remove();
+    
+    void snag();
+    void release(bool add = true);
+    
+    void update();
     void collide(Vec2);
-    void Reset();
+    void reset(Vec2, Vec2);
     void Bounce(const PhysicsContactData* data);
-    void SetBackupVelocity();
-    void UpdateBounce();
-    Vec2 GetPhysicalPosition();
-    bool isHooked;
+    bool isHooked();
     Sprite* line;
+    
     std::vector<Sprite*> pastSprites;
-    void SetStretch(Sprite*, float angle, float magnitude);
-    std::vector<PhysicsBody*> bodies;
-    std::vector<Sprite*> sprites;
-    std::vector<PhysicsJointDistance*> joints;
-    PhysicsJointDistance* joint;
-    std::vector<PhysicsJointDistance*> distanceJoints;
-    static float GetAngle(Vec2 a, Vec2 b);
-    Entity* closest;
-    Sprite* focusPointSprite;
-    Sprite* targetFocusPointSprite;
-    Vec2 GetClosestPosition();
+    void setStretch(Sprite*, float angle, float magnitude);
+
+    Vec2 getClosestPosition();
+    void setLine(float size, float angle);
+    void setLineOff();
+    Vec2 getVelocity();
+    
 private:
+    bool hooked;
     int tailCount;
     int spriteUpdateCount;
-    void CalculateScale(Vec2 userPosition, float boardScale);
+    void updatePosition();
+    void updateSpriteStretch();
     Vec2 backupVelocity;
     Vec2 closestPosition;
     Entity* hook;
     void updatePhysics(float dt);
     float lineBaseScale;
+    Entity* closest;
+
+    Sprite* focusPointSprite;
+    Sprite* targetFocusPointSprite;
+    
+    std::vector<Sprite*> sprites;
+    PhysicsJointDistance* joint;
 };
 
 #endif /* defined(__Snag__User__) */

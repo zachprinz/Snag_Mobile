@@ -1,10 +1,3 @@
-//
-//  LevelSelect.h
-//  Snag
-//
-//  Created by Zachary Prinzbach on 7/3/14.
-//
-//
 
 #ifndef __Snag__LevelSelect__
 #define __Snag__LevelSelect__

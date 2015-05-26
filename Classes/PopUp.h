@@ -1,11 +1,3 @@
-//
-//  PopUp.h
-//  Snag
-//
-//  Created by Zachary Prinzbach on 8/11/14.
-//
-//
-
 #ifndef __Snag__PopUp__
 #define __Snag__PopUp__
 

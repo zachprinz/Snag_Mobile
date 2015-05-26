@@ -1,11 +1,3 @@
-//
-//  LevelEditor.h
-//  Snag
-//
-//  Created by Zachary Prinzbach on 7/1/14.
-//
-//
-
 #ifndef __Snag__LevelEditor__
 #define __Snag__LevelEditor__
 
@@ -29,7 +21,7 @@
 #define NO_TOOL 7
 #define MOVE 8
 #define TILE_SIZE 40
-#define PTM_RATIO 512.0
+#define PTM_RATIO 256.0
 
 using namespace cocos2d::extension;
 

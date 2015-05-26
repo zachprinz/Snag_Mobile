@@ -1,11 +1,3 @@
-//
-//  LogInMenu.cpp
-//  Snag
-//
-//  Created by Zachary Prinzbach on 8/7/14.
-//
-//
-
 #include "LogInMenu.h"
 #include "Game.h"
 #include "MainMenu.h"

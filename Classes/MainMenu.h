@@ -1,11 +1,3 @@
-//
-//  MainMenu.h
-//  Snag
-//
-//  Created by Zachary Prinzbach on 7/1/14.
-//
-//
-
 #ifndef __Snag__MainMenu__
 #define __Snag__MainMenu__
 

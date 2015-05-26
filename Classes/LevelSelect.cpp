@@ -1,11 +1,3 @@
-//
-//  LevelSelect.cpp
-//  Snag
-//
-//  Created by Zachary Prinzbach on 7/3/14.
-//
-//
-
 #include "LevelSelect.h"
 #include "Game.h"
 #include "LevelEditor.h"

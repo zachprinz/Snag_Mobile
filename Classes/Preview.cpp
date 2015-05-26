@@ -1,11 +1,3 @@
-//
-//  Preview.cpp
-//  Snag
-//
-//  Created by Zachary Prinzbach on 8/13/14.
-//
-//
-
 #include "Preview.h"
 #include "MainMenu.h"
 #include "cocos2d.h"
@@ -54,7 +46,7 @@ void Preview::Update(){
     }
 }
 void Preview::UpdateSprite(int ID){
-    float baseScales[6] = {1,1,1.5,1,1,0.5};
+    float baseScales[6] = {0.5,0.5,0.75,0.5,0.5,0.25};
     sprites[ID]->setPosition(MapToScreen(entities[ID]->GetPosition()));
     if(entities[ID]->GetType() != SPAWNER && entities[ID]->GetType() != HOOK)
         sprites[ID]->setScale((entities[ID]->GetSize().x * mapViewScale)/entities[ID]->GetOriginalSize().x, (entities[ID]->GetSize().y * mapViewScale) / entities[ID]->GetOriginalSize().y);

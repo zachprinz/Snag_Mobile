@@ -1,26 +1,25 @@
-//
-//  User.cpp
-//  Snag
-//
-//  Created by Zachary Prinzbach on 6/28/14.
-//
-//
-
 #include "User.h"
 #include "Game.h"
 #include "MainMenu.h"
 #include "Level.h"
+#include "PlayScreen.h"
 #include <math.h>
+#include "Utils.h"
 
-int User::type;
-
-User::User() : Entity(Vec2(150,150), Vec2(0,0), Vec2(0,0), 5){
-    SetUpPhysicsSprite("user.png", Vec2(1.0,1.0));
-    SetUpParticles();
-    emitter->setPositionType(ParticleSystem::PositionType::GROUPED);
-    emitter->setPosition(Vec2(0,0));
-    isHooked = false;
+User::User() : Entity(Vec2(150,150), Vec2(0,0), Vec2(0,0), "user.png", true){
+    setUpPhysicsSprite(true);
+    
+    sprite->setGlobalZOrder(2);
+    sprite->setPosition(getPosition().x,getPosition().y);
+    sprite->setAnchorPoint(Vec2(0.5,0.5));
+    
+    hooked = false;
+    
     line = Sprite::create("game_line.png");
+    line->retain();
+    line->setAnchorPoint(Vec2(0.0,0.5));
+    line->setVisible(false);
+    
     focusPointSprite = Sprite::create("user.png");
     focusPointSprite->retain();
     focusPointSprite->setScale(0.4,0.4);
@@ -30,105 +29,109 @@ User::User() : Entity(Vec2(150,150), Vec2(0,0), Vec2(0,0), 5){
     targetFocusPointSprite->setScale(0.4,0.4);
     targetFocusPointSprite->setAnchorPoint(Vec2(0.5,0.5));
     targetFocusPointSprite->setColor(Color3B(0,0,0));
-    line->retain();
-    line->setAnchorPoint(Vec2(0.0,0.5));
-    line->setVisible(false);
-    sprite->setGlobalZOrder(2);
-    body->setRotationEnable(false);
+    
+    setTag(USER);
+    
     tailCount = 5;
     for(int x = 0; x < tailCount; x++){
         pastSprites.push_back(Sprite::create("user.png"));
-        pastSprites[x]->setPosition(position.x,position.y);
+        pastSprites[x]->setPosition(getPosition().x,getPosition().y);
         pastSprites[x]->retain();
         pastSprites[x]->setAnchorPoint(Vec2(0.5,0.5));
         pastSprites[x]->setVisible(true);
         pastSprites[x]->setOpacity(240);
+        pastSprites[x]->setTag(getTag());
     }
-    auto physMat = PhysicsMaterial(2,1,0);
-    PhysicsBody* previousBody = nullptr;
-    spriteUpdateCount = 0;
+    
+    line = Sprite::create("game_line.png");
+    line->retain();
+    line->setAnchorPoint(Vec2(0.0,0.5));
+    line->setVisible(false);
+    line->setPosition(getPosition().x,getPosition().y);
+    line->setTag(LINE);
+    
 }
-void User::SetUpPhysicsSprite(std::string texture, Vec2 scale){
-    auto physMat = PhysicsMaterial(2,1,0);
-    float tempSpriteSize = sprite->getBoundingBox().size.width;
-    body = PhysicsBody::createCircle(tempSpriteSize / (2.0),physMat);
+
+void User::setUpPhysicsSprite(bool collision){
+    body = PhysicsBody::createCircle(sprite->getBoundingBox().size.width / (2.0), PhysicsMaterial(2,1,0));
     body->setMass(10.0f);
     body->setDynamic(true);
-    body->setTag(type);
-    sprite->setPhysicsBody(body);
-    sprite->setPosition(position.x,position.y);
-    sprite->setAnchorPoint(Vec2(0.5,0.5));
-    sprite->setTag(type);
     body->setVelocityLimit(500);
     body->setContactTestBitmask(true);
     body->setCategoryBitmask(true);
+    body->setRotationEnable(false);
+    sprite->setPhysicsBody(body);
 }
-void User::Add(Game* layer){
+
+void User::add(){
     sprite->setGlobalZOrder(0);
     line->setGlobalZOrder(-1);
-    layer->layers[HOOK]->addChild(line,1);
-    layer->layers[5]->addChild(sprite,1);
-    for(int x = 0; x < sprites.size(); x++){
-        layer->layers[5]->addChild(sprites[x]);
-    }
-    layer->layers[5]->addChild(focusPointSprite,1);
-    layer->layers[5]->addChild(targetFocusPointSprite,1);
-}
-void User::update(float boardScale){
-    if(position.y < -400)
-        Reset();
-    this->CalculateScale(Vec2(0,0), boardScale);
+    PlayScreen::Instance->addSprite(line);
+    PlayScreen::Instance->addSprite(sprite);
+    for(int x = 0; x < sprites.size(); x++)
+        PlayScreen::Instance->addSprite(sprites[x]);
+    line->release();
 
-    float angle;
-    float scale;
-    Vec2 vel = sprite->getPhysicsBody()->getVelocity();
-    angle = GetAngle(Vec2(0,0),vel);
-    float velMag = sqrtf(pow(vel.x,2) + pow(vel.y,2));
-    float over = 100;
-    if(velMag == 0)
-        velMag = 1;
-    scale = 1/((std::log10((velMag/31)+1)));
-    if(scale > 1.0)
-        scale = 1.0;
-    SetStretch(sprite, angle, scale);
-    focusPointSprite->setPosition(Game::Instance->focusPoint);
-    targetFocusPointSprite->setPosition(Game::Instance->targetFocusPoint);
+    //layer->layers[5]->addChild(focusPointSprite,1);
+    //layer->layers[5]->addChild(targetFocusPointSprite,1);
 }
-void User::SetStretch(Sprite* sprite, float angle, float magnitude){
+
+void User::remove(){
+    PlayScreen::Instance->removeChild(line);
+    PlayScreen::Instance->removeChild(sprite);
+    line->retain();
+    line->removeFromParent();
+}
+
+void User::setLine(float size, float angle){
+    line->setRotation(0);
+    line->setScale((size)/100,5);
+    line->setRotation(angle);
+    line->setVisible(true);
+}
+
+void User::setLineOff(){
+    line->setVisible(false);
+}
+
+void User::update(){
+    updatePosition();
+    updateSpriteStretch();
+}
+
+void User::setStretch(Sprite* sprite, float angle, float magnitude){
     sprite->setRotation(0);
-    sprite->setScaleY(magnitude);
-    sprite->setScaleX(1/magnitude);
+    sprite->setScaleY(magnitude * 0.5);
+    sprite->setScaleX(1/magnitude * 0.5);
     sprite->setRotation(angle);
 }
 
-void User::Snag(){
-    closest = Game::Instance->GetClosestHook(position);
-    closestPosition = closest->GetPosition();
-    isHooked = true;
-    joint = PhysicsJointDistance::construct(body, closest->GetSprite()->getPhysicsBody(), Vec2(0.5,0.5), Vec2(0.5,0.5));
+void User::snag(){
+    closest = PlayScreen::Instance->getGame()->getClosestHook(getPosition());
+    closestPosition = closest->getPosition();
+    hooked = true;
+    joint = PhysicsJointDistance::construct(body, closest->getPhysicsBody(), Vec2(0.5,0.5), Vec2(0.5,0.5));
     joint->setCollisionEnable(false);
-    //joint->setDistance(sprite->getPosition().getDistance(closest->GetSprite()->getPosition()));
     joint->setEnable(true);
-    Game::Instance->AddJoint(joint);
-    lineBaseScale = (joint->getDistance());//line->getBoundingBox().size.width;
+    PlayScreen::Instance->addJoint(joint);
+    lineBaseScale = (joint->getDistance());
 }
-void User::Release(bool add){
-    if(isHooked == true){
-        isHooked = false;
-        closest->SetLineOff();
-        Game::Instance->RemoveAllJoints();
+
+void User::release(bool add){
+    if(isHooked() == true){
+        hooked = false;
+        setLineOff();
+        PlayScreen::Instance->removeAllJoints();
         if(add)
             body->setVelocity(Vec2(body->getVelocity().x * 1.35, body->getVelocity().y * 1.25));
     }
 }
-void User::Reset(){
-    if(isHooked)
-        Release();
-    Game::Instance->time = 0.0;
-    Vec2 oLaunch = Game::Instance->currentLevel->GetLaunchPosition();
-    Vec2 oVel = Game::Instance->currentLevel->GetLaunchVelocity();
-    sprite->setPosition(Vec2(oLaunch.x, oLaunch.y));
-    body->setVelocity(Vec2(oVel.x, oVel.y));
+
+void User::reset(Vec2 launchPosition, Vec2 launchVelocity){
+    if(isHooked())
+        release();
+    sprite->setPosition(launchPosition);
+    body->setVelocity(launchVelocity);
     body->resetForces();
     for(int x = 0;x < sprites.size(); x++){
         Vec2 userPos;
@@ -148,68 +151,40 @@ void User::Reset(){
         }
         sprites[x]->setPosition(body->getPosition().x + (userPos.x * 60), body->getPosition().y + (userPos.y *60));
     }
-    Game::Instance->focusPoint = Vec2(oLaunch.x, oLaunch.y);
-    Game::Instance->previousTargetChange = Vec2(0,0);
-    Game::Instance->catching = false;
-    Game::Instance->closing = false;
-    Game::Instance->startClosingDistance = 0;
-    Game::Instance->startClosingMAX_SHIFT = 30;
-    Game::Instance->previousTrail = 0;
-    Game::Instance->MAX_SHIFT = 30;
 }
-void User::CalculateScale(Vec2 userPosition, float boardScale){
-    position = Vec2(sprite->getPosition().x, sprite->getPosition().y);
-    if(isHooked){
-        float distance = position.getDistance(closest->GetPosition());
 
-        closest->SetLine(distance,GetAngle(joint->getBodyA()->getPosition(), joint->getBodyB()->getPosition()));
+void User::updatePosition(){
+    if(isHooked()){
+        float distance = getPosition().getDistance(closest->getPosition());
+        setLine(distance,getAngle(joint->getBodyA()->getPosition(), joint->getBodyB()->getPosition()));
     }
+    //focusPointSprite->setPosition(Game::Instance->focusPoint);
+    //targetFocusPointSprite->setPosition(Game::Instance->targetFocusPoint);
 }
-void User::Bounce(const PhysicsContactData* bounceData){
-    if(isHooked)
-        Release(false);
-}
-void User::SetBackupVelocity(){
 
+void User::updateSpriteStretch(){
+    float angle, scale;
+    Vec2 vel = sprite->getPhysicsBody()->getVelocity();
+    angle = getAngle(Vec2(0,0),vel);
+    float velMag = sqrtf(pow(vel.x,2) + pow(vel.y,2));
+    if(velMag == 0)
+        velMag = 1;
+    scale = 1/((std::log10((velMag/31)+1)));
+    if(scale > 1.0)
+        scale = 1.0;
+    setStretch(sprite, angle, scale);
 }
-Point User::GetPhysicalPosition(){
-    return Vec2(sprite->getPosition().x, sprite->getPosition().y);
+
+void User::Bounce(const PhysicsContactData* bounceData){
+    if(isHooked())
+        release(false);
 }
-Vec2 User::GetClosestPosition(){
+
+Vec2 User::getClosestPosition(){
     if(closest != nullptr){
-        if(isHooked)
+        if(isHooked())
             return closestPosition;
-        return GetPosition();
+        return getPosition();
     }
     return Vec2(0,0);
-}
-float User::GetAngle(Vec2 a, Vec2 b){
-    float o = a.x - b.x;
-    float adj = a.y - b.y;
-    if(a.x == b.x){
-        if(a.y > b.y)
-            return 90;
-        else
-            return 270;
-    }
-    if(a.y == b.y){
-        if(a.x > b.x)
-            return 0;
-        else
-            return 180;
-    }
-    float angle = atan(o/adj) * 57.29;
-    if(adj < 0){ //Left two
-        if(adj > 0) // bottom left
-            angle = (90-angle) + 180;
-        if(adj < 0) // top left
-            angle = 90 + angle;
-    }
-    else{ // Right two
-        if(adj > 0) // bottom right
-            angle += 270;
-        if(adj < 0) // top right
-            angle = (90 - angle);
-    }
-    return angle;
 }

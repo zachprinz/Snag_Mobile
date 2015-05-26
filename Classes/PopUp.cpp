@@ -1,11 +1,3 @@
-//
-//  PopUp.cpp
-//  Snag
-//
-//  Created by Zachary Prinzbach on 8/11/14.
-//
-//
-
 #include "PopUp.h"
 
 PopUp* PopUp::Instance;

@@ -1,11 +1,3 @@
-//
-//  Highscores.h
-//  Snag
-//
-//  Created by Zachary Prinzbach on 9/12/14.
-//
-//
-
 #ifndef __Snag__Highscores__
 #define __Snag__Highscores__
 

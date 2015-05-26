@@ -1,11 +1,3 @@
-//
-//  LevelInfo.h
-//  Snag
-//
-//  Created by Zachary Prinzbach on 7/7/14.
-//
-//
-
 #ifndef __Snag__LevelInfo__
 #define __Snag__LevelInfo__
 

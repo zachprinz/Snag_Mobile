@@ -1,11 +1,3 @@
-//
-//  LevelEditor.cpp
-//  Snag
-//
-//  Created by Zachary Prinzbach on 7/1/14.
-//
-//
-
 #include "LevelEditor.h"
 #include "MainMenu.h"
 #include "Level.h"
@@ -66,7 +58,7 @@ bool LevelEditor::init(){
     this->addChild(verticalAxis,1);
     this->addChild(horizontalAxis,1);
     
-    preview = new Preview(Rect(0,0,visibleSize.width,visibleSize.height), this, 0.33);
+    preview = new Preview(Rect(0,0,visibleSize.width,visibleSize.height), this, 0.75);
     preview->editor = true;
     currentSprite = new Scale9Sprite();
     currentSprite->initWithFile("Sliced.png", Rect(0, 0, 60, 60));
