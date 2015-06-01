@@ -93,6 +93,25 @@ Entity* Entity::createSpawner(Vec2 pos, Vec2 vel){
     ent->setEmitter(emitter);
     return ent;
 }
+Entity* Entity::createEntity(int type, Vec2 pos, Vec2 size, Vec2 vel){
+    switch(type){
+        case WALL:
+            return createWall(pos, size);
+            break;
+        case SPIKE_WALL:
+            return createSpikeWall(pos, size);
+            break;
+        case SPAWNER:
+            return createSpawner(pos, vel);
+            break;
+        case GOAL:
+            return createGoal(pos, size);
+            break;
+        case HOOK:
+            return createHook(pos);
+            break;
+    }
+}
 
 int Entity::count = 0;
 
@@ -204,6 +223,11 @@ void Entity::setTag(int type){
     sprite->setTag(tag);
 }
 int Entity::getTag(){ return tag; }
+float Entity::getSum(){
+    return  (1 *(getPosition().x + getPosition().y)) +
+            (1000 * (size.x + size.y)) +
+            (1000000 * launchVelocity.x + launchVelocity.y);
+}
 PhysicsBody* Entity::getPhysicsBody(){
     return body;
 }

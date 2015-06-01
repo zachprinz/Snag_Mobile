@@ -50,7 +50,7 @@ public:
     void setGravity(Vec2);
     void setSpeed(float);
     
-    void raycast(PhysicsRayCastCallbackFunc, const Point, const Point, void*)
+    void raycast(PhysicsRayCastCallbackFunc, const Point, const Point, void*);
 
 private:
     void updateLayerPositions();

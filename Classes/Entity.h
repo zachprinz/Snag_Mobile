@@ -34,11 +34,13 @@ class Entity{
         static Entity* createGoal(Vec2, Vec2);
         static Entity* createHook(Vec2);
         static Entity* createSpawner(Vec2, Vec2);
+        static Entity* createEntity(int type, Vec2, Vec2, Vec2);
         static int count;
     
         virtual void add();
         virtual void remove();
-        
+    
+        float getSum();
         Vec2  getSize();
         void  setSize(Vec2);
         Point getPosition();
